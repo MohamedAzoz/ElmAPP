@@ -1,0 +1,221 @@
+<p-confirmDialog></p-confirmDialog>
+
+<div class="p-6 bg-slate-50 min-h-screen" [dir]="dir.currentDir()">
+  <div class="max-w-7xl mx-auto">
+    <div
+      class="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-6 gap-4"
+    >
+      <div>
+        <h1 class="text-2xl font-bold text-slate-800 m-0 text-auto">إدارة القادة (Leaders)</h1>
+        <p class="text-slate-500 mt-1">عرض وتعديل صلاحيات قادة المجموعات في الكليات</p>
+      </div>
+      <p-button
+        label="إضافة قائد جديد"
+        icon="pi pi-plus"
+        (onClick)="openAddLeader()"
+        styleClass="p-button-raised p-button-primary rounded-xl px-6"
+      ></p-button>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-y">
+      <p-table
+        [value]="authService.leaders()"
+        [loading]="authService.isLoading()"
+        [lazy]="true"
+        (onLazyLoad)="loadLeaders($event)"
+        [paginator]="true"
+        [rows]="rows()"
+        [totalRecords]="authService.totalCountLeader()"
+        [rowsPerPageOptions]="[5, 10, 20, 50]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="عرض {first} إلى {last} من إجمالي {totalRecords} قائد"
+        styleClass="p-datatable-striped"
+        [tableStyle]="{ 'min-width': '60rem' }"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="text-right bg-slate-50 p-4">اسم المستخدم</th>
+            <th class="text-right bg-slate-50 p-4">الاسم الكامل</th>
+            <th class="text-right bg-slate-50 p-4">المستوى</th>
+            <th class="text-right bg-slate-50 p-4">القسم</th>
+            <th class="text-center bg-slate-50 p-4">صلاحيات المستخدم</th>
+            <th class="text-center bg-slate-50 p-4">الحالة</th>
+            <th class="text-center bg-slate-50 p-4">الإجراءات</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-leader>
+          <tr class="border-b border-slate-100 last:border-0">
+            <td class="p-4 font-medium text-blue-600">{{ leader.userName }}</td>
+            <td class="p-4 font-semibold text-slate-700">{{ leader.fullName }}</td>
+            <td class="p-4">
+              <span class="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm">
+                {{ leader.yearName }}
+              </span>
+            </td>
+            <td class="p-4 text-slate-600">{{ leader.departmentName }}</td>
+
+            <td class="p-4 text-center">
+              <button
+                pButton
+                label="صلاحيات المستخدم"
+                icon="pi pi-users"
+                class="p-button-outlined p-button-secondary p-button-sm rounded-lg"
+                [routerLink]="['/main/admin/management/user-permissions']"
+                [queryParams]="{userId: leader.userId ,userName: leader.userName }"
+              ></button>
+            </td>
+            <td class="p-4 text-center">
+              <p-tag
+                [severity]="leader.isActived ? 'success' : 'danger'"
+                [value]="leader.isActived ? 'نشط' : 'غير نشط'"
+                styleClass="px-3 rounded-lg"
+              ></p-tag>
+            </td>
+            <td class="p-4 text-center">
+              <div class="flex justify-center gap-2">
+                <button
+                  pButton
+                  [icon]="leader.isActived ? 'pi pi-lock' : 'pi pi-lock-open'"
+                  [class]="
+                    leader.isActived
+                      ? 'p-button-rounded p-button-warning p-button-text'
+                      : 'p-button-rounded p-button-success p-button-text'
+                  "
+                  (click)="toggleLeaderStatus(leader)"
+                  [pTooltip]="leader.isActived ? 'تعطيل الحساب' : 'تفعيل الحساب'"
+                ></button>
+
+                <button
+                  pButton
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-danger p-button-text"
+                  (click)="deleteLeader(leader.userId)"
+                  pTooltip="حذف نهائي"
+                ></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6" class="text-center p-8 text-slate-400">
+              <i class="pi pi-users text-4xl mb-3"></i>
+              <p>لا يوجد قادة مسجلين في النظام حالياً</p>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<p-dialog
+  [(visible)]="displayDialog"
+  [modal]="true"
+  [style]="{ width: '500px' }"
+  styleClass="rounded-2xl shadow-xl"
+  [draggable]="false"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-2">
+      <i class="pi pi-user-plus text-2xl text-blue-600"></i>
+      <span class="text-xl font-bold">إضافة قائد جديد</span>
+    </div>
+  </ng-template>
+
+  <div class="flex flex-col gap-4 pt-4">
+    <div class="flex flex-col gap-2">
+      <label class="font-semibold text-slate-700">اسم المستخدم</label>
+      <input
+        pInputText
+        [(ngModel)]="registerLeaderForm.userName"
+        placeholder="أدخل اسم المستخدم"
+        class="w-full p-3 rounded-xl border-slate-200"
+      />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label class="font-semibold text-slate-700">الاسم الكامل</label>
+      <input
+        pInputText
+        [(ngModel)]="registerLeaderForm.fullName"
+        placeholder="أدخل الاسم الكامل"
+        class="w-full p-3 rounded-xl border-slate-200"
+      />
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div class="flex flex-col gap-2">
+        <label class="font-semibold text-slate-700">كلمة المرور</label>
+        <p-password
+          [(ngModel)]="registerLeaderForm.password"
+          [toggleMask]="true"
+          [feedback]="false"
+          styleClass="w-full"
+          inputStyleClass="w-full p-3 rounded-xl"
+        ></p-password>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label class="font-semibold text-slate-700">تأكيد كلمة المرور</label>
+        <p-password
+          [(ngModel)]="registerLeaderForm.confirmPassword"
+          [toggleMask]="true"
+          [feedback]="false"
+          styleClass="w-full"
+          inputStyleClass="w-full p-3 rounded-xl"
+        ></p-password>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div class="flex flex-col gap-2">
+        <label class="font-semibold text-slate-700">المستوى الدراسي</label>
+        <p-select
+          [options]="yearService.years()"
+          [(ngModel)]="registerLeaderForm.yearId"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="اختر المستوى"
+          [showClear]="true"
+          styleClass="w-full p-3 rounded-xl"
+        ></p-select>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label class="font-semibold text-slate-700">القسم</label>
+        <p-select
+          [options]="departmentService.departments()"
+          [(ngModel)]="registerLeaderForm.departmentId"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="اختر القسم"
+          [showClear]="true"
+          styleClass="w-full p-3 rounded-xl"
+        ></p-select>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-3">
+      <p-button
+        label="إلغاء"
+        icon="pi pi-times"
+        [text]="true"
+        severity="secondary"
+        (onClick)="displayDialog.set(false)"
+      ></p-button>
+      <p-button
+        label="حفظ البيانات"
+        icon="pi pi-check"
+        (onClick)="saveLeader()"
+        [loading]="authService.isLoading()"
+        styleClass="p-button-primary rounded-xl"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+

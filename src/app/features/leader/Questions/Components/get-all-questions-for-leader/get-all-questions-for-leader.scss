@@ -1,0 +1,27 @@
+:host ::ng-deep {
+  .p-datatable-lg {
+    .p-datatable-thead > tr > th {
+      background: #fdfdfd;
+      padding: 1.5rem 1rem;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .p-datatable-tbody > tr > td {
+      padding: 1.2rem 1rem;
+    }
+  }
+
+  .p-dialog {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    .p-dialog-header { border: none; padding-top: 2rem; }
+    .p-inputtext { border-radius: 10px; }
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

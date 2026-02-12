@@ -1,0 +1,94 @@
+<div class="min-h-screen bg-[#f8fafc] p-4 md:p-8">
+  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <div class="lg:col-span-3 order-1 lg:order-2">
+      <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 sticky top-8">
+
+        <div class="bg-blue-50 rounded-2xl p-4 text-center mb-6 border border-blue-100">
+          <span class="text-sm text-blue-600 font-bold block mb-1">الوقت المتبقي</span>
+          <span class="text-3xl font-mono font-black text-blue-900 tracking-tighter">
+            {{ quizState.timerTest() }}
+          </span>
+        </div>
+
+        <div class="grid grid-cols-4 gap-3 mb-8">
+          @for (q of data()?.questions; track q.id; let i = $index) {
+            <button
+              (click)="jumpTo(q.id!)"
+              [class]="
+                currentQuesId() === q.id
+                  ? 'bg-indigo-600 text-white border-indigo-600 ring-2 ring-indigo-100'
+                  : isAnswered(q.id!)
+                    ? 'bg-green-100 text-green-700 border-green-200'
+                    : 'bg-gray-50 text-gray-400 border-gray-200'
+              "
+              class="w-full aspect-square rounded-xl font-bold transition-all border flex items-center justify-center relative hover:shadow-md"
+            >
+              {{ i + 1 }}
+              @if (isMarked(q.id!)) {
+                <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
+                </span>
+              }
+            </button>
+          }
+        </div>
+
+        <button
+          pButton
+          label="إنهاء الاختبار"
+          class="w-full p-button-danger rounded-xl py-3 shadow-lg shadow-red-100"
+          tooltipPosition="top"
+          (click)="finishTest()"
+          ></button>
+      </div>
+    </div>
+
+    <div class="lg:col-span-9 order-2 lg:order-1">
+      @if (currentQuestion(); as q) {
+        <div class="animate-fadein">
+          <app-question-carde
+            [question]="q"
+            [savedAnswerId]="quizState.getAnswer(q.id!)"
+            (answerSelect)="quizState.saveAnswer(q.id!, $event)"
+          />
+        </div>
+
+        <div class="flex justify-between mt-6 px-2 items-center bg-white p-4 rounded-2xl shadow-sm">
+          <button
+            pButton
+            icon="pi pi-chevron-right"
+            label="السابق"
+            class="p-button-text text-gray-500 font-bold"
+            (click)="jumpToPrev()"
+            [disabled]="getCurrentIndex() <= 0"
+          ></button>
+
+          <button
+            pButton
+            [icon]="isMarked(q.id!) ? 'pi pi-bookmark-fill' : 'pi pi-bookmark'"
+            [label]="isMarked(q.id!) ? 'تم التمييز' : 'تميز للمراجعة'"
+            class="p-button-rounded p-button-warning p-button-text text-sm"
+            (click)="toggleBookmark(q.id!)"
+          ></button>
+
+          <button
+            pButton
+            icon="pi pi-chevron-left"
+            iconPos="right"
+            label="التالي"
+            class="p-button-text text-indigo-600 font-bold"
+            (click)="jumpToNext()"
+            [disabled]="getCurrentIndex() >= (data()?.questions?.length || 0) - 1"
+          ></button>
+        </div>
+      } @else {
+        <div class="bg-white rounded-3xl p-20 text-center shadow-sm">
+          <i class="pi pi-spin pi-spinner text-4xl text-indigo-500"></i>
+          <p class="mt-4 text-gray-500">جاري تحميل السؤال...</p>
+        </div>
+      }
+    </div>
+  </div>
+</div>

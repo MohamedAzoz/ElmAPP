@@ -1,0 +1,62 @@
+<!-- <section class="max-w-7xl mx-auto px-6 py-10">
+  @if (university()) {
+    @let uniData = university()!;
+    <div class="mb-10 text-center">
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+        {{ uniData.name }}
+      </h1>
+      <p class="text-gray-600">استكشف الكليات المتاحة داخل جامعة {{ uniData.name }}</p>
+    </div>
+
+    @if (isLoadingColleges()) {
+      <div class="flex justify-center py-20">
+        <div
+          class="animate-spin h-10 w-10 border-4 border-indigo-600 border-t-transparent rounded-full"
+        ></div>
+      </div>
+    } @else {
+      @if (collegeFacade.colleges().length > 0) {
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          @for (college of collegeFacade.colleges(); track $index) {
+            @defer (on viewport; prefetch on idle) {
+              <app-college-carde [college]="college" />
+            } @placeholder {
+              <p-skeleton width="25rem" height="250px"></p-skeleton>
+            }
+          }
+        </div>
+      } @else {
+        <div class="text-center py-20 text-gray-500">لا توجد كليات متاحة حاليًا</div>
+      }
+    }
+  } @else {
+    <div class="flex justify-center items-center h-64">
+      <div class="text-gray-500 animate-pulse">جارٍ تحميل بيانات الجامعة...</div>
+    </div>
+  }
+</section> -->
+
+<section class="max-w-7xl mx-auto px-6 py-10">
+  @if (university()) {
+    @let uniData = university()!;
+    <div class="mb-10 text-center">
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">{{ uniData.name }}</h1>
+      <p class="text-gray-600">استكشف الكليات المتاحة داخل جامعة {{ uniData.name }}</p>
+    </div>
+    @if (collegeFacade.colleges().length > 0) {
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (college of collegeFacade.colleges(); track $index) {
+          @defer (on viewport; prefetch on idle) {
+            <app-college-carde [college]="college" />
+          } @placeholder {
+            <div style="height: 300px">
+              <p-skeleton width="100%" height="100%" borderRadius="16px"></p-skeleton>
+            </div>
+          }
+        }
+      </div>
+    } @else {
+      <div class="text-center py-20 text-gray-500">لا توجد كليات متاحة حاليًا</div>
+    }
+  }
+</section>

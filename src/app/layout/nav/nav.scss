@@ -1,0 +1,19 @@
+:host {
+  display: block;
+}
+
+// تخصيص للـ Sidebar header في PrimeNG
+// :host ::ng-deep .p-sidebar-header {
+//   justify-content: space-between;
+//   flex-direction: row-reverse; // لأننا RTL
+// }
+
+.toggle-button {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .toggle-button {
+    display: block;
+  }
+}

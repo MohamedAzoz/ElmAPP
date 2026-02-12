@@ -1,0 +1,31 @@
+:host ::ng-deep {
+  .p-datatable {
+    .p-datatable-thead > tr > th {
+      background: #f8fafc;
+      border: none;
+      color: #64748b;
+    }
+    .p-datatable-tbody > tr {
+      background: transparent;
+      td { border-color: #f1f5f9; }
+    }
+  }
+
+  .p-dialog {
+    .p-dialog-header {
+      background: #f8fafc;
+      padding: 1.5rem;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .p-button { border-radius: 12px; }
+  }
+
+  .p-inputtext {
+    transition: all 0.2s;
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    }
+  }
+}
+
+.rtl { direction: rtl; }

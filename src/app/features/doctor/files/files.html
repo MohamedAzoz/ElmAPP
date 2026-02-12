@@ -1,0 +1,27 @@
+<div class="min-h-screen bg-[#f8fafc] p-6 md:p-12">
+  <div class="max-w-7xl mx-auto">
+    <div class="mb-8">
+      <h2 class="text-2xl font-black text-slate-800">الملخصات والمواد العلمية</h2>
+      <p class="text-slate-500">يمكنك مراجعة ملفات الطلاب وتقييم جودتها من هنا.</p>
+    </div>
+
+    @if (isFileLoading()) {
+      <div class="flex justify-center py-20">
+        <p-progressSpinner></p-progressSpinner>
+      </div>
+    } @else {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (f of files(); track $index) {
+          <app-file-carde [file]="f" />
+        } @empty {
+          <div
+            class="col-span-full text-center py-20 bg-white rounded-3xl shadow-sm border border-dashed"
+          >
+            <i class="pi pi-cloud-upload text-5xl text-slate-300 mb-4"></i>
+            <p class="text-slate-500 font-medium">لا توجد ملفات مرفوعة لهذه المادة حالياً.</p>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

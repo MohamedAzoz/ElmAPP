@@ -1,0 +1,23 @@
+<footer
+  [dir]="dirService.currentDir()"
+  class="mt-auto w-full bg-black dark:bg-gray-950 text-gray-200 dark:text-gray-300 border-t border-gray-800 transition-colors duration-300"
+>
+  <div class="max-w-7xl mx-auto px-4 py-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div>
+        <h2 class="text-2xl font-black mb-4">
+          <span class="text-indigo-500">منصة المعرفة الجامعية</span>
+        </h2>
+        <p class="text-sm leading-relaxed max-w-md text-gray-400">
+          منصة تعليمية ذكية لتوفير ملخصات، بنوك أسئلة، واختبارات عشوائية لدعم طلاب الجامعة وتحسين
+          مستواهم الأكاديمي.
+        </p>
+      </div>
+      
+      </div>
+
+    <div class="border-t border-gray-800 mt-10 pt-6 text-center text-sm text-gray-500 font-medium">
+      © {{ date | date: 'yyyy' }} منصة المعرفة الجامعية — جميع الحقوق محفوظة
+    </div>
+  </div>
+</footer>

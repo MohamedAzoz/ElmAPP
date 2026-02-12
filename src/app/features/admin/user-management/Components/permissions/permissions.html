@@ -1,0 +1,108 @@
+<p-confirmDialog></p-confirmDialog>
+
+<div class="p-6 bg-slate-50 min-h-screen rtl" [dir]="dir.currentDir()">
+  <div class="max-w-7xl mx-auto">
+    <div
+      class="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-6 gap-4"
+    >
+      <div>
+        <h1 class="text-2xl font-bold text-slate-800 m-0 text-auto">
+          إدارة الصلاحيات (Permissions)
+        </h1>
+        <p class="text-slate-500 mt-1 text-auto">إضافة وتعديل مسميات الصلاحيات في النظام</p>
+      </div>
+      <p-button
+        label="إضافة صلاحية جديدة"
+        icon="pi pi-shield"
+        (onClick)="openAddDialog()"
+        styleClass="p-button-raised p-button-success rounded-xl px-6"
+      ></p-button>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <p-table
+        [value]="facade.permissions()"
+        [loading]="facade.isLoading()"
+        [showGridlines]="true" 
+        [stripedRows]="true"
+        [resizableColumns]="true"
+        [reorderableColumns]="true"
+        [rowHover]="true"
+        styleClass="p-datatable-gridlines p-datatable-striped"
+        [rowHover]="true"
+      >
+        <ng-template pTemplate="header">
+          <tr class="bg-slate-50">
+            <th class="text-right p-4 w-16">ID</th>
+            <th class="text-right p-4">اسم الصلاحية</th>
+            <th class="text-center p-4">الإجراءات</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-perm>
+          <tr>
+            <td class="p-4 text-slate-400 font-mono">#{{ perm.id }}</td>
+            <td class="p-4 font-bold text-slate-700">{{ perm.name }}</td>
+            <td class="p-4 text-center">
+              <div class="flex justify-center gap-2">
+                <button
+                  pButton
+                  icon="pi pi-pencil"
+                  class="p-button-rounded p-button-warning p-button-text"
+                  (click)="openEditDialog(perm)"
+                  pTooltip="تعديل المسمى"
+                ></button>
+                <button
+                  pButton
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-danger p-button-text"
+                  (click)="deletePermission(perm.id)"
+                  pTooltip="حذف"
+                ></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<p-dialog
+  [(visible)]="displayDialog"
+  [header]="isEditMode() ? 'تعديل الصلاحية' : 'إضافة صلاحية جديدة'"
+  [modal]="true"
+  [style]="{ width: '450px' }"
+  styleClass="rounded-2xl"
+  [draggable]="false"
+>
+  <div class="flex flex-col gap-4 pt-4">
+    <div class="flex flex-col gap-2">
+      <label class="font-bold text-slate-700">اسم الصلاحية</label>
+      <input
+        pInputText
+        [(ngModel)]="permissionForm.name"
+        placeholder="مثلاً: AddUsers"
+        class="w-full p-3 rounded-xl border-slate-200"
+      />
+      <small class="text-slate-400">يفضل استخدام كلمات تعبر عن الأكشن (Add, Delete, View)</small>
+    </div>
+
+    <div class="flex justify-end gap-3 mt-6">
+      <p-button
+        label="إلغاء"
+        icon="pi pi-times"
+        [text]="true"
+        severity="secondary"
+        (onClick)="displayDialog.set(false)"
+      ></p-button>
+      <p-button
+        [label]="isEditMode() ? 'تحديث' : 'حفظ'"
+        [icon]="isEditMode() ? 'pi pi-save' : 'pi pi-check'"
+        (onClick)="savePermission()"
+        [disabled]="!permissionForm.name"
+        styleClass="rounded-xl px-6"
+      ></p-button>
+    </div>
+  </div>
+</p-dialog>

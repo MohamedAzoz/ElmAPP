@@ -1,0 +1,42 @@
+<div class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+  <div class="w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden animate-fadein">
+
+    <div class="h-32 bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center">
+      <div class="bg-white/20 p-4 rounded-full backdrop-blur-md">
+        <i class="pi pi-trophy text-white text-5xl"></i>
+      </div>
+    </div>
+
+    <div class="p-8 text-center">
+      <h1 class="text-3xl font-black text-gray-800 mb-2">انتهى الاختبار!</h1>
+      <p class="text-gray-500 mb-8">إليك تفاصيل أدائك في هذا الاختبار</p>
+
+      <div class="relative w-48 h-48 mx-auto mb-8">
+        <svg class="w-full h-full" viewBox="0 0 36 36">
+          <path class="text-gray-100" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+          <path class="text-indigo-600" [attr.stroke-dasharray]="scoreData.score + ', 100'" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+        </svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center">
+          <span class="text-4xl font-bold text-gray-800">{{ scoreData.score | number:'1.0-0' }}%</span>
+          <span class="text-sm text-gray-400 font-medium">الدرجة النهائية</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 mb-8">
+        <div class="bg-green-50 p-4 rounded-2xl">
+          <span class="block text-green-600 font-bold text-xl">{{ scoreData.correct }}</span>
+          <span class="text-xs text-green-700 font-medium">إجابة صحيحة</span>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-2xl">
+          <span class="block text-gray-600 font-bold text-xl">{{ scoreData.total }}</span>
+          <span class="text-xs text-gray-500 font-medium">إجمالي الأسئلة</span>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <button pButton (click)="goBack()" label="العودة الى الموارد" icon="pi pi-replay" class="p-button-primary p-button-lg rounded-xl w-full"></button>
+        <button pButton (click)="goHome()" label="الرئيسية" variant="text" class="p-button-secondary"></button>
+      </div>
+    </div>
+  </div>
+</div>

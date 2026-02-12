@@ -1,0 +1,59 @@
+<p-toast></p-toast>
+
+<div class="flex justify-center items-center min-h-[80vh] p-4 bg-slate-50">
+  <p-card styleClass="w-full max-w-lg shadow-xl border-0 rounded-3xl overflow-hidden">
+    <ng-template #header>
+      <div class="bg-indigo-600 p-8 text-center">
+        <i class="pi pi-star-fill text-yellow-400 text-5xl mb-4"></i>
+        <h2 class="text-white text-2xl font-bold m-0">تقييم المحتوى العلمي</h2>
+        <p class="text-indigo-100 mt-2">رأيك يساعد الطلاب على تحسين جودة ملخصاتهم</p>
+      </div>
+    </ng-template>
+
+    <form [formGroup]="rateForm" (ngSubmit)="submitRating()" class="flex flex-col gap-6 p-2">
+      <div class="text-center py-4 bg-slate-50 rounded-2xl border border-gray-100">
+        <label class="block text-gray-700 font-bold mb-3">ما هو تقييمك العام للملف؟</label>
+        <p-rating
+          formControlName="rating"
+          [stars]="5"
+          iconOnClass="pi pi-star-fill text-4xl text-yellow-500"
+          iconOffClass="pi pi-star text-4xl text-gray-300"
+        ></p-rating>
+        @if (rateForm.get('rating')?.touched && rateForm.get('rating')?.invalid) {
+          <small class="text-red-500 block mt-2">يرجى اختيار عدد النجوم</small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="comment" class="text-gray-700 font-bold">ملاحظاتك الإضافية (اختياري)</label>
+        <textarea
+          id="comment"
+          pInputTextarea
+          formControlName="comment"
+          rows="5"
+          class="w-full p-4 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500"
+          placeholder="اكتب ملاحظاتك هنا لمساعدة الطالب..."
+        ></textarea>
+      </div>
+
+      <div class="flex gap-3 mt-4">
+        <p-button
+          label="إلغاء"
+          icon="pi pi-times"
+          styleClass="w-full p-button-text text-gray-500"
+          (onClick)="router.navigate(['../../'], { relativeTo: route })"
+          [disabled]="isSubmitting"
+        ></p-button>
+
+        <p-button
+          label="حفظ التقييم"
+          icon="pi pi-check"
+          type="submit"
+          styleClass="w-full shadow-lg bg-indigo-600 border-0 py-3"
+          [loading]="isSubmitting"
+          [disabled]="rateForm.invalid"
+        ></p-button>
+      </div>
+    </form>
+  </p-card>
+</div>

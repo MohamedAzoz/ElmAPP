@@ -1,0 +1,67 @@
+@if (curriulum()) {
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div class="mb-4 p-4 flex items-center justify-center">
+    <a
+      [routerLink]="[`F`]"
+      class="block w-[25rem] focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-xl"
+      aria-label="الانتقال إلى الملخصات"
+    >
+      <p-card
+        class="cursor-pointer overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+      >
+        <ng-template #title>
+          <div class="text-center py-3">
+            <span
+              class="text-lg font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors"
+            >
+             ملخصات على المادة
+            </span>
+          </div>
+        </ng-template>
+      </p-card>
+    </a>
+  </div>
+  <div class="mb-4 p-4 flex items-center justify-center">
+    <a
+      [routerLink]="[`QB`]"
+      class="block w-[25rem] focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-xl"
+      aria-label="الانتقال إلى بنوك اسئلة"
+    >
+      <p-card
+        class="cursor-pointer overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+      >
+        <ng-template #title>
+          <div class="text-center py-3">
+            <span
+              class="text-lg font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors"
+            >
+             بنوك الاسئلة
+            </span>
+          </div>
+        </ng-template>
+      </p-card>
+    </a>
+  </div>
+  <div class="mb-4 p-4 flex items-center justify-center">
+    <a
+      [routerLink]="['T']"
+      class="block w-[25rem] focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-xl"
+     aria-label="الانتقال إلى الاختبارات"
+    >
+      <p-card
+        class="cursor-pointer overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+      >
+        <ng-template #title>
+          <div class="text-center py-3">
+            <span
+              class="text-lg font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors"
+            >
+             اعمل اختبار
+            </span>
+          </div>
+        </ng-template>
+      </p-card>
+    </a>
+  </div>
+</div>
+}

@@ -1,0 +1,806 @@
+<div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 md:p-6" [dir]="dir.currentDir()">
+  <!-- Confirm Dialog -->
+  <p-confirmDialog></p-confirmDialog>
+
+  <!-- Header Section -->
+  <div class="mb-6">
+    <p-card styleClass="border-0 shadow-lg rounded-2xl overflow-hidden">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <!-- Title Section -->
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+            <i class="pi pi-question-circle text-white text-2xl"></i>
+          </div>
+          <div>
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-1">
+              إدارة بنك الأسئلة
+            </h1>
+            <p class="text-gray-500 text-sm">
+              إضافة وتعديل وحذف الأسئلة والإجابات
+            </p>
+          </div>
+        </div>
+
+        <!-- Stats & Actions -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full md:w-auto">
+          <!-- Stats Badge -->
+          <div class="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-xl">
+            <i class="pi pi-database text-blue-600"></i>
+            <span class="text-blue-800 font-semibold">{{ totalQuestions() }}</span>
+            <span class="text-blue-600">سؤال</span>
+          </div>
+
+          <!-- Add Button with Menu -->
+          <p-splitButton 
+            label="إضافة سؤال" 
+            icon="pi pi-plus"
+            [model]="addMenuItems"
+            (onClick)="openAddQuestionDialog()"
+            styleClass="p-button-success shadow-md"
+            [disabled]="isLoading()">
+          </p-splitButton>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="flex flex-col items-center justify-center py-20">
+      <p-progressSpinner 
+        strokeWidth="4" 
+        styleClass="w-16 h-16"
+        animationDuration=".5s">
+      </p-progressSpinner>
+      <p class="mt-4 text-gray-500">جاري تحميل الأسئلة...</p>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading() && questions().length === 0) {
+    <p-card styleClass="border-0 shadow-lg rounded-2xl">
+      <div class="flex flex-col items-center justify-center py-16 text-center">
+        <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+          <i class="pi pi-inbox text-gray-400 text-5xl"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-700 mb-2">لا توجد أسئلة بعد</h3>
+        <p class="text-gray-500 mb-6 max-w-md">
+          ابدأ بإضافة أسئلة إلى بنك الأسئلة من خلال الضغط على زر "إضافة سؤال"
+        </p>
+        <div class="flex flex-wrap justify-center gap-3">
+          <p-button 
+            label="إضافة سؤال واحد" 
+            icon="pi pi-plus" 
+            (onClick)="openAddQuestionDialog()"
+            styleClass="p-button-primary">
+          </p-button>
+          <p-button 
+            label="رفع ملف Excel" 
+            icon="pi pi-file-excel" 
+            (onClick)="openExcelUploadDialog()"
+            styleClass="p-button-outlined p-button-success">
+          </p-button>
+        </div>
+      </div>
+    </p-card>
+  }
+
+  <!-- Questions Table -->
+  @if (!isLoading() && questions().length > 0) {
+    <p-card styleClass="border-0 shadow-lg rounded-2xl overflow-hidden">
+      <p-table 
+        [value]="questions()"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[5, 10, 25, 50]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="عرض {first} إلى {last} من {totalRecords} سؤال"
+        [globalFilterFields]="['content', 'questionType']"
+        styleClass="p-datatable-sm p-datatable-striped"
+        [rowHover]="true"
+        dataKey="id"
+        [expandedRowKeys]="expandedRows()"
+        responsiveLayout="scroll">
+
+        <!-- Header -->
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3rem">
+              <i class="pi pi-chevron-down text-gray-400"></i>
+            </th>
+            <th style="width: 4rem" class="text-center">#</th>
+            <th pSortableColumn="content" class="min-w-[300px]">
+              <div class="flex items-center gap-2">
+                <i class="pi pi-question-circle text-blue-500"></i>
+                السؤال
+                <p-sortIcon field="content"></p-sortIcon>
+              </div>
+            </th>
+            <th pSortableColumn="questionType" style="width: 150px">
+              <div class="flex items-center gap-2">
+                <i class="pi pi-tag text-green-500"></i>
+                النوع
+                <p-sortIcon field="questionType"></p-sortIcon>
+              </div>
+            </th>
+            <th style="width: 120px" class="text-center">
+              <div class="flex items-center justify-center gap-2">
+                <i class="pi pi-list text-purple-500"></i>
+                الإجابات
+              </div>
+            </th>
+            <th style="width: 180px" class="text-center">
+              <div class="flex items-center justify-center gap-2">
+                <i class="pi pi-cog text-gray-500"></i>
+                الإجراءات
+              </div>
+            </th>
+          </tr>
+        </ng-template>
+
+        <!-- Body -->
+        <ng-template pTemplate="body" let-question let-expanded="expanded" let-rowIndex="rowIndex">
+          <tr class="transition-all hover:bg-blue-50/50">
+            <!-- Expand Button -->
+            <td>
+              <button 
+                type="button" 
+                pButton 
+                pRipple 
+                [pRowToggler]="question"
+                class="p-button-text p-button-rounded p-button-plain"
+                [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-left'">
+              </button>
+            </td>
+            
+            <!-- Index -->
+            <td class="text-center">
+              <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium">
+                {{ rowIndex + 1 }}
+              </span>
+            </td>
+            
+            <!-- Content -->
+            <td>
+              <div class="max-w-md">
+                <p class="text-gray-800 font-medium line-clamp-2">
+                  {{ question.content }}
+                </p>
+              </div>
+            </td>
+            
+            <!-- Type -->
+            <td>
+              <p-tag 
+                [value]="getQuestionTypeLabel(question.questionType)"
+                [severity]="getQuestionTypeSeverity(question.questionType)"
+                [icon]="getQuestionTypeIcon(question.questionType)"
+                styleClass="text-xs">
+              </p-tag>
+            </td>
+            
+            <!-- Options Count -->
+            <td class="text-center">
+              <p-button 
+                [label]="(question.options?.length || 0).toString()"
+                icon="pi pi-eye"
+                (onClick)="openOptionsDialog(question)"
+                styleClass="p-button-text p-button-sm"
+                pTooltip="عرض الإجابات"
+                tooltipPosition="top">
+              </p-button>
+            </td>
+            
+            <!-- Actions -->
+            <td>
+              <div class="flex items-center justify-center gap-2">
+                <p-button 
+                  icon="pi pi-pencil"
+                  (onClick)="openEditQuestionDialog(question)"
+                  styleClass="p-button-rounded p-button-text p-button-info"
+                  pTooltip="تعديل السؤال"
+                  tooltipPosition="top">
+                </p-button>
+                <p-button 
+                  icon="pi pi-list"
+                  (onClick)="openOptionsDialog(question)"
+                  styleClass="p-button-rounded p-button-text p-button-success"
+                  pTooltip="إدارة الإجابات"
+                  tooltipPosition="top">
+                </p-button>
+                <p-button 
+                  icon="pi pi-trash"
+                  (onClick)="deleteQuestion(question)"
+                  styleClass="p-button-rounded p-button-text p-button-danger"
+                  pTooltip="حذف السؤال"
+                  tooltipPosition="top">
+                </p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- Expanded Row - Options Preview -->
+        <ng-template pTemplate="rowexpansion" let-question>
+          <tr>
+            <td colspan="6" class="p-0">
+              <div class="bg-gradient-to-r from-gray-50 to-blue-50 p-4 m-2 rounded-xl border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                  <h4 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    <i class="pi pi-list text-blue-500"></i>
+                    الإجابات المتاحة ({{ question.options?.length || 0 }})
+                  </h4>
+                  <p-button 
+                    label="إدارة الإجابات"
+                    icon="pi pi-cog"
+                    (onClick)="openOptionsDialog(question)"
+                    styleClass="p-button-sm p-button-outlined">
+                  </p-button>
+                </div>
+                
+                @if (question.options?.length) {
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    @for (option of question.options; track option.id; let i = $index) {
+                      <div 
+                        class="flex items-center gap-3 p-3 rounded-lg transition-all"
+                        [class]="option.isCorrect 
+                          ? 'bg-green-100 border border-green-200' 
+                          : 'bg-white border border-gray-200'">
+                        <span 
+                          class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
+                          [class]="option.isCorrect 
+                            ? 'bg-green-500 text-white' 
+                            : 'bg-gray-200 text-gray-600'">
+                          {{ ['أ', 'ب', 'ج', 'د', 'هـ', 'و'][i] || i + 1 }}
+                        </span>
+                        <span 
+                          class="flex-1 text-sm"
+                          [class]="option.isCorrect ? 'text-green-800 font-medium' : 'text-gray-700'">
+                          {{ option.content }}
+                        </span>
+                        @if (option.isCorrect) {
+                          <i class="pi pi-check-circle text-green-500 text-lg"></i>
+                        }
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div class="text-center py-4 text-gray-500">
+                    <i class="pi pi-inbox text-2xl mb-2"></i>
+                    <p>لا توجد إجابات لهذا السؤال</p>
+                  </div>
+                }
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- Empty Message -->
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6" class="text-center py-8">
+              <i class="pi pi-search text-3xl text-gray-300 mb-2"></i>
+              <p class="text-gray-500">لا توجد نتائج مطابقة للبحث</p>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  }
+
+  <!-- ========== DIALOGS ========== -->
+
+  <!-- Add/Edit Single Question Dialog -->
+  <p-dialog 
+    [header]="editingQuestion() ? 'تعديل السؤال' : 'إضافة سؤال جديد'"
+    [(visible)]="showAddQuestionDialog"
+    [modal]="true"
+    [style]="{ width: '95vw', maxWidth: '700px' }"
+    [draggable]="false"
+    [resizable]="false"
+    styleClass="rounded-2xl"
+    [closable]="!isSubmitting()">
+    
+    <form [formGroup]="questionForm" class="space-y-6">
+      <!-- Question Content -->
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-gray-700">
+          <i class="pi pi-question-circle ml-1 text-blue-500"></i>
+          نص السؤال <span class="text-red-500">*</span>
+        </label>
+        <textarea 
+          pTextarea 
+          formControlName="content"
+          rows="4"
+          class="w-full"
+          placeholder="اكتب نص السؤال هنا..."
+          [autoResize]="true">
+        </textarea>
+        @if (questionForm.get('content')?.invalid && questionForm.get('content')?.touched) {
+          <small class="text-red-500 text-xs">
+            يجب أن يحتوي السؤال على 5 أحرف على الأقل
+          </small>
+        }
+      </div>
+
+      <!-- Question Type -->
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-gray-700">
+          <i class="pi pi-tag ml-1 text-green-500"></i>
+          نوع السؤال <span class="text-red-500">*</span>
+        </label>
+        <p-select  
+          formControlName="questionType"
+          [options]="questionTypes"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="اختر نوع السؤال"
+          styleClass="w-full">
+          <ng-template pTemplate="selectedItem" let-selected>
+            @if (selected) {
+              <div class="flex items-center gap-2">
+                <i [class]="selected.icon + ' text-blue-500'"></i>
+                <span>{{ selected.label }}</span>
+              </div>
+            }
+          </ng-template>
+          <ng-template pTemplate="item" let-item>
+            <div class="flex items-center gap-2">
+              <i [class]="item.icon + ' text-blue-500'"></i>
+              <span>{{ item.label }}</span>
+            </div>
+          </ng-template>
+        </p-select>
+      </div>
+
+      <!-- Options Section (Only for new questions or MCQ) -->
+      @if (!editingQuestion() && questionForm.get('questionType')?.value === 'MCQ') {
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <label class="block text-sm font-medium text-gray-700">
+              <i class="pi pi-list ml-1 text-purple-500"></i>
+              الإجابات <span class="text-red-500">*</span>
+            </label>
+            <p-button 
+              label="إضافة إجابة"
+              icon="pi pi-plus"
+              (onClick)="addOption()"
+              styleClass="p-button-sm p-button-outlined p-button-success"
+              [disabled]="optionsArray.length >= 6">
+            </p-button>
+          </div>
+
+          <div class="space-y-3" formArrayName="options">
+            @for (option of optionsArray.controls; track $index; let i = $index) {
+              <div 
+                [formGroupName]="i"
+                class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 transition-all hover:border-blue-300">
+                <!-- Option Letter -->
+                <span class="w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-sm">
+                  {{ ['أ', 'ب', 'ج', 'د', 'هـ', 'و'][i] }}
+                </span>
+                
+                <!-- Option Input -->
+                <div class="flex-1">
+                  <input 
+                    pInputText
+                    [formControlName]="'content'"
+                    class="w-full"
+                    [placeholder]="'الإجابة ' + (i + 1)">
+                </div>
+                
+                <!-- Is Correct Checkbox -->
+                <div class="flex items-center gap-2">
+                  <p-checkbox 
+                    [formControlName]="'isCorrect'"
+                    [binary]="true"
+                    inputId="correct-{{i}}">
+                  </p-checkbox>
+                  <label 
+                    for="correct-{{i}}" 
+                    class="text-xs text-gray-600 cursor-pointer whitespace-nowrap">
+                    صحيحة
+                  </label>
+                </div>
+                
+                <!-- Remove Button -->
+                <p-button 
+                  icon="pi pi-times"
+                  (onClick)="removeOption(i)"
+                  styleClass="p-button-rounded p-button-text p-button-danger p-button-sm"
+                  [disabled]="optionsArray.length <= 2">
+                </p-button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </form>
+
+    <ng-template pTemplate="footer">
+      <div class="flex justify-end gap-3">
+        <p-button 
+          label="إلغاء"
+          icon="pi pi-times"
+          (onClick)="showAddQuestionDialog.set(false)"
+          styleClass="p-button-text"
+          [disabled]="isSubmitting()">
+        </p-button>
+        <p-button 
+          [label]="editingQuestion() ? 'تحديث' : 'إضافة'"
+          [icon]="isSubmitting() ? 'pi pi-spinner pi-spin' : 'pi pi-check'"
+          (onClick)="saveQuestion()"
+          styleClass="p-button-success"
+          [disabled]="isSubmitting()">
+        </p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Bulk Add Questions Dialog -->
+  <p-dialog 
+    header="إضافة مجموعة أسئلة"
+    [(visible)]="showBulkAddDialog"
+    [modal]="true"
+    [style]="{ width: '95vw', maxWidth: '900px' }"
+    [maximizable]="true"
+    [draggable]="false"
+    styleClass="rounded-2xl"
+    [closable]="!isSubmitting()">
+    
+    <form [formGroup]="bulkQuestionsForm">
+      <div class="space-y-6" formArrayName="questions">
+        @for (question of bulkQuestionsArray.controls; track $index; let qi = $index) {
+          <p-card 
+            [formGroupName]="qi"
+            styleClass="border border-gray-200 rounded-xl shadow-sm">
+            <ng-template pTemplate="header">
+              <div class="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-xl">
+                <span class="font-semibold text-gray-700">
+                  <i class="pi pi-question-circle ml-2 text-blue-500"></i>
+                  السؤال {{ qi + 1 }}
+                </span>
+                <p-button 
+                  icon="pi pi-trash"
+                  (onClick)="removeBulkQuestion(qi)"
+                  styleClass="p-button-rounded p-button-text p-button-danger p-button-sm"
+                  [disabled]="bulkQuestionsArray.length <= 1"
+                  pTooltip="حذف السؤال">
+                </p-button>
+              </div>
+            </ng-template>
+
+            <div class="space-y-4">
+              <!-- Content -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">نص السؤال</label>
+                  <textarea 
+                    pInputTextarea
+                    formControlName="content"
+                    rows="2"
+                    class="w-full"
+                    placeholder="اكتب نص السؤال..."
+                    [autoResize]="true">
+                  </textarea>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">نوع السؤال</label>
+                  <p-select 
+                    formControlName="questionType"
+                    [options]="questionTypes"
+                    optionLabel="label"
+                    optionValue="value"
+                    styleClass="w-full">
+                  </p-select>
+                </div>
+              </div>
+
+              <!-- Options -->
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <label class="text-sm font-medium text-gray-700">الإجابات</label>
+                  <p-button 
+                    icon="pi pi-plus"
+                    label="إضافة"
+                    (onClick)="addBulkQuestionOption(qi)"
+                    styleClass="p-button-sm p-button-outlined p-button-secondary"
+                    [disabled]="getBulkQuestionOptions(qi).length >= 6">
+                  </p-button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2" formArrayName="options">
+                  @for (opt of getBulkQuestionOptions(qi).controls; track $index; let oi = $index) {
+                    <div 
+                      [formGroupName]="oi"
+                      class="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+                      <span class="w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-xs">
+                        {{ ['أ', 'ب', 'ج', 'د', 'هـ', 'و'][oi] }}
+                      </span>
+                      <input 
+                        pInputText
+                        formControlName="content"
+                        class="flex-1 p-inputtext-sm"
+                        placeholder="الإجابة...">
+                      <p-checkbox 
+                        formControlName="isCorrect"
+                        [binary]="true"
+                        pTooltip="إجابة صحيحة">
+                      </p-checkbox>
+                      <p-button 
+                        icon="pi pi-times"
+                        (onClick)="removeBulkQuestionOption(qi, oi)"
+                        styleClass="p-button-rounded p-button-text p-button-danger p-button-sm"
+                        [disabled]="getBulkQuestionOptions(qi).length <= 2">
+                      </p-button>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </p-card>
+        }
+      </div>
+
+      <!-- Add More Questions Button -->
+      <div class="flex justify-center mt-6">
+        <p-button 
+          label="إضافة سؤال آخر"
+          icon="pi pi-plus-circle"
+          (onClick)="addBulkQuestion()"
+          styleClass="p-button-outlined p-button-lg">
+        </p-button>
+      </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+      <div class="flex items-center justify-between">
+        <span class="text-gray-500 text-sm">
+          <i class="pi pi-info-circle ml-1"></i>
+          سيتم إضافة {{ bulkQuestionsArray.length }} سؤال
+        </span>
+        <div class="flex gap-3">
+          <p-button 
+            label="إلغاء"
+            icon="pi pi-times"
+            (onClick)="showBulkAddDialog.set(false)"
+            styleClass="p-button-text"
+            [disabled]="isSubmitting()">
+          </p-button>
+          <p-button 
+            label="إضافة الكل"
+            [icon]="isSubmitting() ? 'pi pi-spinner pi-spin' : 'pi pi-check-circle'"
+            (onClick)="saveBulkQuestions()"
+            styleClass="p-button-success"
+            [disabled]="isSubmitting()">
+          </p-button>
+        </div>
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Excel Upload Dialog -->
+  <p-dialog 
+    header="رفع أسئلة من ملف Excel"
+    [(visible)]="showExcelUploadDialog"
+    [modal]="true"
+    [style]="{ width: '95vw', maxWidth: '600px' }"
+    [draggable]="false"
+    styleClass="rounded-2xl"
+    [closable]="!isSubmitting()">
+    
+    <div class="space-y-6">
+      <!-- Info Section -->
+      <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+        <div class="flex items-start gap-3">
+          <i class="pi pi-info-circle text-blue-500 text-xl mt-0.5"></i>
+          <div>
+            <h4 class="font-semibold text-blue-800 mb-1">تعليمات رفع الملف</h4>
+            <ul class="text-sm text-blue-700 space-y-1 list-disc list-inside">
+              <li>يجب أن يكون الملف بصيغة Excel (.xlsx أو .xls)</li>
+              <li>استخدم النموذج المرفق لضمان التنسيق الصحيح</li>
+              <li>تأكد من ملء جميع الحقول المطلوبة</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Download Template Button -->
+      <div class="flex justify-center">
+        <p-button 
+          label="تحميل نموذج Excel"
+          icon="pi pi-download"
+          (onClick)="downloadExcelTemplate()"
+          styleClass="p-button-outlined p-button-help">
+        </p-button>
+      </div>
+
+      <p-divider></p-divider>
+
+      <!-- File Upload -->
+      <p-fileUpload 
+        mode="advanced"
+        name="excelFile"
+        accept=".xlsx,.xls"
+        [maxFileSize]="10000000"
+        (onUpload)="onExcelUpload($event)"
+        (onSelect)="onExcelUpload($event)"
+        [customUpload]="true"
+        [auto]="false"
+        chooseLabel="اختر ملف"
+        uploadLabel="رفع"
+        cancelLabel="إلغاء"
+        chooseIcon="pi pi-file-excel"
+        styleClass="w-full">
+        <ng-template pTemplate="empty">
+          <div class="flex flex-col items-center justify-center py-8 text-gray-500">
+            <i class="pi pi-cloud-upload text-4xl mb-3 text-gray-300"></i>
+            <p class="text-lg font-medium mb-1">اسحب الملف هنا</p>
+            <p class="text-sm">أو اضغط لاختيار ملف</p>
+          </div>
+        </ng-template>
+      </p-fileUpload>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button 
+        label="إغلاق"
+        icon="pi pi-times"
+        (onClick)="showExcelUploadDialog.set(false)"
+        styleClass="p-button-text"
+        [disabled]="isSubmitting()">
+      </p-button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Options Management Dialog -->
+  <p-dialog 
+    header="إدارة إجابات السؤال"
+    [(visible)]="showOptionsDialog"
+    [modal]="true"
+    [style]="{ width: '95vw', maxWidth: '700px' }"
+    [draggable]="false"
+    styleClass="rounded-2xl">
+    
+    @if (selectedQuestion()) {
+      <div class="space-y-6">
+        <!-- Question Preview -->
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-100">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+              <i class="pi pi-question-circle text-white"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-gray-800 font-medium">{{ selectedQuestion()?.content }}</p>
+              <p-tag 
+                [value]="getQuestionTypeLabel(selectedQuestion()?.questionType)"
+                [severity]="getQuestionTypeSeverity(selectedQuestion()?.questionType)"
+                styleClass="mt-2 text-xs">
+              </p-tag>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Option Button -->
+        <div class="flex justify-end">
+          <p-button 
+            label="إضافة إجابة جديدة"
+            icon="pi pi-plus"
+            (onClick)="openAddOptionDialog()"
+            styleClass="p-button-success">
+          </p-button>
+        </div>
+
+        <!-- Options List -->
+        <div class="space-y-3">
+          @for (option of selectedQuestion()?.options; track option.id; let i = $index) {
+            <div 
+              class="flex items-center gap-4 p-4 rounded-xl border-2 transition-all"
+              [class]="option.isCorrect 
+                ? 'bg-green-50 border-green-200' 
+                : 'bg-white border-gray-200 hover:border-gray-300'">
+              
+              <!-- Option Letter -->
+              <span 
+                class="w-10 h-10 rounded-full flex items-center justify-center font-bold"
+                [class]="option.isCorrect 
+                  ? 'bg-green-500 text-white' 
+                  : 'bg-gray-200 text-gray-600'">
+                {{ ['أ', 'ب', 'ج', 'د', 'هـ', 'و'][i] || i + 1 }}
+              </span>
+              
+              <!-- Option Content -->
+              <div class="flex-1">
+                <p 
+                  class="font-medium"
+                  [class]="option.isCorrect ? 'text-green-800' : 'text-gray-700'">
+                  {{ option.content }}
+                </p>
+                @if (option.isCorrect) {
+                  <span class="text-xs text-green-600 flex items-center gap-1 mt-1">
+                    <i class="pi pi-check-circle"></i>
+                    الإجابة الصحيحة
+                  </span>
+                }
+              </div>
+              
+              <!-- Actions -->
+              <div class="flex items-center gap-2">
+                <p-button 
+                  icon="pi pi-pencil"
+                  (onClick)="openEditOptionDialog(option)"
+                  styleClass="p-button-rounded p-button-text p-button-info"
+                  pTooltip="تعديل">
+                </p-button>
+                <p-button 
+                  icon="pi pi-trash"
+                  (onClick)="deleteOption(option)"
+                  styleClass="p-button-rounded p-button-text p-button-danger"
+                  pTooltip="حذف">
+                </p-button>
+              </div>
+            </div>
+          } @empty {
+            <div class="text-center py-8 text-gray-500">
+              <i class="pi pi-inbox text-4xl mb-3 text-gray-300"></i>
+              <p>لا توجد إجابات لهذا السؤال</p>
+              <p class="text-sm">اضغط على "إضافة إجابة جديدة" للبدء</p>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <ng-template pTemplate="footer">
+      <p-button 
+        label="إغلاق"
+        icon="pi pi-times"
+        (onClick)="showOptionsDialog.set(false)"
+        styleClass="p-button-text">
+      </p-button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Add/Edit Option Dialog -->
+  <p-dialog 
+    [header]="selectedOption() ? 'تعديل الإجابة' : 'إضافة إجابة جديدة'"
+    [(visible)]="showAddOptionDialog"
+    [modal]="true"
+    [style]="{ width: '95vw', maxWidth: '500px' }"
+    [draggable]="false"
+    styleClass="rounded-2xl"
+    [closable]="!isSubmitting()"/>
+    
+    <form [formGroup]="optionForm" class="space-y-6">
+      <!-- Option Content -->
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-gray-700">
+          <i class="pi pi-pencil ml-1 text-blue-500"></i>
+          نص الإجابة <span class="text-red-500">*</span>
+        </label>
+        <textarea 
+          pInputTextarea
+          formControlName="content"
+          rows="3"
+          class="w-full"
+          placeholder="اكتب نص الإجابة هنا..."
+          [autoResize]="true">
+        </textarea>
+        @if (optionForm.get('content')?.invalid && optionForm.get('content')?.touched) {
+          <small class="text-red-500 text-xs">نص الإجابة مطلوب</small>
+        }
+      </div>
+
+      <!-- Is Correct -->
+      <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
+        <p-checkbox 
+          formControlName="isCorrect"
+          [binary]="true"
+          inputId="isCorrectOption">
+        </p-checkbox>
+        <label for="isCorrectOption" class="cursor-pointer">
+          <span class="font-medium text-gray-700">هذه الإجابة الصحيحة</span>
+          <p class="text-xs text-gray-500 mt-1">حدد هذا الخيار إذا كانت هذه الإجابة هي الصحيحة</p>
+        </label>
+      </div>
+    </form>
+</div>

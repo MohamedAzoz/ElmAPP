@@ -1,0 +1,102 @@
+<div class="p-6 rtl">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-xl font-bold">إدارة ربط المنهج (Curriculum)</h1>
+    <p-button label="إضافة ربط جديد" icon="pi pi-plus" (onClick)="openAddDialog()"></p-button>
+  </div>
+
+  <p-table
+    [value]="curriculumFacade.curriculums()"
+    [loading]="curriculumFacade.isLoading()"
+    [paginator]="true"
+    [rows]="rows()"
+    [lazy]="true"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [totalRecords]="curriculumFacade.totalCount()"
+    (onLazyLoad)="loadCurriculums($event)"
+    [rowHover]="true"
+    [showGridlines]="true"
+    [stripedRows]="true"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>القسم</th>
+        <th>المستوى الدراسي</th>
+        <th>الدكتور المحاضر</th>
+        <th>الإجراءات</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-cur>
+      <tr>
+        <td>{{ cur.departmentName }}</td>
+        <td>{{ cur.yearName }}</td>
+        <td>{{ cur.doctorName }}</td>
+        <td>
+          <button
+            pButton
+            icon="pi pi-trash"
+            class="p-button-text p-button-danger"
+            (click)="delete(cur.id)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  [(visible)]="displayDialog"
+  header="تخصيص المادة لمنهج"
+  [modal]="true"
+  [style]="{ width: '500px' }"
+>
+  <div class="grid gap-4 mt-4">
+    <div class="flex flex-col gap-2">
+      <label>اختر الكلية</label>
+      <p-select
+        [options]="collegeFacade.colleges()"
+        [(ngModel)]="selectedCollegeId"
+        optionLabel="name"
+        optionValue="id"
+        placeholder="اختر الكلية"
+      ></p-select>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label>اختر القسم</label>
+      <p-select
+        [options]="departmentFacade.departments()"
+        [disabled]="selectedCollegeId() === null"
+        [(ngModel)]="curriculumForm.departmentId"
+        optionLabel="name"
+        optionValue="id"
+        placeholder="اختر القسم"
+      ></p-select>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label>اختر المستوى</label>
+      <p-select
+        [options]="yearFacade.years()"
+        [disabled]="selectedCollegeId() === null"
+        [(ngModel)]="curriculumForm.yearId"
+        optionLabel="name"
+        optionValue="id"
+        placeholder="اختر المستوى"
+      ></p-select>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label>اختر الدكتور</label>
+      <p-select
+        [options]="curriculumFacade.doctors()"
+        [(ngModel)]="curriculumForm.doctorId"
+        optionLabel="fullName"
+        optionValue="doctorId"
+        placeholder="اختر الدكتور"
+      ></p-select>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button label="حفظ الربط" icon="pi pi-check" (onClick)="save()"></p-button>
+  </ng-template>
+</p-dialog>

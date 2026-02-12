@@ -1,0 +1,256 @@
+<!-- <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-4xl mx-auto">
+    
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+      <div class="flex items-center gap-3">
+        <div class="bg-white p-3 rounded-2xl shadow-sm">
+          <i class="pi pi-bell text-indigo-600 text-2xl" pBadge [value]="notifyFacade.unreadCount().toString()" severity="danger"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900 m-0">مركز الإشعارات</h1>
+          <p class="text-gray-500 text-sm">تابع آخر المستجدات والتنبيهات الخاصة بك</p>
+        </div>
+      </div>
+
+      <p-button 
+        label="تحديد الكل كمقروء" 
+        icon="pi pi-check-circle" 
+        [text]="true"
+        severity="help"
+        (onClick)="markAllAsRead()"
+        [disabled]="notifyFacade.unreadCount() === 0"
+        styleClass="hover:bg-indigo-50 font-bold transition-all"
+      ></p-button>
+    </div>
+
+    <div class="flex flex-col gap-4">
+      
+      @if (notifyFacade.loading()) {
+        @for (item of [1,2,3]; track $index) {
+          <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+            <p-skeleton shape="circle" size="3rem"></p-skeleton>
+            <div class="flex-1">
+              <p-skeleton width="60%" styleClass="mb-2"></p-skeleton>
+              <p-skeleton width="40%"></p-skeleton>
+            </div>
+          </div>
+        }
+      }
+
+      @if (!notifyFacade.loading() && notifyFacade.notifications().length === 0) {
+        <div class="flex flex-col items-center justify-center py-20 text-center animate-fadein">
+          <div class="w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+            <i class="pi pi-bell-slash text-4xl text-gray-400"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-700">لا توجد إشعارات حالياً</h3>
+          <p class="text-gray-500 mt-2">أنت مطلع على كل شيء! سنخبرك فور حدوث أي جديد.</p>
+        </div>
+      }
+
+      @for (item of notifyFacade.notifications(); track item.id) {
+        <div 
+          class="group relative bg-white p-5 rounded-2xl border transition-all duration-300 hover:shadow-md animate-slide-up"
+          [ngClass]="{
+            'border-l-4 border-l-indigo-500 bg-indigo-50/30': !item.isRead,
+            'border-gray-100': item.isRead
+          }"
+        >
+          <div class="flex items-start gap-4">
+            
+            <div class="flex-shrink-0 mt-1">
+              @if (!item.isRead) {
+                <span class="flex h-3 w-3 relative">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
+                </span>
+              } @else {
+                <i class="pi pi-check-circle text-gray-400 text-lg"></i>
+              }
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <div class="flex justify-between items-start">
+                <h3 
+                  class="text-lg font-semibold mb-1 truncate pr-2"
+                  [ngClass]="{'text-indigo-900': !item.isRead, 'text-gray-700': item.isRead}"
+                >
+                  {{ item.title }}
+                </h3>
+                <span class="text-xs text-gray-400 whitespace-nowrap bg-gray-50 px-2 py-1 rounded-md">
+                  {{ item.createdAt | date: 'shortTime' }}
+                </span>
+              </div>
+              
+              <p class="text-gray-600 text-sm leading-relaxed mb-2 break-words">
+                {{ item.message }}
+              </p>
+              
+              <div class="flex items-center justify-between mt-3">
+                <span class="text-xs text-gray-400">
+                  {{ item.createdAt | date:'dd/MM/yyyy' }}
+                </span>
+
+                <div class="flex gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                  @if (!item.isRead) {
+                    <button 
+                      pTooltip="تحديد كمقروء" 
+                      tooltipPosition="top"
+                      (click)="markAsRead(item.id!, $event)"
+                      class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 hover:bg-indigo-600 hover:text-white transition-colors flex items-center justify-center"
+                    >
+                      <i class="pi pi-check text-xs"></i>
+                    </button>
+                  }
+                  
+                  <button 
+                    pTooltip="حذف الإشعار" 
+                    tooltipPosition="top"
+                    (click)="deleteNotification(item.id!, $event)"
+                    class="w-8 h-8 rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center"
+                  >
+                    <i class="pi pi-trash text-xs"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div> -->
+
+
+<p-toast position="top-left" dir="rtl"></p-toast>
+
+<div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8" dir="rtl">
+  <div class="max-w-4xl mx-auto">
+    
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+      <div class="flex items-center gap-3">
+        <div class="bg-white p-3 rounded-2xl shadow-sm">
+          <i class="pi pi-bell text-indigo-600 text-2xl" pBadge 
+             [value]="notifyFacade.unreadCount().toString()" 
+             severity="danger"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900 m-0">مركز الإشعارات</h1>
+          <p class="text-gray-500 text-sm">تابع آخر المستجدات والتنبيهات الخاصة بك</p>
+        </div>
+      </div>
+
+      <p-button 
+        label="تحديد الكل كمقروء" 
+        icon="pi pi-check-circle" 
+        [text]="true"
+        severity="help"
+        (onClick)="markAllAsRead()"
+        [disabled]="notifyFacade.unreadCount() === 0"
+        styleClass="hover:bg-indigo-50 font-bold transition-all">
+      </p-button>
+    </div>
+
+    <!-- ✅ حالة الخطأ -->
+    @if (notifyFacade.error()) {
+      <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-4 flex items-center gap-3">
+        <i class="pi pi-exclamation-triangle text-red-500 text-xl"></i>
+        <div>
+          <p class="text-red-700 font-semibold">{{ notifyFacade.error() }}</p>
+          <button (click)="ngOnInit()" class="text-red-600 underline text-sm mt-1">إعادة المحاولة</button>
+        </div>
+      </div>
+    }
+
+    <div class="flex flex-col gap-4">
+      
+      @if (notifyFacade.loading()) {
+        @for (item of [1,2,3]; track $index) {
+          <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+            <p-skeleton shape="circle" size="3rem"></p-skeleton>
+            <div class="flex-1">
+              <p-skeleton width="60%" styleClass="mb-2"></p-skeleton>
+              <p-skeleton width="40%"></p-skeleton>
+            </div>
+          </div>
+        }
+      }
+
+      @if (!notifyFacade.loading() && notifyFacade.notifications().length === 0 && !notifyFacade.error()) {
+        <div class="flex flex-col items-center justify-center py-20 text-center animate-fadein">
+          <div class="w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+            <i class="pi pi-bell-slash text-4xl text-gray-400"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-700">لا توجد إشعارات حالياً</h3>
+          <p class="text-gray-500 mt-2">أنت مطلع على كل شيء! سنخبرك فور حدوث أي جديد.</p>
+        </div>
+      }
+
+      @for (item of notifyFacade.notifications(); track item.id) {
+        <div 
+          class="group relative bg-white p-5 rounded-2xl border transition-all duration-300 hover:shadow-md"
+          [ngClass]="{
+            'border-r-4 border-r-indigo-500 bg-indigo-50/30': !item.isRead,
+            'border-gray-100': item.isRead
+          }">
+          <!-- ✅ غيرنا border-l لـ border-r عشان RTL -->
+
+          <div class="flex items-start gap-4">
+            <div class="flex-shrink-0 mt-1">
+              @if (!item.isRead) {
+                <span class="flex h-3 w-3 relative">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
+                </span>
+              } @else {
+                <i class="pi pi-check-circle text-gray-400 text-lg"></i>
+              }
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <div class="flex justify-between items-start">
+                <h3 
+                  class="text-lg font-semibold mb-1 truncate pl-2"
+                  [ngClass]="{'text-indigo-900': !item.isRead, 'text-gray-700': item.isRead}">
+                  {{ item.title }}
+                </h3>
+                <span class="text-xs text-gray-400 whitespace-nowrap bg-gray-50 px-2 py-1 rounded-md">
+                  {{ item.createdAt | date: 'shortTime' }}
+                </span>
+              </div>
+              
+              <p class="text-gray-600 text-sm leading-relaxed mb-2 break-words">
+                {{ item.message }}
+              </p>
+              
+              <div class="flex items-center justify-between mt-3">
+                <span class="text-xs text-gray-400">
+                  {{ item.createdAt | date:'dd/MM/yyyy' }}
+                </span>
+
+                <div class="flex gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                  @if (!item.isRead) {
+                    <button 
+                      pTooltip="تحديد كمقروء" 
+                      tooltipPosition="top"
+                      (click)="markAsRead(item.id!, $event)"
+                      class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 hover:bg-indigo-600 hover:text-white transition-colors flex items-center justify-center">
+                      <i class="pi pi-check text-xs"></i>
+                    </button>
+                  }
+                  
+                  <button 
+                    pTooltip="حذف الإشعار" 
+                    tooltipPosition="top"
+                    (click)="deleteNotification(item.id!, $event)"
+                    class="w-8 h-8 rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center">
+                    <i class="pi pi-trash text-xs"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

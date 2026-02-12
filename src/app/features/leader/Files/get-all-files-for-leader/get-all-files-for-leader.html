@@ -1,0 +1,148 @@
+<p-confirmDialog></p-confirmDialog>
+
+<div class="p-6 bg-slate-50 min-h-screen" [dir]="dir.currentDir()">
+  <div class="max-w-6xl mx-auto">
+    <div
+      class="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl shadow-sm border border-slate-100"
+    >
+      <div>
+        <h1 class="text-2xl font-black text-slate-800 m-0">إدارة الملخصات</h1>
+        <p class="text-slate-500 mt-1">رفع وعرض ملفات المنهج الدراسية</p>
+      </div>
+      <p-button
+        label="رفع ملخص جديد"
+        icon="pi pi-cloud-upload"
+        (onClick)="displayUploadDialog.set(true)"
+        styleClass="rounded-xl shadow-md p-button-primary"
+      ></p-button>
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-y">
+      <p-table
+        [value]="facade.files()"
+        [loading]="facade.isFileLoading()"
+        [rows]="10"
+        [paginator]="true"
+        styleClass="p-datatable-lg"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="text-right py-4 px-6">اسم الملف</th>
+            <th class="text-center">بواسطة</th>
+            <th class="text-center">تاريخ التقييم</th>
+            <th class="text-center">الإجراءات</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-file>
+          <tr class="hover:bg-slate-50/50 transition-colors">
+            <td class="py-4 px-6">
+              <div class="flex items-center gap-3">
+                <i class="pi pi-file-pdf text-red-500 text-xl"></i>
+                <div class="flex flex-col">
+                  <span class="font-bold text-slate-700">{{ file.name }}</span>
+                  <small class="text-slate-400">{{ file.comment || 'لا يوجد وصف' }}</small>
+                </div>
+              </div>
+            </td>
+            <td class="text-center">
+              <span class="text-slate-600 font-medium">{{
+                file.doctorRatedName || 'لم يقيّم بعد'
+              }}</span>
+            </td>
+            <td class="text-center text-slate-500">
+              {{ file.ratedAt | date: 'dd/MM/yyyy' }}
+            </td>
+            <td class="text-center">
+              <div class="flex justify-center gap-2">
+                <button
+                  pButton
+                  icon="pi pi-eye"
+                  class="p-button-rounded p-button-text p-button-info"
+                  pTooltip="عرض الملف"
+                  (click)="facade.showFile(file.storageName)"
+                ></button>
+
+                <button
+                  pButton
+                  icon="pi pi-download"
+                  class="p-button-rounded p-button-text p-button-success"
+                  pTooltip="تحميل الملف"
+                  (click)="facade.downloadFile(file.storageName)"
+                ></button>
+
+                <button
+                  pButton
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-text p-button-danger"
+                  pTooltip="حذف نهائي"
+                  (click)="confirmDelete(file.id)"
+                ></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="4" class="text-center py-16">
+              <i class="pi pi-folder-open text-5xl text-slate-200 mb-4 block"></i>
+              <span class="text-slate-400">لا توجد ملخصات مرفوعة لهذا المنهج</span>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<p-dialog
+  [(visible)]="displayUploadDialog"
+  header="رفع ملخص جديد"
+  [modal]="true"
+  [style]="{ width: '500px' }"
+  styleClass="rounded-2xl"
+>
+  <div class="flex flex-col gap-5 mt-4">
+    <div class="flex flex-col gap-2">
+      <label class="font-bold text-slate-700">وصف الملف</label>
+      <input
+        pInputText
+        [(ngModel)]="uploadForm.description"
+        placeholder="مثلاً: ملخص المحاضرة الأولى - كيمياء"
+        class="w-full rounded-xl"
+      />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label class="font-bold text-slate-700">اختر الملف</label>
+      <p-fileUpload
+        mode="basic"
+        chooseLabel="اختر الملف"
+        [multiple]="false"
+        (onSelect)="onFileSelect($event)"
+        styleClass="w-full"
+      ></p-fileUpload>
+      @if (uploadForm.file) {
+        <small class="text-green-600 font-bold"
+          ><i class="pi pi-check mr-1"></i> تم اختيار: {{ uploadForm.file.name }}</small
+        >
+      }
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="إلغاء"
+      [text]="true"
+      severity="secondary"
+      (onClick)="displayUploadDialog.set(false)"
+    ></p-button>
+    <p-button
+      label="بدء الرفع"
+      icon="pi pi-upload"
+      (onClick)="handleUpload()"
+      [disabled]="!uploadForm.file || !uploadForm.description"
+    ></p-button>
+  </ng-template>
+</p-dialog>

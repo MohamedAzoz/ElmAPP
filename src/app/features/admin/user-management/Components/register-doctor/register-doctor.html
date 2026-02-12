@@ -1,0 +1,200 @@
+<p-confirmDialog></p-confirmDialog>
+
+<div class="p-6 bg-slate-50 min-h-screen rtl">
+  <div class="max-w-7xl mx-auto">
+    <div
+      class="flex flex-col md:flex-row justify-between items-center bg-white p-8 rounded-3xl shadow-sm mb-8 border border-slate-100 gap-4"
+    >
+      <div>
+        <h1 class="text-3xl font-black text-slate-800 m-0">إدارة هيئة التدريس</h1>
+        <p class="text-slate-500 mt-2 text-lg">
+          تحكم في صلاحيات وحسابات الدكاتور المسجلين في النظام
+        </p>
+      </div>
+      <p-button
+        label="إضافة دكتور جديد"
+        icon="pi pi-user-plus"
+        (onClick)="openAddDialog()"
+        styleClass="rounded-2xl shadow-lg p-button-primary px-8 py-3 text-lg font-bold"
+      ></p-button>
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-y">
+      <p-table
+        [value]="auth.doctors()"
+        [loading]="auth.isLoading()"
+        [paginator]="true"
+        [rows]="rows()"
+        [totalRecords]="auth.totalCount()"
+        [lazy]="true"
+        (onLazyLoad)="loadDoctors($event)"
+        styleClass="p-datatable-gridlines p-datatable-lg"
+        [rowHover]="true"
+        [rowsPerPageOptions]="[10, 25, 50]"
+        [showGridlines]="true"
+        [stripedRows]="true"
+      >
+        <ng-template pTemplate="header">
+          <tr class="bg-slate-50">
+            <th class="py-5 px-6 text-right text-slate-600 font-bold">اسم المستخدم</th>
+            <th class="py-5 px-6 text-center text-slate-600 font-bold">الاسم الكامل</th>
+            <th class="py-5 px-6 text-center text-slate-600 font-bold">اللقب/الرتبة</th>
+            <th class="py-5 px-6 text-center text-slate-600 font-bold">الارتباطات</th>
+            <th class="py-5 px-6 text-center text-slate-600 font-bold">الحالة</th>
+            <th class="py-5 px-6 text-center text-slate-600 font-bold">الإجراءات</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-doc>
+          <tr class="hover:bg-blue-50/30 transition-all duration-200">
+            <td class="py-4 px-6 font-medium text-slate-700">{{ doc.userName }}</td>
+            <td class="py-4 px-6">
+              <div class="font-bold text-slate-900">{{ doc.fullName }}</div>
+            </td>
+            <td class="py-4 px-6">
+              <span
+                class="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-bold border border-blue-100"
+              >
+                {{ doc.title }}
+              </span>
+            </td>
+            <td class="text-center py-4 px-6">
+              <div class="flex justify-center gap-2">
+                <button
+                  pButton
+                  label="صلاحيات المستخدم"
+                  icon="pi pi-users"
+                  class="p-button-outlined p-button-secondary p-button-sm rounded-lg"
+                  [routerLink]="['user-permissions']"
+                  [queryParams]="{ userId: doc.userId, userName: doc.userName }"
+                ></button>
+              </div>
+            </td>
+            <td class="text-center py-4 px-6">
+              <p-tag
+                [severity]="doc.isActived ? 'success' : 'danger'"
+                [value]="doc.isActived ? 'نشط' : 'متوقف'"
+                styleClass="px-4 py-1 rounded-lg text-sm"
+              ></p-tag>
+            </td>
+            <td class="text-center py-4 px-6">
+              <div class="flex justify-center gap-3">
+                <button
+                  pButton
+                  [icon]="doc.isActived ? 'pi pi-lock' : 'pi pi-lock-open'"
+                  [class]="
+                    doc.isActived
+                      ? 'p-button-rounded p-button-warning p-button-text'
+                      : 'p-button-rounded p-button-success p-button-text'
+                  "
+                  (click)="toggleStatus(doc)"
+                  [pTooltip]="doc.isActived ? 'تعطيل الحساب' : 'تفعيل الحساب'"
+                ></button>
+                <button
+                  pButton
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-danger p-button-text"
+                  (click)="deleteDoctor(doc.userId)"
+                  pTooltip="حذف نهائي"
+                ></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5" class="text-center py-10 text-slate-400">
+              لا يوجد أطباء مسجلين حالياً
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<p-dialog
+  [(visible)]="displayDialog"
+  header="تسجيل دكتور جديد"
+  [modal]="true"
+  [style]="{ width: '500px' }"
+  styleClass="rounded-3xl overflow-hidden shadow-2xl"
+  [draggable]="false"
+>
+  <div class="flex flex-col gap-6 pt-6">
+    <div class="flex flex-col gap-2">
+      <label class="font-bold text-slate-700">الاسم الكامل</label>
+      <input
+        pInputText
+        [(ngModel)]="doctorForm.fullName"
+        placeholder="أدخل الاسم الرباعي"
+        class="w-full p-3 rounded-xl border-slate-200"
+      />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label class="font-bold text-slate-700">اسم المستخدم</label>
+      <input
+        pInputText
+        [(ngModel)]="doctorForm.userName"
+        placeholder="Username"
+        class="w-full p-3 rounded-xl border-slate-200"
+      />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label class="font-bold text-slate-700">اللقب الوظيفي</label>
+      <input
+        pInputText
+        [(ngModel)]="doctorForm.title"
+        placeholder="مثلاً: أستاذ دكتور"
+        class="w-full p-3 rounded-xl border-slate-200"
+      />
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div class="flex flex-col gap-2">
+        <label class="font-bold text-slate-700">كلمة المرور</label>
+        <p-password
+          [(ngModel)]="doctorForm.password"
+          [toggleMask]="true"
+          [feedback]="false"
+          styleClass="w-full"
+          inputStyleClass="w-full p-3 rounded-xl"
+        ></p-password>
+      </div>
+      <div class="flex flex-col gap-2">
+        <label class="font-bold text-slate-700">تأكيد الكلمة</label>
+        <p-password
+          [(ngModel)]="doctorForm.confirmPassword"
+          [toggleMask]="true"
+          [feedback]="false"
+          styleClass="w-full"
+          inputStyleClass="w-full p-3 rounded-xl"
+        ></p-password>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 mt-6">
+      <p-button
+        label="إلغاء"
+        icon="pi pi-times"
+        [text]="true"
+        severity="secondary"
+        (onClick)="displayDialog.set(false)"
+      ></p-button>
+      <p-button
+        label="حفظ البيانات"
+        icon="pi pi-check"
+        (onClick)="saveDoctor()"
+        [disabled]="
+          !doctorForm.userName ||
+          !doctorForm.password ||
+          doctorForm.password !== doctorForm.confirmPassword
+        "
+        styleClass="rounded-xl px-6"
+      ></p-button>
+    </div>
+  </div>
+</p-dialog>

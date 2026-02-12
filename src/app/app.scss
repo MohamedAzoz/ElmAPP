@@ -1,0 +1,32 @@
+.custom-toast {
+  direction: rtl;
+  
+  .p-toast-message {
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+  }
+  
+  .p-toast-message-success {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+  }
+  
+  .p-toast-message-error {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  }
+  
+  .p-toast-message-warn {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  }
+  
+  .p-toast-message-info {
+    background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+  }
+  
+  .p-toast-summary {
+    font-weight: 700;
+  }
+  
+  .p-toast-detail {
+    margin-top: 0.5rem;
+  }
+}

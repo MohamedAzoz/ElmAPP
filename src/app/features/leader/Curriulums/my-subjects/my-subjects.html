@@ -1,0 +1,12 @@
+ <div class="container" [dir]="dir.currentDir()">
+  <div class="header">
+    <h1>منهجي الدراسي</h1>
+    <p>استعرض جميع المواد الدراسية المتاحة لك هذا العام</p>
+  </div>
+
+  <div class="grid">
+    @for (item of curriulums(); track item.id) {
+      <app-curriulum-carde [curriculum]="item"></app-curriulum-carde>
+    }
+  </div>
+</div>

@@ -1,0 +1,189 @@
+<p-confirmDialog></p-confirmDialog>
+
+<div class="p-6 bg-slate-50 min-h-screen rtl">
+  <div class="max-w-6xl mx-auto">
+    <div
+      class="flex justify-between items-center bg-white p-6 rounded-3xl shadow-sm mb-6 border border-slate-100"
+    >
+      <div>
+        <h1 class="text-2xl font-black text-slate-800 m-0">قاعدة بيانات المواد الدراسية</h1>
+        <p class="text-slate-500 mt-1">إدارة كافة المواد الأكاديمية المتاحة في النظام</p>
+      </div>
+      <p-button
+        label="إضافة مادة جديدة"
+        icon="pi pi-book"
+        (onClick)="openAddDialog()"
+        styleClass="rounded-2xl shadow-md p-button-primary px-6"
+      ></p-button>
+    </div>
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-y p-2">
+      <p-table
+        #dt
+        [value]="facade.subjects()"
+        [paginator]="true"
+        [rows]="rows()"
+        [rowsPerPageOptions]="[10, 25, 50]"
+        [dir]="dir.currentDir()"
+        [showGridlines]="true" 
+        [stripedRows]="true"
+        [resizableColumns]="true"
+        [reorderableColumns]="true"
+        [rowHover]="true"
+        [totalRecords]="facade.totalCount()"
+        styleClass="p-datatable-gridlines p-datatable-lg"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th  class="py-4 px-6 text-right">كود المادة</th>
+            <th  class="py-4 px-6 text-right">اسم المادة</th>
+            <th  class="mx-auto text-center">الإجراءات</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-subject>
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="py-4 px-6">
+              <span
+                class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-lg font-mono font-bold border border-indigo-100"
+              >
+                {{ subject.code }}
+              </span>
+            </td>
+            <td class="py-4 px-6">
+              <span class="font-bold text-slate-700">{{ subject.name }}</span>
+            </td>
+
+            <td class="py-4 px-6">
+              <div class="flex justify-center gap-2">
+                <button
+                  pButton
+                  icon="pi pi-book"
+                  class="p-button-rounded p-button-text p-button-info"
+                  routerLink="{{ subject.id }}/curriculums"
+                ></button>
+                <button
+                  pButton
+                  icon="pi pi-pencil"
+                  class="p-button-rounded p-button-text p-button-info"
+                  (click)="openEditDialog(subject)"
+                ></button>
+                <button
+                  pButton
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-text p-button-danger"
+                  (click)="confirmDelete(subject.id)"
+                ></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<!-- <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+  <p-table
+    [value]="facade.subjects()"
+    [loading]="facade.isLoading()"
+    [rows]="rows"
+    [paginator]="true"
+    [totalRecords]="facade.totalCount()"
+    [lazy]="true"
+    (onLazyLoad)="loadSubjects($event)"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="عرض {first} إلى {last} من إجمالي {totalRecords} مادة"
+    styleClass="p-datatable-lg"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="py-4 px-6 text-right">كود المادة</th>
+        <th class="py-4 px-6 text-right">اسم المادة</th>
+        <th class="text-center">المناهج</th>
+        <th class="text-center">الإجراءات</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-subject>
+      <tr class="hover:bg-slate-50 transition-colors">
+        <td class="py-4 px-6">
+          <span class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-lg font-mono font-bold border border-indigo-100">
+            {{ subject.code }}
+          </span>
+        </td>
+        <td class="py-4 px-6">
+          <span class="font-bold text-slate-700">{{ subject.name }}</span>
+        </td>
+        
+        <td class="text-center">
+          <button
+            pButton
+            icon="pi pi-sitemap"
+            class="p-button-rounded p-button-text p-button-secondary"
+            [routerLink]="[subject.id, 'curriculums']"
+            pTooltip="عرض المناهج المرتبطة"
+          ></button>
+        </td>
+
+        <td class="text-center">
+          <div class="flex justify-center gap-2">
+            <button
+              pButton
+              icon="pi pi-pencil"
+              class="p-button-rounded p-button-text p-button-info"
+              (click)="openEditDialog(subject)"
+            ></button>
+            <button
+              pButton
+              icon="pi pi-trash"
+              class="p-button-rounded p-button-text p-button-danger"
+              (click)="confirmDelete(subject.id)"
+            ></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div> -->
+<p-dialog
+  [(visible)]="displayDialog"
+  [header]="isEditMode() ? 'تعديل مادة' : 'إضافة مادة'"
+  [modal]="true"
+  [style]="{ width: '450px' }"
+  styleClass="rounded-3xl shadow-2xl"
+>
+  <div class="flex flex-col gap-5 pt-4">
+    <div class="flex flex-col gap-2">
+      <label class="font-bold text-slate-700">كود المادة (Code)</label>
+      <input
+        pInputText
+        [(ngModel)]="subjectForm.code"
+        placeholder="مثلاً: CS101"
+        class="w-full p-3 rounded-xl border-slate-200"
+      />
+    </div>
+    <div class="flex flex-col gap-2">
+      <label class="font-bold text-slate-700">اسم المادة</label>
+      <input
+        pInputText
+        [(ngModel)]="subjectForm.name"
+        placeholder="مثلاً: مقدمة في علوم الحاسب"
+        class="w-full p-3 rounded-xl border-slate-200"
+      />
+    </div>
+    <div class="flex justify-end gap-2 mt-4">
+      <p-button
+        label="إلغاء"
+        [text]="true"
+        severity="secondary"
+        (onClick)="displayDialog.set(false)"
+      ></p-button>
+      <p-button
+        [label]="isEditMode() ? 'تحديث' : 'حفظ'"
+        icon="pi pi-check"
+        (onClick)="saveSubject()"
+        [disabled]="!subjectForm.name || !subjectForm.code"
+      ></p-button>
+    </div>
+  </div>
+</p-dialog>

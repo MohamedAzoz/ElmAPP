@@ -1,0 +1,25 @@
+.animate-fadein {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+:host ::ng-deep {
+  .p-button.p-button-text:enabled:hover {
+    background: rgba(79, 70, 229, 0.05);
+  }
+
+  .p-tooltip {
+    font-family: 'Tajawal', sans-serif; // إذا كنت تستخدم خط عربي
+    font-size: 12px;
+  }
+}
+
+// تنسيق خاص لشبكة الأرقام لتكون متجاوبة
+.grid-cols-4 {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}

@@ -1,0 +1,37 @@
+<section class="max-w-7xl mx-auto px-6 py-10">
+  @if (departmentFacade.department()) {
+    @let uniData = departmentFacade.department()!;
+    <div class="mb-10 text-center">
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+        {{ uniData.name }}
+      </h1>
+      <p class="text-gray-600">استكشف المواد المتاحة داخل القسم {{ uniData.name }}</p>
+    </div>
+
+    @if (curriulumFacade.isCurriulumLoading()) {
+      <div class="flex justify-center py-20">
+        <div
+          class="animate-spin h-10 w-10 border-4 border-indigo-600 border-t-transparent rounded-full"
+        ></div>
+      </div>
+    } @else {
+      @if (curriulumFacade.curriulums().length > 0) {
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          @for (curriulum of curriulumFacade.curriulums(); track $index) {
+            @defer (on viewport; prefetch on idle) {
+              <app-curriulum-carde [curriculum]="curriulum" />
+            } @placeholder {
+              <p-skeleton width="25rem" height="250px"></p-skeleton>
+            }
+          }
+        </div>
+      } @else {
+        <div class="text-center py-20 text-gray-500">لا توجد مواد متاحة حاليًا</div>
+      }
+    }
+  } @else {
+    <div class="flex justify-center items-center h-64">
+      <div class="text-gray-600 animate-pulse">جارٍ تحميل بيانات القسم...</div>
+    </div>
+  }
+</section>

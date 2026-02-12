@@ -1,0 +1,38 @@
+<div class="min-h-[80vh] flex flex-col items-center justify-center font-['Cairo'] rtl p-6" dir="rtl">
+  
+  <div class="text-center mb-12 animate-fadein">
+    <h1 class="text-2xl md:text-4xl font-black text-slate-800 mb-2">
+      مرحباً بك، <span class="text-indigo-600">{{ identity.fullName || 'أستاذنا العزيز' }}</span>
+    </h1>
+    <p class="text-slate-500 font-medium">نحن سعداء بوجودك في منصة الجامعة الذكية</p>
+    <div class="w-40 h-1.5 bg-indigo-600 mx-auto mt-4 rounded-full opacity-20"></div>
+  </div>
+
+  <div class="relative w-full max-w-2xl flex justify-center items-center animate-scalein">
+    <div class="absolute inset-0 bg-indigo-500/5 rounded-full blur-3xl scale-75 -z-10"></div>
+    
+    <img 
+      src="svgviewer-output.svg" 
+      alt="Platform Illustration" 
+      class="w-72 max-w-md md:max-w-lg lg:max-w-xl h-auto drop-shadow-2xl transition-transform duration-700 hover:scale-105"
+    />
+  </div>
+
+  <div class="mt-16 max-w-2xl text-center">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-slate-100 pt-10">
+      <div class="flex flex-col items-center gap-2">
+        <i class="pi pi-book text-indigo-500 text-xl"></i>
+        <span class="text-slate-600 font-bold">ملخصات معتمدة</span>
+      </div>
+      <div class="flex flex-col items-center gap-2 border-x border-slate-100">
+        <i class="pi pi-check-square text-indigo-500 text-xl"></i>
+        <span class="text-slate-600 font-bold">اختبارات ذكية</span>
+      </div>
+      <div class="flex flex-col items-center gap-2">
+        <i class="pi pi-star text-indigo-500 text-xl"></i>
+        <span class="text-slate-600 font-bold">تقييم أكاديمي</span>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,79 @@
+<div class="mb-6 p-2 flex items-center justify-center">
+  @if (fileFacade.isFileLoading()) {
+  } @else if (file) {
+    <div class="w-full max-w-[26rem] transition-all duration-300 hover:scale-[1.02]">
+      <p-card styleClass="shadow-lg border-0 rounded-2xl overflow-hidden">
+        <ng-template #header>
+          <div
+            class="bg-gradient-to-r from-slate-50 to-slate-100 p-4 border-b border-gray-100 flex items-center gap-3"
+          >
+            <i class="pi pi-file-pdf text-red-500 text-2xl"></i>
+            <h3 class="text-gray-800 font-bold text-lg truncate m-0" [title]="file.name">
+              {{ file.name }}
+            </h3>
+          </div>
+        </ng-template>
+
+        <div class="flex flex-col gap-4">
+          @if (file.doctorRatedName !== 'NotRated' || file.comment) {
+            <div class="bg-blue-50 border-s-4 border-blue-400 p-3 rounded-e-lg">
+              <div class="flex items-center gap-2 mb-1">
+                <i class="pi pi-star-fill text-yellow-500 text-sm"></i>
+                @if (isDoctorView) {
+                  <span class="text-sm font-bold text-blue-900"
+                    >تقييمك: {{ file.doctorRatedName }}</span
+                  >
+                } @else {
+                  <span class="text-sm font-bold text-blue-900"
+                    >تقييم الدكتور: {{ file.doctorRatedName }}</span
+                  >
+                }
+              </div>
+              @if (file.comment) {
+                <p class="text-sm text-blue-800 leading-relaxed italic m-0">"{{ file.comment }}"</p>
+              }
+            </div>
+          } @else {
+            <div class="text-center py-4 text-gray-400 border border-dashed rounded-xl">
+              @if (isDoctorView) {
+                <p class="text-sm m-0">لم تضع تقييمك لهذا الملف بعد</p>
+              } @else {
+                <p class="text-sm m-0">لم يقيم الدكتور المحتوي بعد</p>
+              }
+            </div>
+          }
+        </div>
+
+        <ng-template #footer>
+          <div class="flex flex-col gap-3 pt-2">
+            <div class="flex gap-2">
+              <p-button
+                label="معاينة"
+                icon="pi pi-eye"
+                styleClass="w-full p-button-outlined"
+                severity="secondary"
+                (onClick)="show(file.storageName!)"
+              ></p-button>
+              <p-button
+                label="تحميل"
+                icon="pi pi-download"
+                styleClass="w-full"
+                severity="primary"
+                (onClick)="downLoad(file.storageName!)"
+              ></p-button>
+            </div>
+
+            @if (permissionFacade.hasPermission('RateFiles') && isDoctorView) {
+              <p-button
+                label="تقييم المحتوى"
+                icon="pi pi-pencil"
+                styleClass="w-full p-button-raised p-button-warning"
+                (onClick)="goToRate()"
+              ></p-button>
+            }
+          </div>
+        </ng-template>
+      </p-card>
+    </div>
+  }
+</div>

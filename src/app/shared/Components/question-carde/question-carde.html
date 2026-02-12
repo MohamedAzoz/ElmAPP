@@ -1,0 +1,67 @@
+<!-- <div class="bg-white rounded-2xl shadow-lg p-6 md:p-10 animate-fadein">
+  <div class="mb-8 border-b pb-6 border-gray-100">
+    <h2
+      class="text-xl md:text-2xl font-bold text-gray-800 leading-relaxed text-center md:text-start"
+    >
+      {{ question.content }}
+    </h2>
+  </div>
+
+  <div class="grid gap-4">
+    @for (option of question.options; track $index) {
+      <button
+        (click)="select(option)"
+        [disabled]="!!selectedOptionId"
+        [ngClass]="getOptionClass(option)"
+        class="w-full text-start p-4 rounded-xl border-2 transition-all duration-200 flex items-center justify-between group relative overflow-hidden"
+      >
+        <span class="z-10 relative text-lg">{{ option.content }}</span>
+
+        @if (selectedOptionId === option.id) {
+          @if (option.isCorrect) {
+            <i class="pi pi-check-circle text-green-600 text-xl"></i>
+          } @else if (option.isSelected!) {
+            <i class="pi pi-check text-blue-600 text-xl"></i>
+          } @else {
+            <i class="pi pi-times-circle text-red-600 text-xl"></i>
+          }
+        }
+      </button>
+    }
+  </div>
+</div> -->
+<div class="bg-white rounded-2xl shadow-lg p-6 md:p-10 animate-fadein">
+  <div class="mb-8 border-b pb-6 border-gray-100">
+    <h2 class="text-xl md:text-2xl font-bold text-gray-800 leading-relaxed text-center md:text-start">
+      {{ question.content }}
+    </h2>
+  </div>
+
+  <div class="grid gap-4">
+    @for (option of question.options; track $index) {
+      <button
+        (click)="select(option)"
+        [ngClass]="getOptionClass(option)"
+
+        class="w-full text-start p-4 rounded-xl border-2 transition-all duration-200 flex items-center justify-between group relative overflow-hidden"
+
+
+        [disabled]="!!selectedOptionId && !isTestMode(option)"
+      >
+      <span class="z-10 relative text-lg">{{ option.content }}</span>
+
+        @if (selectedOptionId === option.id) {
+            @if (option.isCorrect === true) {
+                <i class="pi pi-check-circle text-green-600 text-xl"></i>
+            }
+            @else if (option.isCorrect === false) {
+                <i class="pi pi-times-circle text-red-600 text-xl"></i>
+            }
+            @else {
+                <i class="pi pi-check text-blue-600 text-xl font-bold"></i>
+            }
+        }
+      </button>
+    }
+  </div>
+</div>

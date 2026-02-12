@@ -1,0 +1,109 @@
+<p-confirmDialog></p-confirmDialog>
+
+<div class="p-6 bg-slate-50 min-h-screen" [dir]="dir.currentDir()">
+  <div class="max-w-5xl mx-auto">
+    <div
+      class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-6 flex justify-between items-auto"
+    >
+      <div>
+        <h1 class="text-2xl font-bold text-slate-800 m-0">
+          صلاحيات المستخدم: <span class="text-blue-600">{{ userName() }}</span>
+        </h1>
+        <p class="text-slate-500 mt-1">عرض وإدارة الصلاحيات الخاصة بهذا الحساب بشكل مباشر</p>
+      </div>
+      <p-button
+        label="إضافة صلاحية للمستخدم"
+        icon="pi pi-plus-circle"
+        (onClick)="openAddDialog()"
+        styleClass="p-button-success rounded-xl"
+      ></p-button>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <p-table
+        [value]="facade.userPermissions()"
+        [loading]="facade.isLoading()"
+        styleClass="p-datatable-striped"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="text-right p-4 bg-slate-50">رقم الصلاحية</th>
+            <th class="text-right p-4 bg-slate-50">اسم الصلاحية</th>
+            <th class="text-center p-4 bg-slate-50">الإجراءات</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-perm>
+          <tr>
+            <td class="p-4">#{{ perm.permissionId }}</td>
+            <td class="p-4 font-bold text-slate-700">
+              <i class="pi pi-key text-yellow-500 ml-2"></i>
+              {{ perm.permissionName }}
+            </td>
+            <td class="p-4 text-center">
+              <button
+                pButton
+                icon="pi pi-trash"
+                class="p-button-rounded p-button-danger p-button-text"
+                (click)="removePermission(perm.permissionName)"
+                pTooltip="سحب الصلاحية"
+              ></button>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="3" class="text-center p-10 text-slate-400">
+              هذا المستخدم لا يملك أي صلاحيات خاصة حالياً.
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<p-dialog
+  [(visible)]="displayAddDialog"
+  header="إسناد صلاحية جديدة"
+  [modal]="true"
+  [draggable]="true"
+  [resizable]="true"
+  [style]="{ width: '400px', height: 'auto' }"
+  styleClass="rounded-2xl"
+>
+  <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-2 pb-4 w-full">
+      <label class="font-bold text-slate-700">اختر الصلاحية</label>
+      <p-select 
+        [options]="facade.permissions()"
+        [(ngModel)]="selectedPermissionName"
+        optionLabel="name"
+        optionValue="name"
+        [filter]="true"
+        filterBy="name"
+        [showClear]="true"
+        placeholder="اختر من القائمة"
+        class="w-full rounded-xl"
+        [dir]="dir.currentDir()"
+      ></p-select>
+    </div>
+
+    <div class="flex justify-end gap-2 mt-6">
+      <p-button
+        label="إلغاء"
+        [text]="true"
+        severity="secondary"
+        (onClick)="displayAddDialog.set(false)"
+      ></p-button>
+      <p-button
+        label="إضافة الآن"
+        icon="pi pi-check"
+        (onClick)="assignPermission()"
+        [disabled]="!selectedPermissionName()"
+        styleClass="rounded-xl"
+      ></p-button>
+    </div>
+  </div>
+</p-dialog>
