@@ -1,8 +1,7 @@
-@import "tailwindcss";
+
 :host {
   display: block;
 }
-
 
 :host ::ng-deep .p-sidebar-header {
    justify-content: space-between;
@@ -24,7 +23,6 @@
   transition: all 0.35s ease-in-out;
   border-radius: 10px;
   font-weight: 500;
-   
 }
 
 :host ::ng-deep .p-menu-overlay {

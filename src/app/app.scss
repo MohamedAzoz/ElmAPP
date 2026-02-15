@@ -31,7 +31,6 @@
   }
 }
 
-/* الحاوية الرئيسية */
 .academic-loader {
   display: flex;
   flex-direction: column;
@@ -40,18 +39,16 @@
   position: relative;
 }
 
-/* الحلقة الخارجية الدوارة */
 .outer-ring {
   width: 120px;
   height: 120px;
   border: 2px solid rgba(255, 215, 0, 0.1);
-  border-top: 2px solid #FFD700; /* لون ذهبي جامعي */
+  border-top: 2px solid #FFD700;
   border-radius: 50%;
   animation: spin 2s linear infinite;
   position: absolute;
 }
 
-/* حاوية الأيقونة مع أنيميشن الطفو والنبض */
 .icon-container {
   display: flex;
   align-items: center;
@@ -63,7 +60,6 @@
   filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
 }
 
-/* نص التحميل */
 .loading-text {
   margin-top: 40px;
   color: #fff;
@@ -74,17 +70,13 @@
   animation: textFade 1.5s ease-in-out infinite alternate;
 }
 
-/* تعريفات الأنيميشن */
-
-/* 1. دوران الحلقة */
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-/* 2. الطفو والنبض (مناسب جداً للرموز التعليمية) */
 @keyframes floatAndPulse {
-  0%, 100% {
+  0% {
     transform: translateY(0) scale(1);
     opacity: 0.8;
   }
@@ -92,9 +84,12 @@
     transform: translateY(-15px) scale(1.1);
     opacity: 1;
   }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.8;
+  }
 }
 
-/* 3. تلاشي النص */
 @keyframes textFade {
   from { opacity: 0.4; }
   to { opacity: 1; }
