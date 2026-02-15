@@ -37,18 +37,19 @@ export class ErrorLogger {
     }
 
     // Send to server in production
-    if (environment.production) {
-      this.sendToServer(errorLog);
-    }
-  }
+  //   if (environment.production) {
+  //     this.sendToServer(errorLog);
+  //   }
+  // }
 
-  private sendToServer(errorLog: ErrorLog): void {
-    // إرسال الخطأ للخادم (يمكن تجاهل الأخطاء هنا)
-    this.http.post(`${environment.apiUrl}/api/logs/errors`, errorLog).subscribe({
-      error: () => {
-        // Silent fail - don't cause infinite loop
-        console.warn('Failed to send error log to server');
-      },
-    });
+//   private sendToServer(errorLog: ErrorLog): void {
+//     // إرسال الخطأ للخادم (يمكن تجاهل الأخطاء هنا)
+//     this.http.post(`${environment.apiUrl}/api/logs/errors`, errorLog).subscribe({
+//       error: () => {
+//         // Silent fail - don't cause infinite loop
+//         console.warn('Failed to send error log to server');
+//       },
+//     });
   }
 }
+

@@ -10,6 +10,8 @@ import { PrimengBtnModule } from '../../../../shared/Models/primeng-btn/primeng-
 import { GlobalService } from '../../../../core/Services/global-service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ProgressSpinner } from 'primeng/progressspinner';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-get-all-questions',
@@ -18,9 +20,10 @@ import { ProgressSpinner } from 'primeng/progressspinner';
     ProgressBarModule,
     ConfirmDialogModule,
     QuestionCarde,
-    ProgressSpinner,
+    SelectButtonModule,
+    FormsModule
   ],
-  providers: [ConfirmationService, MessageService],
+  providers: [ConfirmationService],
   templateUrl: './get-all-questions.html',
   styleUrl: './get-all-questions.scss',
 })
@@ -40,7 +43,7 @@ export class GetAllQuestions implements OnInit {
   private params = toSignal(this.route.paramMap);
   private bankId = computed(() => Number(this.params()?.get('bankId')));
   private questionIdFromUrl = computed(() => Number(this.params()?.get('questionId')));
-
+  isTestMode = signal('ltr');
   // 2. حساب الـ Index بناءً على الـ ID الموجود في الرابط
   currentIndex = computed(() => {
     const id = this.questionIdFromUrl();
@@ -122,7 +125,7 @@ export class GetAllQuestions implements OnInit {
       acceptLabel: 'نعم، أنهِ الاختبار',
       rejectLabel: 'إلغاء',
       accept: () => {
-        this.quizState.calculateScore(this.questions());
+        this.quizState.saveTestResult(this.questions());
         this.messageService.add({
           severity: 'success',
           summary: 'تم الحفظ',

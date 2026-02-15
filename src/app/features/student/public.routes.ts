@@ -5,12 +5,17 @@ export const publicRoutes: Routes = [
   {
     path: 'colleges',
     children: [
-      { path: '', loadComponent: () => import('./Universty/home/home').then((m) => m.Home) },
+      {
+        path: '',
+        title: 'الجامعات',
+        loadComponent: () => import('./Universty/home/home').then((m) => m.Home),
+      },
       {
         path: ':collegeId/years',
         children: [
           {
             path: '',
+            title: 'السنوات',
             loadComponent: () =>
               import('./Colleges/home-college/home-college').then((m) => m.HomeCollege),
           },
@@ -19,6 +24,7 @@ export const publicRoutes: Routes = [
             children: [
               {
                 path: '',
+                title: 'الاقسام',
                 loadComponent: () => import('./Year/home-year/home-year').then((m) => m.HomeYear),
               },
               {
@@ -26,6 +32,7 @@ export const publicRoutes: Routes = [
                 children: [
                   {
                     path: '',
+                    title: 'المناهج',
                     loadComponent: () =>
                       import('./Department/home-department/home-department').then(
                         (m) => m.HomeDepartment,
@@ -36,6 +43,7 @@ export const publicRoutes: Routes = [
                     children: [
                       {
                         path: '',
+                        title: 'المصادر',
                         loadComponent: () =>
                           import('./Curriulums/home-curriulum/home-curriulum').then(
                             (m) => m.HomeCurriulum,
@@ -43,6 +51,7 @@ export const publicRoutes: Routes = [
                       },
                       {
                         path: 'F',
+                        title: 'الملخصات',
                         loadComponent: () =>
                           import('./Files/get-all-files/get-all-files').then((m) => m.GetAllFiles),
                       },
@@ -51,6 +60,7 @@ export const publicRoutes: Routes = [
                         children: [
                           {
                             path: '',
+                            title: 'بنك الاسئلة',
                             loadComponent: () =>
                               import('./QuestionBanks/get-all-question-banks/get-all-question-banks').then(
                                 (m) => m.GetAllQuestionBanks,
@@ -58,6 +68,7 @@ export const publicRoutes: Routes = [
                           },
                           {
                             path: ':bankId/:questionId',
+                            title: 'الاسئلة',
                             loadComponent: () =>
                               import('./Questions/get-all-questions/get-all-questions').then(
                                 (m) => m.GetAllQuestions,
@@ -86,6 +97,7 @@ export const publicRoutes: Routes = [
                       },
                       {
                         path: 'result',
+                        title: 'النتيجة',
                         loadComponent: () =>
                           import('./Result_Exam/result/result').then((m) => m.Result),
                       },

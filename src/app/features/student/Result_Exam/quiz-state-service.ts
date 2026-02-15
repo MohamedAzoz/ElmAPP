@@ -1,184 +1,145 @@
-import { Injectable, signal, effect, computed } from '@angular/core';
+import { Injectable, signal, effect, computed, inject } from '@angular/core';
+import { LocalStorage } from '../../../core/Services/local-storage';
 
 @Injectable({ providedIn: 'root' })
 export class QuizStateService {
-  // تخزين الإجابات: المفتاح هو ID السؤال، والقيمة هي ID الخيار المختار
+  private localStorage = inject(LocalStorage);
   userAnswers = signal<Map<number, number>>(new Map());
-  // المؤقت
+  timeLeft = signal<number>(0);
   timerString = signal<string>('00:00');
-  // timeEnd = signal<number>(0); // بالثواني
-  timeLeft = signal<number>(0); // بالثواني
-  startTime = signal<number>(Date.now());
-  timerTest = computed(() => {
-    const m = Math.floor(this.timeLeft() / 60)
-      .toString()
-      .padStart(2, '0');
-    const s = (this.timeLeft() % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
-  });
-
   private timerInterval: any;
+
+  examResult = signal<any>(null);
+
   private readonly KEYS = {
-    START_TIME: 'quiz_start_time',
     ANSWERS: 'quiz_answers',
-    SCORE: 'quiz_last_score',
+    RESULT: 'quiz_last_result',
+    START_TIME: 'session_start_time',
+    TIMER_EXPIRE: 'quiz_timer_expire', // مفتاح جديد لحفظ وقت الانتهاء
   };
 
   constructor() {
-    // استرجاع الإجابات القديمة إن وجدت
-    const savedAnswers = localStorage.getItem(this.KEYS.ANSWERS);
-    if (savedAnswers) {
-      this.userAnswers.set(new Map(JSON.parse(savedAnswers)));
-    }
+    const savedAnswers = this.localStorage.get(this.KEYS.ANSWERS);
+    if (savedAnswers) this.userAnswers.set(new Map(savedAnswers));
 
-    // عند تغير الإجابات، احفظها في الـ LocalStorage
+    const savedResult = this.localStorage.get(this.KEYS.RESULT);
+    if (savedResult) this.examResult.set(savedResult);
+
     effect(() => {
       const answersObj = Array.from(this.userAnswers().entries());
-      localStorage.setItem(this.KEYS.ANSWERS, JSON.stringify(answersObj));
+      this.localStorage.set(this.KEYS.ANSWERS, answersObj);
     });
+  }
+
+  saveTestResult(data: any) {
+    let finalData;
+    if (Array.isArray(data)) {
+      const questions = data;
+      let correct = 0;
+      const answers = this.userAnswers();
+      questions.forEach((q) => {
+        const selectedOptionId = answers.get(q.id);
+        const correctOption = q.options?.find((o: any) => o.isCorrect);
+        if (selectedOptionId && correctOption && selectedOptionId === correctOption.id) {
+          correct++;
+        }
+      });
+      finalData = {
+        score: questions.length > 0 ? (correct / questions.length) * 100 : 0,
+        correct: correct,
+        total: questions.length,
+      };
+    } else {
+      finalData = {
+        score: data.gradePercentage ?? data.score,
+        correct: data.correctAnswers ?? data.correct,
+        total: data.totalQuestions ?? data.total,
+        details: data.details,
+      };
+    }
+
+    this.examResult.set(finalData);
+    this.localStorage.set(this.KEYS.RESULT, finalData);
+    this.stopTimer();
   }
 
   startTimer() {
-    let startTime = localStorage.getItem(this.KEYS.START_TIME);
-
-    if (!startTime) {
-      startTime = Date.now().toString();
-      localStorage.setItem(this.KEYS.START_TIME, startTime);
-    }
-
+    this.stopTimer();
+    const startTime = Date.now();
     this.timerInterval = setInterval(() => {
-      const now = Date.now();
-      const diff = Math.floor((now - Number(startTime)) / 1000);
-
-      const minutes = Math.floor(diff / 60)
+      const diff = Math.floor((Date.now() - startTime) / 1000);
+      const m = Math.floor(diff / 60)
         .toString()
         .padStart(2, '0');
-      const seconds = (diff % 60).toString().padStart(2, '0');
-
-      this.timerString.set(`${minutes}:${seconds}`);
-    }, 800);
+      const s = (diff % 60).toString().padStart(2, '0');
+      this.timerString.set(`${m}:${s}`);
+    }, 1000);
   }
 
-  saveAnswer(questionId: number, optionId: number) {
-    this.userAnswers.update((map) => {
-      const newMap = new Map(map);
-      newMap.set(questionId, optionId);
-      return newMap;
-    });
-  }
-
-  getAnswer(questionId: number): number | undefined {
-    return this.userAnswers().get(questionId);
-  }
-
-  // حساب الدرجة
-  calculateScore(questions: any[]): number {
-    let correct = 0;
-    const answers = this.userAnswers();
-
-    questions.forEach((q) => {
-      const selectedOptionId = answers.get(q.id);
-      const correctOption = q.options?.find((o: any) => o.isCorrect);
-      if (selectedOptionId && correctOption && selectedOptionId === correctOption.id) {
-        correct++;
-      }
-    });
-
-    const finalScore = (correct / questions.length) * 100;
-    localStorage.setItem(
-      this.KEYS.SCORE,
-      JSON.stringify({
-        score: finalScore,
-        correct: correct,
-        total: questions.length,
-      }),
-    );
-    return finalScore;
-  }
-
-  getSavedScore() {
-    const score = localStorage.getItem(this.KEYS.SCORE);
-    return score ? JSON.parse(score) : null;
-  }
-
-  resetQuiz() {
-    localStorage.removeItem(this.KEYS.START_TIME);
-    localStorage.removeItem(this.KEYS.ANSWERS);
-    clearInterval(this.timerInterval);
-    this.userAnswers.set(new Map());
-    this.timerString.set('00:00');
-  }
-
-  clearAll() {
-    this.resetQuiz();
-    localStorage.removeItem(this.KEYS.SCORE);
-    this.userAnswers.set(new Map());
-    this.examResult = null;
+  // التعديل هنا: نمرر مدة الاختبار بالثواني
+  startCountdown(totalSeconds: number) {
     this.stopTimer();
-  }
-  private examResult: any = null;
 
-  // دالة لحفظ نتيجة الاختبار القادمة من الـ API
-  saveTestResult(data: any) {
-    this.examResult = {
-      score: data.scorePercentage, // ربط النسبة المئوية
-      correct: data.correctAnswers, // ربط عدد الإجابات الصحيحة
-      total: data.totalQuestions, // ربط إجمالي الأسئلة
-    };
-  }
+    // التحقق أولاً إذا كان هناك وقت محفوظ مسبقاً (لحماية الوقت عند الـ Refresh)
+    let expiryTime = this.localStorage.get(this.KEYS.TIMER_EXPIRE);
 
-  // الدالة التي تستخدمها صفحة Result لعرض البيانات
-  getSavedScoreForTest() {
-    return this.examResult;
-  }
-
-  // TimeEnd(time: number) {
-  //   this.timeEnd.set(Math.round(time * 60));
-  // }
-  // هل مر 2 دقيقة؟ (120 ثانية)
-  // canSubmit = computed(() => {
-  //   const elapsed = Math.floor((Date.now() - this.startTime()) / 1000);
-  //   return elapsed >= 60;
-  // console.log(this.timeEnd());
-  // return elapsed >= this.timeEnd();
-  // });
-
-  // canSubmit = computed(() => {
-  //   const elapsed = Math.round((Date.now() - this.startTime()) / 1000);
-  //   return elapsed >= 60;
-  // });
-
-  startCountdown(expiresAt: Date) {
-    const expiry = new Date(expiresAt).getTime();
-
-    // حفظ وقت البدء الفعلي في localStorage إذا لم يكن موجوداً لمنع تصفير الـ 2 دقيقة
-    const storedStart = localStorage.getItem('session_start_time');
-    if (storedStart) {
-      this.startTime.set(Number(storedStart));
-    } else {
-      const now = Date.now();
-      localStorage.setItem('session_start_time', now.toString());
-      this.startTime.set(now);
+    if (!expiryTime) {
+      // إذا لم يوجد، نحسب وقت الانتهاء من الآن ونحفظه
+      expiryTime = Date.now() + totalSeconds * 1000;
+      this.localStorage.set(this.KEYS.TIMER_EXPIRE, expiryTime);
     }
 
-    if (this.timerInterval) clearInterval(this.timerInterval);
+    const expiry = Number(expiryTime);
 
     this.timerInterval = setInterval(() => {
-      const now = Date.now();
-      const diff = Math.floor((expiry - now) / 1000);
-
+      const diff = Math.floor((expiry - Date.now()) / 1000);
       if (diff <= 0) {
         this.timeLeft.set(0);
-        clearInterval(this.timerInterval);
-        // يمكنك هنا استدعاء دالة الإنهاء التلقائي
+        this.stopTimer();
+        this.localStorage.remove(this.KEYS.TIMER_EXPIRE); // تنظيف الوقت عند الانتهاء
       } else {
         this.timeLeft.set(diff);
       }
     }, 1000);
   }
 
+  timerTest = computed(() => {
+    const totalSeconds = this.timeLeft();
+    if (totalSeconds <= 0) return '00:00';
+
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60;
+
+    // تنسيق الوقت ليظهر HH:MM:SS إذا زاد عن ساعة، أو MM:SS إذا كان أقل
+    const hoursPart = h > 0 ? `${h.toString().padStart(2, '0')}:` : '';
+    return `${hoursPart}${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  });
+
   stopTimer() {
-    clearInterval(this.timerInterval);
-    localStorage.removeItem('session_start_time');
+    if (this.timerInterval) clearInterval(this.timerInterval);
+  }
+
+  clearAll() {
+    this.stopTimer();
+    this.userAnswers.set(new Map());
+    this.examResult.set(null);
+    this.timerString.set('00:00');
+    this.timeLeft.set(0);
+    this.localStorage.remove(this.KEYS.ANSWERS);
+    this.localStorage.remove(this.KEYS.RESULT);
+    this.localStorage.remove(this.KEYS.TIMER_EXPIRE); // حذف وقت العداد
+  }
+
+  getAnswer(questionId: number) {
+    return this.userAnswers().get(questionId);
+  }
+
+  saveAnswer(qId: number, oId: number) {
+    this.userAnswers.update((m) => {
+      const newMap = new Map(m);
+      newMap.set(qId, oId);
+      return newMap;
+    });
   }
 }

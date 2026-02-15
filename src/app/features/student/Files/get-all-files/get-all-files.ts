@@ -12,7 +12,7 @@ import { GlobalService } from '../../../../core/Services/global-service';
   styleUrl: './get-all-files.scss',
 })
 export class GetAllFiles implements OnInit {
-  private curriulumFacade = inject(CurriulumFacade);
+   curriulumFacade = inject(CurriulumFacade);
   private title = inject(GlobalService);
   private fileFacade = inject(FileFacade);
   private active = inject(ActivatedRoute);

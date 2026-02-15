@@ -1,85 +1,95 @@
-<div class="min-h-screen flex items-stretch bg-white font-['Cairo']" [dir]="dir.currentDir()">
-  <div
-    class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-indigo-700 via-blue-800 to-indigo-900 items-center justify-center p-12 relative overflow-hidden"
-  >
-    <div class="relative text-center z-10" [dir]="dir.currentDir()">
-      <div class="bg-white/10 backdrop-blur-lg p-8 rounded-3xl border border-white/20 shadow-2xl">
-        <i class="pi pi-graduation-cap text-white mb-6 block drop-shadow-lg"></i>
-        <h1 class="text-4xl font-black text-white mb-4 tracking-tight">منصة الجامعة الذكية</h1>
-        <p class="text-blue-100 text-lg leading-relaxed max-w-md mx-auto">
-          مرحباً بك في بوابتك الأكاديمية الرقمية. تابع دروسك، اختباراتك، وتواصل مع كليتك بكل سهولة.
-        </p>
-      </div>
-    </div>
-    <div class="absolute top-[-10%] right-[-10%] w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+@if (rateLimitService.isLoginLocked()) {
+  <app-lock-ui type="login"></app-lock-ui>
+} @else {
+<div class="min-h-screen flex items-stretch bg-surface" dir="ltr">
     <div
-      class="absolute bottom-[-10%] left-[-10%] w-80 h-80 bg-blue-500/20 rounded-full blur-3xl"
-    ></div>
-  </div>
-
-  <div class="w-full lg:w-1/2 flex items-center justify-center p-8 md:p-16 bg-gray-50">
-    <div class="w-full max-w-md space-y-8">
-      <div class="text-center lg:text-start">
-        <h2 class="text-3xl font-bold text-gray-900 tracking-tight">تسجيل الدخول</h2>
-        <p class="mt-2 text-gray-500 font-medium">قم بإدخال بياناتك الأكاديمية للمتابعة</p>
+      class="hidden lg:flex lg:w-1/2 bg-linear-to-br from-indigo-700 via-blue-800 to-indigo-900 items-center justify-center p-12 relative overflow-hidden"
+    >
+      <div class="relative text-center z-10" dir="ltr">
+        <div class="bg-white/10 backdrop-blur-lg p-8 rounded-3xl border border-white/20 shadow-2xl">
+          <i class="pi pi-graduation-cap text-white mb-6 block drop-shadow-lg"></i>
+          <h1 class="text-4xl font-black text-white mb-4 tracking-tight">منصة الجامعة الذكية</h1>
+          <p class="text-blue-100 text-lg leading-relaxed max-w-md mx-auto">
+            مرحباً بك في بوابتك الأكاديمية الرقمية. تابع دروسك، اختباراتك، وتواصل مع كليتك بكل
+            سهولة.
+          </p>
+        </div>
       </div>
-      @if (authFacade.error()) {
-        <p-message
-          severity="error"
-          [text]="authFacade.error()!"
-          styleClass="w-full mb-4"
-        ></p-message>
-      }
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="mt-8 space-y-6">
-        <div class="space-y-4">
-          <div class="flex flex-col gap-2">
-            <label class="text-sm font-semibold text-gray-700 ml-1">اسم المستخدم</label>
-            <span class="p-input-icon-left w-full">
-              <i class="pi pi-user text-gray-400"></i>
-              <input
-                type="text"
-                pInputText
-                formControlName="userName"
-                placeholder="أدخل اسم المستخدم"
-                class="w-full p-3 border-gray-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 rounded-xl border-gray-200 focus:border-indigo-500 transition-all shadow-sm"
-              />
-            </span>
-            @if (loginForm.get('userName')?.touched && loginForm.get('userName')?.invalid) {
-              <small class="text-red-500 font-medium ml-1 animate-fadein"
-                >اسم المستخدم مطلوب (3 أحرف على الأقل)</small
-              >
-            }
+      <div
+        class="absolute top-[-10%] right-[-10%] w-96 h-96 bg-white/10 rounded-full blur-3xl"
+      ></div>
+      <div
+        class="absolute bottom-[-10%] left-[-10%] w-80 h-80 bg-blue-500/20 rounded-full blur-3xl"
+      ></div>
+    </div>
+
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-8 md:p-16 bg-gray-50">
+      <div class="w-full max-w-md space-y-8">
+        <div class="text-center lg:text-start">
+          <h2 class="text-3xl font-bold text-gray-900 tracking-tight">تسجيل الدخول</h2>
+          <p class="mt-2 text-gray-500 font-medium">قم بإدخال بياناتك الأكاديمية للمتابعة</p>
+        </div>
+        @if (authFacade.error()) {
+          <p-message
+            severity="error"
+            [text]="authFacade.error()!"
+            styleClass="w-full mb-4"
+          ></p-message>
+        }
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="mt-8 space-y-6">
+          <div class="space-y-4">
+            <div class="flex flex-col gap-2">
+              <label class="text-sm font-semibold text-gray-700 ml-1">اسم المستخدم</label>
+              <span class="p-input-icon-left w-full">
+                <i class="pi pi-user text-gray-400"></i>
+                <input
+                  type="text"
+                  pInputText
+                  formControlName="userName"
+                  placeholder="أدخل اسم المستخدم"
+                  class="w-full p-3 border-gray-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 rounded-xl transition-all shadow-sm"
+                  pattern="^[a-zA-Z][a-zA-Z0-9@#$!%*?&]{6,15}$"
+                />
+              </span>
+              <!-- pattern('^[a-zA-Z][a-zA-Z0-9@#$!%*?&]{7,15}$') -->
+              @if (loginForm.get('userName')?.touched && loginForm.get('userName')?.invalid) {
+                <small class="text-red-500 font-medium ml-1 animate-fadein"
+                  >اسم المستخدم مطلوب (6 أحرف على الأقل)</small
+                >
+              }
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="text-sm font-semibold text-gray-700 ml-1">كلمة المرور</label>
+              <p-password
+                formControlName="password"
+                [toggleMask]="true"
+                [feedback]="false"
+                placeholder="••••••••"
+                styleClass="w-full"
+                inputStyleClass="w-full p-3 rounded-xl border-gray-200 focus:border-indigo-500 shadow-sm"
+                pattern="^[a-zA-Z][a-zA-Z0-9@#$!%*?&]{6,15}$"
+              ></p-password>
+              @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
+                <small class="text-red-500 font-medium ml-1 animate-fadein"
+                  >كلمة المرور مطلوبة (6 أحرف على الأقل)</small
+                >
+              }
+            </div>
           </div>
 
-          <div class="flex flex-col gap-2">
-            <label class="text-sm font-semibold text-gray-700 ml-1">كلمة المرور</label>
-            <p-password
-              formControlName="password"
-              [toggleMask]="true"
-              [feedback]="false"
-              placeholder="••••••••"
-              styleClass="w-full"
-              inputStyleClass="w-full p-3 rounded-xl border-gray-200 focus:border-indigo-500 shadow-sm"
-            ></p-password>
-            @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
-              <small class="text-red-500 font-medium ml-1 animate-fadein"
-                >كلمة المرور غير صحيحة</small
-              >
-            }
+          <div>
+            <button
+              pButton
+              type="submit"
+              label="تسجيل الدخول"
+              [loading]="authFacade.isLoading()"
+              [disabled]="loginForm.invalid"
+              class="w-full p-4 bg-main hover:bg-main-hover border-none rounded-xl text-lg font-bold shadow-lg shadow-accent-soft transition-all transform hover:-translate-y-0.5 active:scale-95"
+            ></button>
           </div>
-        </div>
-
-        <div>
-          <button
-            pButton
-            type="submit"
-            label="تسجيل الدخول"
-            [loading]="authFacade.isLoading()"
-            [disabled]="loginForm.invalid"
-            class="w-full p-4 bg-indigo-600 hover:bg-indigo-700 border-none rounded-xl text-lg font-bold shadow-lg shadow-indigo-100 transition-all transform hover:-translate-y-0.5 active:scale-95"
-          ></button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   </div>
-</div>
+}

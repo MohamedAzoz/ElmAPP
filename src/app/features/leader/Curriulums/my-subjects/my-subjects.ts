@@ -1,12 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CurriulumCarde } from '../../../../shared/Components/curriulum-carde/curriulum-carde';
 import { CurriulumFacade } from '../curriulum-facade';
 import { IdentitySignals } from '../../../../core/Auth/services/identity-signals';
 import { DirectionService } from '../../../../core/Services/direction';
+import { Carde } from '../../../../shared/Components/carde/carde';
 
 @Component({
   selector: 'app-my-subjects',
-  imports: [CurriulumCarde],
+  imports: [Carde],
   templateUrl: './my-subjects.html',
   styleUrl: './my-subjects.scss',
 })

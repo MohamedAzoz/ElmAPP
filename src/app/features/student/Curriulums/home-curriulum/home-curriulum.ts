@@ -14,7 +14,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 export class HomeCurriulum implements OnInit {
   private active = inject(ActivatedRoute);
   private title = inject(GlobalService);
-  private curriulumFacade = inject(CurriulumFacade);
+ curriulumFacade = inject(CurriulumFacade);
 
   private lastLoadedId = signal<number | null>(null);
   private params = toSignal(this.active.paramMap);

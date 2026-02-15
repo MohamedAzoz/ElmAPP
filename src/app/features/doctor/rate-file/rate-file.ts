@@ -37,7 +37,7 @@ export class RateFile implements OnInit {
 
   ngOnInit() {
     const fileId = Number(this.route.snapshot.paramMap.get('fileId'));
-    const doctorId = this.identity.userId || '09bf356d-5114-4df6-905a-2a15a265e6c9';
+    const doctorId = this.identity.userId;
 
     this.rateForm = this.fb.group({
       fileId: [fileId, Validators.required],
@@ -45,6 +45,8 @@ export class RateFile implements OnInit {
       rating: [null, [Validators.required, Validators.min(1)]],
       comment: [''],
     });
+    console.log(this.rateForm.value);
+    
   }
 
   submitRating() {

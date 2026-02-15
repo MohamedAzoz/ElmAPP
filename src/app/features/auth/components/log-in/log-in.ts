@@ -7,10 +7,12 @@ import { MessageService } from 'primeng/api';
 import { GlobalService } from '../../../../core/Services/global-service';
 import { PrimengModule } from '../../../../shared/Models/primeng/primeng-module';
 import { DirectionService } from '../../../../core/Services/direction';
+import { LockUi } from '../../../../shared/Components/lock-ui/lock-ui';
+import { RateLimitService } from '../../../../core/Services/rate-limit-service';
 
 @Component({
   selector: 'app-log-in',
-  imports: [ReactiveFormsModule, PrimengModule],
+  imports: [ReactiveFormsModule, PrimengModule, LockUi],
   templateUrl: './log-in.html',
   styleUrl: './log-in.scss',
 })
@@ -19,16 +21,20 @@ export class LogIn implements OnInit {
   private router = inject(Router);
   private messageService = inject(MessageService);
   private globalService = inject(GlobalService);
+  public rateLimitService = inject(RateLimitService);
   public authFacade = inject(AuthFacade);
-  dir = inject(DirectionService);
+  // dir = inject(DirectionService);
 
   loginForm!: FormGroup;
 
   ngOnInit() {
+    this.authFacade.clearState();
+
     this.globalService.setTitle('تسجيل الدخول');
     this.loginForm = this.fb.group({
-      userName: ['', [Validators.required, Validators.minLength(6)]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      userName: ['', [Validators.required, Validators.pattern('^[a-zA-Z][a-zA-Z0-9@#$!%*?&]{6,15}$')]],
+      // password mach Mz@200445 ar any password the same rules
+      password: ['', [Validators.required,Validators.pattern('^[a-zA-Z][a-zA-Z0-9@#$!%*?&]{6,15}$')]],
     });
   }
 

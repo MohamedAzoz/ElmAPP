@@ -1,21 +1,32 @@
-<p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
 
 <div class="p-6 bg-slate-50 min-h-screen" [dir]="dir.currentDir()">
   <div class="max-w-6xl mx-auto">
     
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex flex-wrap gap-2 md:justify-between justify-center items-center mb-6 bg-surface p-4 rounded-xl shadow-lg">
       <div>
-        <h1 class="text-2xl font-bold text-slate-800 m-0">إدارة بنوك الأسئلة</h1>
-        <p class="text-slate-500">قم بإضافة وتعديل بنوك الأسئلة لهذا المنهج</p>
+        <h1 class="text-2xl font-bold text-text-dark m-0">إدارة بنوك الأسئلة</h1>
+        <p class="text-text-muted">قم بإضافة وتعديل بنوك الأسئلة لهذا المنهج</p>
       </div>
-      <p-button 
-        label="بنك جديد" 
-        icon="pi pi-plus" 
-        severity="primary" 
-        (onClick)="showAddDialog()"
+      <!-- back button -->
+      <div class="flex gap-2">
+        <p-button 
+          label="رجوع" 
+          icon="pi pi-arrow-right" 
+          severity="secondary" 
+         [routerLink]="['../']"
         styleClass="rounded-xl shadow-md"
       ></p-button>
+      </div>
+      <div class="flex gap-2">
+        <p-button 
+          label="بنك جديد" 
+          icon="pi pi-plus" 
+          severity="primary" 
+          (onClick)="showAddDialog()"
+        styleClass="rounded-xl shadow-md"
+      ></p-button>
+      </div>
     </div>
 
     <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">

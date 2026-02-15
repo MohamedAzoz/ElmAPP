@@ -20,8 +20,6 @@ export const permissionGuard: CanActivateFn = (route, state) => {
   if (hasPermission) {
     return true; // مسموح له بالدخول
   } else {
-    // 3. غير مسموح له، حوله لصفحة الخطأ
-    // ملاحظة: تأكد أن المسار '/access-denied' موجود فعلياً في الـ Routes الرئيسية
     return router.createUrlTree(['/access-denied']); 
   }
 };

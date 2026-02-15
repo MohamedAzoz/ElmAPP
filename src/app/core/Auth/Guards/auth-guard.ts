@@ -9,5 +9,6 @@ export const authGuard: CanActivateFn = (route, state) => {
   if (identity.isAuthenticated) {
     return true;
   }
+  // التوجيه الصحيح بدون عمل nested URLs
   return router.navigate(['/main/login']);
 };

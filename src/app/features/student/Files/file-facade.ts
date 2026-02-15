@@ -24,7 +24,6 @@ export class FileFacade {
       error: (err) => console.error('فشل في فتح الملف:', err),
     });
   }
-
   // دالة التحميل (ستكشف لك سبب خطأ 500)
   downloadFile(storageName: string) {
     const url = `${this.baseUrl}/api/FilePublic/DownloadFile/${storageName}`;
@@ -58,4 +57,5 @@ export class FileFacade {
       },
     });
   }
+
 }

@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { QuestionBankFacade } from '../question-bank-facade';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -27,7 +27,8 @@ import { DirectionService } from '../../../../core/Services/direction';
     DialogModule,
     ToastModule,
     ConfirmDialogModule,
-  ],
+    RouterLink
+],
   providers: [MessageService, ConfirmationService],
   templateUrl: './get-all-question-banks-for-leader.html',
   styleUrl: './get-all-question-banks-for-leader.scss',

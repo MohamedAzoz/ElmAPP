@@ -11,6 +11,11 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { QuestionBankFacade } from '../../../QuestionBanks/question-bank-facade';
 import { GlobalService } from '../../../../../core/Services/global-service';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { StartTestCommand } from '../../../../../core/api/clients';
+import { LocalStorage } from '../../../../../core/Services/local-storage';
+import { RateLimitService } from '../../../../../core/Services/rate-limit-service';
+import { LockUi } from '../../../../../shared/Components/lock-ui/lock-ui';
+import { MessageService } from 'primeng/api';
 @Component({
   selector: 'app-start-test',
   standalone: true,
@@ -21,14 +26,18 @@ import { toSignal } from '@angular/core/rxjs-interop';
     PrimengBtnModule,
     CardModule,
     FloatLabelModule,
+    LockUi,
   ],
   templateUrl: './start-test.html',
   styleUrl: './start-test.scss',
 })
 export class StartTest implements OnInit {
   private route = inject(ActivatedRoute);
+  public rateLimitService = inject(RateLimitService);
   private router = inject(Router);
   private title = inject(GlobalService);
+  private localStorage = inject(LocalStorage);
+  private messageService = inject(MessageService);
   bankFacade = inject(QuestionBankFacade);
   testFacade = inject(TestFacade);
   selectedBank = signal<any>(null);
@@ -36,6 +45,7 @@ export class StartTest implements OnInit {
 
   private params = toSignal(this.route.paramMap);
   private curriculumId = computed(() => Number(this.params()?.get('curriculumId')));
+
   constructor() {
     effect(() => {
       const id = this.curriculumId();
@@ -58,38 +68,38 @@ export class StartTest implements OnInit {
   ngOnInit() {
     this.title.setTitle('بدء الاختبار');
   }
-
-  // toMinutes(time: string): number {
-  //   const [hours, minutes] = time.split(':').map(Number);
-  //   return (hours * 60 + minutes) * 0.1;
-  // }
-  // في الملف start-test.ts
   onStart() {
     if (!this.selectedBank()) return;
 
-    const command = {
+    const command: StartTestCommand = {
       questionsBankId: this.selectedBank().id,
       numberOfQuestions: this.numQuestions(),
     };
 
+    this.testFacade.isStarting.set(true);
+
     this.testFacade.startTest(command).subscribe({
       next: (res) => {
         this.testFacade.isStarting.set(false);
-        // this.quiztestFacade.TimeEnd(this.toMinutes(res.data?.duration || '0'));
-        this.testFacade.currentTestData.set(res.data || null);
-        // التأكد من وجود أسئلة قبل الانتقال
-        const firstQuestionId = res.data?.questions?.[0]?.id;
-        if (firstQuestionId) {
-          // نستخدم ['./', id] للانتقال نسبةً للمسار الحالي (الذي ينتهي بـ /T)
-          // ليصبح المسار: /T/123
+        const questions = res.data || [];
+
+        this.testFacade.currentTestData.set(questions);
+
+        if (questions.length > 0) {
+          this.localStorage.set('current_session', questions);
+          const firstQuestionId = questions[0].id;
           this.router.navigate([firstQuestionId], { relativeTo: this.route });
         } else {
-          console.error('البنك فارغ، لا توجد أسئلة لبدء الاختبار');
+          this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'البنك فارغ' });
         }
       },
       error: (err) => {
         this.testFacade.isStarting.set(false);
-        console.error('خطأ في بدء الجلسة', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'خطأ',
+          detail: 'خطأ في بدء الاختبار',
+        });
       },
     });
   }

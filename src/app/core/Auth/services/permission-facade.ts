@@ -6,12 +6,14 @@ import {
   UserPermissionPublicClient,
 } from '../../../core/api/clients';
 import { finalize } from 'rxjs';
+import { LocalStorage } from '../../Services/local-storage';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PermissionFacade {
   private userPermissionPublic = inject(UserPermissionPublicClient);
+  private localStorage = inject(LocalStorage);
   private rolePermissionPublic = inject(RolePermissionPublicClient);
 
   // --- Signals الحالة (State) ---
@@ -54,13 +56,13 @@ export class PermissionFacade {
   }
   setPermissions(permissions: GetPermissionsDto[]) {
     this.userPermissions.set(permissions);
-    localStorage.setItem('permissions', JSON.stringify(permissions));
+    this.localStorage.set('permissions', permissions);
   }
   // داخل PermissionFacade
   // تأكد أن هذا السطر يرجع قيمة الـ signal مباشرة
   Permissions = computed(() => {
-    const stored = localStorage.getItem('permissions');
-    const fromStore = stored ? JSON.parse(stored) as GetPermissionsDto[] : [];
+    const stored = this.localStorage.get('permissions');
+    const fromStore = stored ? (stored as GetPermissionsDto[]) : [];
     return this.userPermissions().length > 0 ? this.userPermissions() : fromStore;
   });
 

@@ -1,150 +1,3 @@
-<!-- <p-toast></p-toast>
-<p-confirmDialog></p-confirmDialog>
-
-<div class="p-6 bg-slate-50 min-h-screen rtl">
-  <div class="max-w-7xl mx-auto">
-    
-    <div class="flex flex-col md:flex-row justify-between items-center bg-white p-8 rounded-3xl shadow-sm mb-8 border border-slate-100 gap-4">
-      <div>
-        <h1 class="text-3xl font-black text-slate-800 m-0">إدارة الكليات</h1>
-        <p class="text-slate-500 mt-2 text-lg">التحكم في كليات الجامعة والبيانات الأساسية لها</p>
-      </div>
-      <p-button 
-        label="إضافة كلية جديدة" 
-        icon="pi pi-plus" 
-        (onClick)="openAddDialog()"
-        styleClass="rounded-2xl shadow-lg p-button-primary p-4 font-bold"
-      ></p-button>
-    </div>
-
-    <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
-      <p-table 
-        [value]="collegeFacade.colleges()" 
-        [loading]="collegeFacade.isLoading()"
-        [rows]="10" 
-        [paginator]="true"
-        styleClass="p-datatable-lg p-datatable-striped"
-        [responsiveLayout]="'scroll'"
-      >
-        <ng-template pTemplate="header">
-          <tr class="bg-slate-50">
-            <th class="py-5 px-6 text-right text-slate-600 uppercase text-sm font-bold">الشعار</th>
-            <th class="py-5 px-6 text-right text-slate-600 uppercase text-sm font-bold">اسم الكلية</th>
-            <th class="py-5 px-6 text-center text-slate-600 uppercase text-sm font-bold">الإجراءات</th>
-          </tr>
-        </ng-template>
-
-        <ng-template pTemplate="body" let-college>
-          <tr class="hover:bg-indigo-50/30 transition-all duration-200">
-            <td class="py-4 px-6">
-              <div class="relative group w-16 h-16">
-                @if (college.imagName) {
-                  <img 
-                    [src]="imageFacade.imageUrl + '/' + college.imagName" 
-                    class="w-16 h-16 rounded-2xl object-cover shadow-sm border-2 border-white group-hover:scale-105 transition-transform"
-                    alt="Logo"
-                  />
-                  <button 
-                    (click)="deleteOnlyImage(college.id)"
-                    class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <i class="pi pi-times text-[10px]"></i>
-                  </button>
-                } @else {
-                  <div 
-                    (click)="openImageDialog(college.id, false)"
-                    class="w-16 h-16 rounded-2xl bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center cursor-pointer hover:bg-slate-200 transition-colors"
-                  >
-                    <i class="pi pi-image text-slate-400 text-xl"></i>
-                  </div>
-                }
-              </div>
-            </td>
-            <td class="py-4 px-6">
-              <span class="text-slate-700 font-bold text-lg">{{ college.name }}</span>
-            </td>
-            <td class="text-center">
-              <div class="flex justify-center gap-3">
-                <button 
-                  pButton icon="pi pi-pencil" 
-                  class="p-button-rounded p-button-text p-button-info hover:bg-info-50" 
-                  (click)="openEditDialog(college)"
-                  pTooltip="تعديل الاسم"
-                ></button>
-                
-                <button 
-                  pButton icon="pi pi-camera" 
-                  class="p-button-rounded p-button-text p-button-success" 
-                  (click)="openImageDialog(college.id, !!college.imagName)"
-                  pTooltip="تغيير الصورة"
-                ></button>
-
-                <button 
-                  pButton icon="pi pi-trash" 
-                  class="p-button-rounded p-button-text p-button-danger" 
-                  (click)="deleteCollege(college.id)"
-                  pTooltip="حذف الكلية"
-                ></button>
-              </div>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </div>
-  </div>
-</div>
-
-<p-dialog 
-  [(visible)]="displayCollegeDialog" 
-  [header]="isEditMode() ? 'تحديث بيانات الكلية' : 'إضافة كلية جديدة'" 
-  [modal]="true" 
-  [style]="{width: '450px'}" 
-  styleClass="rounded-3xl shadow-2xl"
->
-  <div class="flex flex-col gap-6 py-4">
-    <div class="flex flex-col gap-3">
-      <label class="font-bold text-slate-700 text-lg">اسم الكلية</label>
-      <input 
-        pInputText 
-        [(ngModel)]="collegeForm.name" 
-        placeholder="مثلاً: كلية الطب البشري" 
-        class="w-full p-4 rounded-xl border-slate-200 focus:border-indigo-500"
-      />
-    </div>
-  </div>
-  <ng-template pTemplate="footer">
-    <div class="flex gap-2 justify-end px-2 pb-2">
-      <p-button label="إلغاء" [text]="true" severity="secondary" (onClick)="displayCollegeDialog.set(false)"></p-button>
-      <p-button [label]="isEditMode() ? 'تحديث الآن' : 'حفظ الكلية'" icon="pi pi-check" (onClick)="saveCollege()" [disabled]="!collegeForm.name"></p-button>
-    </div>
-  </ng-template>
-</p-dialog>
-
-<p-dialog 
-  [(visible)]="displayImageDialog" 
-  header="رفع شعار الكلية" 
-  [modal]="true" 
-  [style]="{width: '400px'}"
-  styleClass="rounded-3xl"
->
-  <div class="flex flex-col items-center gap-6 py-8 text-center">
-    <div class="w-24 h-24 bg-indigo-50 rounded-full flex items-center justify-center">
-      <i class="pi pi-cloud-upload text-4xl text-indigo-500"></i>
-    </div>
-    <div>
-      <h3 class="font-bold text-slate-800">اختر شعار الكلية</h3>
-      <p class="text-slate-400 text-sm">يفضل أن تكون الصورة بصيغة PNG أو JPG</p>
-    </div>
-    <p-fileUpload 
-      mode="basic" 
-      chooseLabel="اختيار ملف" 
-      [auto]="true" 
-      (onSelect)="onImageUpload($event)"
-      styleClass="p-button-rounded"
-    ></p-fileUpload>
-  </div>
-</p-dialog> -->
-
 <p-confirmDialog></p-confirmDialog>
 
 <div class="p-6 bg-slate-50 min-h-screen rtl">
@@ -196,13 +49,13 @@
                     class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center cursor-pointer"
                     (click)="openImageDialog(college.id,college.storageName, false)"
                   >
-                    <i class="pi pi-camera text-slate-400"></i>
+                    <i class="pi pi-camera text-text-muted"></i>
                   </div>
                 }
               </div>
             </td>
             <td>
-              <span class="font-bold text-slate-700 text-lg">{{ college.name }}</span>
+              <span class="font-semibold text-text-main text-lg">{{ college.name }}</span>
             </td>
 
             <td class="text-center">
@@ -213,7 +66,7 @@
                 severity="secondary"
                 size="small"
                 routerLink="{{ college.id }}/departments"
-                styleClass="rounded-xl font-bold"
+                styleClass="rounded-xl font-semibold"
               ></p-button>
             </td>
             <td class="text-center">
@@ -224,7 +77,7 @@
                 severity="secondary"
                 size="small"
                 routerLink="{{ college.id }}"
-                styleClass="rounded-xl font-bold"
+                styleClass="rounded-xl font-semibold"
               ></p-button>
             </td>
             <td class="text-center">
@@ -268,7 +121,7 @@
 >
   <div class="flex flex-col gap-4 pt-4">
     <div class="flex flex-col gap-2">
-      <label class="font-bold text-slate-600">اسم الكلية</label>
+      <label class="font-bold text-text-main">اسم الكلية</label>
       <input
         pInputText
         [(ngModel)]="collegeForm.name"
@@ -301,8 +154,8 @@
   styleClass="rounded-3xl"
 >
   <div class="flex flex-col items-center gap-6 py-6 text-center">
-    <div class="p-4 bg-indigo-50 rounded-full">
-      <i class="pi pi-upload text-3xl text-indigo-500"></i>
+    <div class="p-4 bg-gray-50 rounded-2xl">
+      <i class="pi pi-upload text-3xl text-main"></i>
     </div>
     <p-fileUpload
       mode="basic"

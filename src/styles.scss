@@ -1,17 +1,6 @@
-// /* 1. استيراد Tailwind v4 */
-// @use "tailwindcss";
-
-// /* 2. استيراد أيقونات PrimeIcons */
-// @use "primeicons/primeicons.css";
-
-// /* 3. استيراد ثيم الألوان الخاص بـ Tailwind-PrimeUI */
-// // @custom-variant dark (&:where(.dark, .dark *));
-// @tailwind base;
-// @tailwind components;
-// @tailwind utilities;
-
+@import url('https://fonts.googleapis.com/css?family=Rubik');
 /* 1. استدعاء Tailwind الأساسي */
-@use "tailwindcss";
+@import "tailwindcss";
 
 /* 2. استدعاء إضافة PrimeUI لـ Tailwind v4 (المسار المباشر) */
 @import "../node_modules/tailwindcss-primeui/v4/index.css";
@@ -26,73 +15,35 @@
   @tailwind utilities;
 }
 
-
-
-/* الحاوية الرئيسية */
-.academic-loader {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+@theme {
+  /* ألوان العلامة التجارية (للأزرار والتفاعلات) */
+  --color-main: #2563EB;       /* أزرق احترافي وجذاب */
+  --color-main-hover: #1D4ED8; /* أزرق أغمق عند التمرير Hover */
+  
+  --color-nav:#CCE0FF;
+  --color-nav-hover:#99C2FF;
+  --color-link-hover:oklch(90.5% 0.182 98.111);
+  /* ألوان الخلفيات (لخلق العمق) */
+  --color-bg-page: #F8FAFC;       /* خلفية الموقع بالكامل (مريحة جداً للعين) */
+  --color-surface: #FFFFFF;       /* أبيض ناصع للكروت والـ Navbar */
+  
+  /* ألوان النصوص (حسب معايير القراءة العالمية) */
+  --color-text-dark: #0F172A;          /* للـ Footer والعناوين الرئيسية (أسود مزرق أنيق) */
+  --color-text-main: #334155;     /* للنصوص العادية والفقرات (رمادي داكن) */
+  --color-text-muted: #64748B;    /* للنصوص الفرعية والملاحظات */
+  /* لون مميز للـ Hover في القوائم */
+  --color-accent-soft: #EFF6FF;   /* أزرق فاتح جداً لتظليل العناصر عند التمرير */
 }
 
-/* الحلقة الخارجية الدوارة */
-.outer-ring {
-  width: 120px;
-  height: 120px;
-  border: 2px solid rgba(255, 215, 0, 0.1);
-  border-top: 2px solid #FFD700; /* لون ذهبي جامعي */
-  border-radius: 50%;
-  animation: spin 2s linear infinite;
-  position: absolute;
-}
-
-/* حاوية الأيقونة مع أنيميشن الطفو والنبض */
-.icon-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: floatAndPulse 3s ease-in-out infinite;
-}
-
-.cap-icon {
-  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
-}
-
-/* نص التحميل */
-.loading-text {
-  margin-top: 40px;
-  color: #fff;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 1.1rem;
-  letter-spacing: 1px;
-  font-weight: 300;
-  animation: textFade 1.5s ease-in-out infinite alternate;
-}
-
-/* تعريفات الأنيميشن */
-
-/* 1. دوران الحلقة */
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* 2. الطفو والنبض (مناسب جداً للرموز التعليمية) */
-@keyframes floatAndPulse {
-  0%, 100% {
-    transform: translateY(0) scale(1);
-    opacity: 0.8;
-  }
-  50% {
-    transform: translateY(-15px) scale(1.1);
-    opacity: 1;
+@layer base {
+  body {
+    background-color: var(--color-bg-page);
+    color: var(--color-text-main);
+    font-family: 'Rubik','Cairo', sans-serif;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
   }
 }
 
-/* 3. تلاشي النص */
-@keyframes textFade {
-  from { opacity: 0.4; }
-  to { opacity: 1; }
-}
+

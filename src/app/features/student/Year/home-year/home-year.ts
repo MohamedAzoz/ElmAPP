@@ -3,13 +3,13 @@ import { ActivatedRoute } from '@angular/router';
 import { DepartmentFacade } from '../../Department/department-facade';
 import { YearFacade } from '../year-facade';
 import { Skeleton } from 'primeng/skeleton';
-import { DepartmentCarde } from '../../../../shared/Components/department-carde/department-carde';
 import { GlobalService } from '../../../../core/Services/global-service';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { Carde } from '../../../../shared/Components/carde/carde';
 
 @Component({
   selector: 'app-home-year',
-  imports: [Skeleton, DepartmentCarde],
+  imports: [Skeleton, Carde],
   templateUrl: './home-year.html',
   styleUrl: './home-year.scss',
 })

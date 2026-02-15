@@ -28,7 +28,7 @@ export class ChangePassword implements OnInit {
   private globalService = inject(GlobalService);
   private identity = inject(IdentitySignals);
   public authFacade = inject(AuthFacade);
-  public dir = inject(DirectionService);
+  // public dir = inject(DirectionService);
   private router = inject(Router);
 
   changePasswordForm!: FormGroup;

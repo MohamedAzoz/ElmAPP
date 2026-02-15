@@ -4,13 +4,13 @@ import { DepartmentFacade } from '../department-facade';
 import { Skeleton } from 'primeng/skeleton';
 import { CurriulumFacade } from '../../Curriulums/curriulum-facade';
 import { YearFacade } from '../../Year/year-facade';
-import { CurriulumCarde } from '../../../../shared/Components/curriulum-carde/curriulum-carde';
 import { GlobalService } from '../../../../core/Services/global-service';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { Carde } from '../../../../shared/Components/carde/carde';
 
 @Component({
   selector: 'app-home-department',
-  imports: [Skeleton, CurriulumCarde],
+  imports: [Skeleton, Carde],
   templateUrl: './home-department.html',
   styleUrl: './home-department.scss',
 })

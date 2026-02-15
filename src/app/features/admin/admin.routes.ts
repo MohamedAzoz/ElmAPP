@@ -12,6 +12,7 @@ export const adminRoutes: Routes = [
     children: [
       {
         path: '',
+        title: 'ادارة الكليات',
         loadComponent: () =>
           import('./management/Colleges/Components/get-all-colleges-for-admin/get-all-colleges-for-admin').then(
             (m) => m.GetAllCollegesForAdmin,
@@ -22,6 +23,7 @@ export const adminRoutes: Routes = [
         children: [
           {
             path: '',
+            title: 'ادارة السنوات',
             loadComponent: () =>
               import('./management/Year/Components/get-all-years-for-admin/get-all-years-for-admin').then(
                 (m) => m.GetAllYearsForAdmin,
@@ -29,6 +31,7 @@ export const adminRoutes: Routes = [
           },
           {
             path: 'departments',
+            title: 'ادارة الاقسام',
             loadComponent: () =>
               import('./management/Department/Components/get-all-departments-for-admin/get-all-departments-for-admin').then(
                 (m) => m.GetAllDepartmentsForAdmin,
@@ -47,6 +50,7 @@ export const adminRoutes: Routes = [
     children: [
       {
         path: '',
+        title: 'ادارة المواد',
         loadComponent: () =>
           import('./management/Subjects/Components/get-all-subjects-for-admin/get-all-subjects-for-admin').then(
             (m) => m.GetAllSubjectsForAdmin,
@@ -54,6 +58,7 @@ export const adminRoutes: Routes = [
       },
       {
         path: ':subjectId/curriculums',
+        title: 'ادارة المناهج',
         loadComponent: () =>
           import('./management/Curriulums/Components/get-all-curriulums-for-admin/get-all-curriulums-for-admin').then(
             (m) => m.GetAllCurriulumsForAdmin,
@@ -66,8 +71,9 @@ export const adminRoutes: Routes = [
     children: [
       {
         path: '',
+        title: 'ادارة الدكاترة',
         canActivate: [permissionGuard],
-        data: {
+          data: {
           permission: 'Doctors',
         },
         loadComponent: () =>
@@ -77,6 +83,7 @@ export const adminRoutes: Routes = [
       },
       {
         path: 'leaders',
+        title: 'ادارة القادة',
         canActivate: [permissionGuard],
         data: {
           permission: 'Leaders',
@@ -88,6 +95,7 @@ export const adminRoutes: Routes = [
       },
       {
         path: 'user-permissions',
+        title: 'ادارة صلاحيات المستخدم',
         canActivate: [permissionGuard],
         data: {
           permission: 'UserPermissions',
@@ -99,6 +107,7 @@ export const adminRoutes: Routes = [
       },
       {
         path: 'permissions',
+        title: 'ادارة الصلاحيات',
         canActivate: [permissionGuard],
         data: {
           permission: 'Permissions',
@@ -115,11 +124,13 @@ export const adminRoutes: Routes = [
         children: [
           {
             path: '',
+            title: 'ادارة الادوار',
             loadComponent: () =>
               import('./user-management/Components/roles/roles').then((m) => m.Roles),
           },
           {
             path: 'role-permissions',
+            title: 'ادارة صلاحيات الادوار',
             canActivate: [permissionGuard],
             data: {
               permission: 'RolePermissions',

@@ -8,13 +8,14 @@ export const doctorRoutes: Routes = [
   },
   {
     path: 'subjects',
-    canActivate:[permissionGuard],
+    canActivate: [permissionGuard],
     data: {
       permission: 'RateFiles',
     },
     children: [
       {
         path: '',
+        title: 'المواد الدراسية',
         loadComponent: () => import('./my-subjects/my-subjects').then((m) => m.MySubjects),
       },
       {
@@ -28,10 +29,12 @@ export const doctorRoutes: Routes = [
           },
           {
             path: 'files',
+            title: 'الملفات',
             loadComponent: () => import('./files/files').then((m) => m.Files),
           },
           {
             path: 'rate/:fileId',
+            title: 'تقييم الملف',
             loadComponent: () => import('./rate-file/rate-file').then((m) => m.RateFile),
           },
         ],
@@ -40,7 +43,8 @@ export const doctorRoutes: Routes = [
   },
   {
     path: 'notifications',
-    canActivate:[permissionGuard],
+    title: 'الاشعارات',
+    canActivate: [permissionGuard],
     data: {
       permission: 'Notifications',
     },

@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { FormGroup, FormsModule } from '@angular/forms';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FileFacade } from '../file-facade'; // تأكد من المسار
 import { MessageService, ConfirmationService } from 'primeng/api';
 
@@ -28,15 +28,16 @@ import { IdentitySignals } from '../../../../core/Auth/services/identity-signals
     FileUploadModule,
     PrimengModule,
     DatePipe,
+    RouterLink,
   ],
-  providers: [ ConfirmationService],
+  providers: [ConfirmationService],
   templateUrl: './get-all-files-for-leader.html',
   styleUrl: './get-all-files-for-leader.scss',
 })
 export class GetAllFilesForLeader implements OnInit {
   public facade = inject(FileFacade);
   private route = inject(ActivatedRoute);
-  private identity=inject(IdentitySignals)
+  private identity = inject(IdentitySignals);
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
   public dir = inject(DirectionService);
@@ -52,10 +53,9 @@ export class GetAllFilesForLeader implements OnInit {
   };
 
   ngOnInit() {
-    this.leaderId=  this.identity.userId;
+    this.leaderId = this.identity.userId;
     this.curriculumId = Number(this.route.snapshot.paramMap.get('curriculumId'));
     this.loadFiles();
-
   }
 
   loadFiles() {

@@ -9,6 +9,7 @@ export const leaderRoutes: Routes = [
     children: [
       {
         path: '',
+        title: 'المواد الدراسية',
         loadComponent: () =>
           import('./Curriulums/my-subjects/my-subjects').then((m) => m.MySubjects),
       },
@@ -21,6 +22,7 @@ export const leaderRoutes: Routes = [
         children: [
           {
             path: '',
+            title: 'الموارد',
             loadComponent: () => import('./resource/resource').then((m) => m.Resource),
           },
           {
@@ -31,6 +33,7 @@ export const leaderRoutes: Routes = [
             children: [
               {
                 path: '',
+                title: 'بنوك الاسئلة',
                 loadComponent: () =>
                   import('./QuestionBanks/get-all-question-banks-for-leader/get-all-question-banks-for-leader').then(
                     (m) => m.GetAllQuestionBanksForLeader,
@@ -42,6 +45,7 @@ export const leaderRoutes: Routes = [
                   { path: '', redirectTo: 'questions', pathMatch: 'full' },
                   {
                     path: 'questions',
+                    title: 'الاسئلة',
                     loadComponent: () =>
                       import('./Questions/Components/get-all-questions-for-leader/get-all-questions-for-leader').then(
                         (m) => m.GetAllQuestionForLeader,
@@ -53,6 +57,7 @@ export const leaderRoutes: Routes = [
           },
           {
             path: 'files',
+            title: 'الملخصات',
             loadComponent: () =>
               import('./Files/get-all-files-for-leader/get-all-files-for-leader').then(
                 (m) => m.GetAllFilesForLeader,

@@ -1,23 +1,34 @@
-<div class="min-h-screen bg-[#f8fafc] p-4 md:p-8">
+<div class="min-h-screen bg-bg-page p-4 md:p-8" dir="ltr">
   <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
-
     <div class="lg:col-span-3 order-1 lg:order-2">
       <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 sticky top-8">
-
+        <div class="flex mb-2 justify-center bg-accent-soft border border-main/30 rounded-xl">
+            <p-selectbutton
+        [options]="[
+          { label: 'AR', value: 'rtl' },
+          { label: 'EN', value: 'ltr' },
+        ]"
+        [(ngModel)]="dir"
+        optionLabel="label"
+        optionValue="value"
+        class="border border-main text-white"
+        aria-labelledby="basic"
+      />
+        </div>
         <div class="bg-blue-50 rounded-2xl p-4 text-center mb-6 border border-blue-100">
-          <span class="text-sm text-blue-600 font-bold block mb-1">الوقت المتبقي</span>
-          <span class="text-3xl font-mono font-black text-blue-900 tracking-tighter">
+          <span class="text-sm text-main font-bold block mb-1">الوقت المتبقي</span>
+          <span class="text-3xl font-mono font-black text-main/40 tracking-tighter">
             {{ quizState.timerTest() }}
           </span>
         </div>
-
+        
         <div class="grid grid-cols-4 gap-3 mb-8">
-          @for (q of data()?.questions; track q.id; let i = $index) {
+          @for (q of data(); track q.id; let i = $index) {
             <button
               (click)="jumpTo(q.id!)"
               [class]="
                 currentQuesId() === q.id
-                  ? 'bg-indigo-600 text-white border-indigo-600 ring-2 ring-indigo-100'
+                  ? 'bg-main text-white border-main ring-2 ring-indigo-100'
                   : isAnswered(q.id!)
                     ? 'bg-green-100 text-green-700 border-green-200'
                     : 'bg-gray-50 text-gray-400 border-gray-200'
@@ -27,7 +38,9 @@
               {{ i + 1 }}
               @if (isMarked(q.id!)) {
                 <span class="absolute -top-1 -right-1 flex h-3 w-3">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                  <span
+                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"
+                  ></span>
                   <span class="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
                 </span>
               }
@@ -41,16 +54,17 @@
           class="w-full p-button-danger rounded-xl py-3 shadow-lg shadow-red-100"
           tooltipPosition="top"
           (click)="finishTest()"
-          ></button>
+        ></button>
       </div>
     </div>
 
-    <div class="lg:col-span-9 order-2 lg:order-1">
+    <div class="lg:col-span-9 order-2 lg:order-1" [dir]="dir()">
       @if (currentQuestion(); as q) {
         <div class="animate-fadein">
           <app-question-carde
             [question]="q"
             [savedAnswerId]="quizState.getAnswer(q.id!)"
+            [isTestMode]="true"
             (answerSelect)="quizState.saveAnswer(q.id!, $event)"
           />
         </div>
@@ -60,7 +74,7 @@
             pButton
             icon="pi pi-chevron-right"
             label="السابق"
-            class="p-button-text text-gray-500 font-bold"
+            class="p-button-text text-text-muted font-semibold"
             (click)="jumpToPrev()"
             [disabled]="getCurrentIndex() <= 0"
           ></button>
@@ -78,15 +92,15 @@
             icon="pi pi-chevron-left"
             iconPos="right"
             label="التالي"
-            class="p-button-text text-indigo-600 font-bold"
+            class="p-button-text text-main font-semibold"
             (click)="jumpToNext()"
-            [disabled]="getCurrentIndex() >= (data()?.questions?.length || 0) - 1"
+            [disabled]="getCurrentIndex() >= (data().length || 0) - 1"
           ></button>
         </div>
       } @else {
         <div class="bg-white rounded-3xl p-20 text-center shadow-sm">
-          <i class="pi pi-spin pi-spinner text-4xl text-indigo-500"></i>
-          <p class="mt-4 text-gray-500">جاري تحميل السؤال...</p>
+          <i class="pi pi-spin pi-spinner text-4xl text-main"></i>
+          <p class="mt-4 text-text-muted">جاري تحميل السؤال...</p>
         </div>
       }
     </div>

@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, RouterLinkActive } from '@angular/router';
 import { IdentitySignals } from '../../core/Auth/services/identity-signals';
 import { AuthFacade } from '../../core/Auth/services/auth-facade';
 import { ButtonModule } from 'primeng/button';
@@ -9,10 +9,11 @@ import { AvatarModule } from 'primeng/avatar';
 import { MenuItem } from 'primeng/api';
 import { PermissionFacade } from '../../core/Auth/services/permission-facade';
 import { ILink } from '../ilink';
+import { Theme } from '../../theme';
 
 @Component({
   selector: 'app-nav',
-  imports: [CommonModule, RouterModule, ButtonModule, MenuModule, AvatarModule],
+  imports: [CommonModule, RouterModule,RouterLinkActive, ButtonModule, MenuModule, AvatarModule],
   templateUrl: './nav.html',
   styleUrl: './nav.scss',
 })
@@ -21,6 +22,7 @@ export class Nav {
   private authFacade = inject(AuthFacade);
   private router = inject(Router);
   private permissionFacade = inject(PermissionFacade);
+  themeService = inject(Theme);
 
   sidebarVisible = signal(false);
 
@@ -29,49 +31,55 @@ export class Nav {
       label: 'إدارة الكليات',
       icon: 'pi pi-building',
       permission: 'Colleges',
-      command: () => this.navigateTo('/main/admin/colleges'),
+      command: () => '/main/admin/colleges',
     },
     {
       label: 'إدارة المواد',
       icon: 'pi pi-book',
       permission: 'Subjects',
-      command: () => this.navigateTo('/main/admin/subjects'),
+      command: () => '/main/admin/subjects',
     },
     {
       label: 'ادارة الدكاترة',
       icon: 'pi pi-users',
       permission: 'Doctors',
-      command: () => this.navigateTo('/main/admin/management'),
+      command: () => '/main/admin/management',
     },
     {
       label: 'ادارة الطلاب',
       icon: 'pi pi-users',
       permission: 'Leaders',
-      command: () => this.navigateTo('/main/admin/management/leaders'),
+      command: () => '/main/admin/management/leaders',
+    },
+    {
+      label: 'ادارة الصلاحيات',
+      icon: 'pi pi-users',
+      permission: 'Permissions',
+      command: () => '/main/admin/management/permissions',
     },
     {
       label: 'الادوار',
       icon: 'pi pi-shield',
       permission: 'Roles',
-      command: () => this.navigateTo('/main/admin/management/roles'),
+      command: () => '/main/admin/management/roles',
     },
     {
-      label: 'المواد (دكتور)',
+      label: 'المواد',
       icon: 'pi pi-check-circle',
       permission: 'RateFiles',
-      command: () => this.navigateTo('/main/doctor/subjects'),
+      command: () => '/main/doctor/subjects',
     },
     {
       label: 'الإشعارات',
       icon: 'pi pi-bell',
       permission: 'Notifications',
-      command: () => this.navigateTo('/main/doctor/notifications'),
+      command: () => '/main/doctor/notifications',
     },
     {
-      label: 'موادي (ليدر)',
+      label: 'موادي',
       icon: 'pi pi-briefcase',
       permission: 'QuestionBanks',
-      command: () => this.navigateTo('/main/leader/my-subjects'),
+      command: () => '/main/leader/my-subjects',
     },
   ];
 
@@ -85,7 +93,7 @@ export class Nav {
     {
       label: 'تغيير كلمة المرور',
       icon: 'pi pi-key',
-      command: () => this.router.navigate(['/main/changePassword']),
+      command: () => '/main/changePassword',
     },
     { separator: true },
     { label: 'تسجيل الخروج', icon: 'pi pi-sign-out', command: () => this.logout() },
@@ -95,13 +103,9 @@ export class Nav {
     return this.permissionFacade.hasPermission(permission);
   }
 
-  private navigateTo(path: string) {
-    this.router.navigate([path]);
-    this.sidebarVisible.set(false);
-  }
-
   logout() {
     this.authFacade.logout();
+    window.location.reload();
     this.router.navigate(['/main/login']);
   }
 }

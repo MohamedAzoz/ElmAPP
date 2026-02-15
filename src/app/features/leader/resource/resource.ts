@@ -5,10 +5,11 @@ import { GlobalService } from '../../../core/Services/global-service';
 import { RouterLink } from '@angular/router';
 import { CardModule } from 'primeng/card';
 import { CurriulumFacade } from '../../student/Curriulums/curriulum-facade';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-resource',
-  imports: [RouterLink, CardModule],
+  imports: [RouterLink, CardModule, ButtonModule],
   templateUrl: './resource.html',
   styleUrl: './resource.scss',
 })

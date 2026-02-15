@@ -70,7 +70,7 @@ export class UserPermissions implements OnInit {
     this.confirmationService.confirm({
       message: `هل أنت متأكد من سحب صلاحية (${permissionName}) من المستخدم؟`,
       header: 'تأكيد الحذف',
-      icon: 'pi pi-exclamation-circle',
+      icon: 'pi pi-exclamation-triangle',
       acceptLabel: 'نعم، احذف',
       rejectLabel: 'إلغاء',
       acceptButtonStyleClass: 'p-button-danger',

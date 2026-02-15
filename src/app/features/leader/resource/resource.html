@@ -1,46 +1,56 @@
 @if (curriulum()) {
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-  <div class="mb-4 p-4 flex items-center justify-center">
-    <a
-      [routerLink]="['files']"
-      class="block w-[25rem] focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-xl"
-      aria-label="الانتقال إلى الملخصات"
-    >
-      <p-card
-        class="cursor-pointer overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+  <div class="flex flex-col gap-6 my-6">
+    <div class="mb-4 p-4 flex items-center justify-center">
+      <a
+        [routerLink]="['files']"
+        class="block w-100 focus:outline-none focus:ring-2 focus:ring-main rounded-xl"
+        aria-label="الانتقال إلى الملخصات"
       >
-        <ng-template #title>
-          <div class="text-center py-3">
-            <span
-              class="text-lg font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors"
-            >
-             ملخصات على المادة
-            </span>
-          </div>
-        </ng-template>
-      </p-card>
-    </a>
-  </div>
-  <div class="mb-4 p-4 flex items-center justify-center">
-    <a
-      [routerLink]="['questionBanks']"
-      class="block w-[25rem] focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-xl"
-      aria-label="الانتقال إلى بنوك اسئلة"
-    >
-      <p-card
-        class="cursor-pointer overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+        <p-card
+          class="cursor-pointer border border-text-muted hover:border-main border-b-8 overflow-hidden rounded-xl shadow-md hover:shadow-accent-soft transition-all duration-300 transform hover:-translate-y-2 bg-surface"
+        >
+          <ng-template #title>
+            <div class="text-center py-3">
+              <span
+                class="text-lg font-semibold text-text-dark group-hover:text-main transition-colors"
+              >
+                ملخصات على المادة
+              </span>
+            </div>
+          </ng-template>
+        </p-card>
+      </a>
+    </div>
+    <div class="mb-4 p-4 flex items-center justify-center">
+      <a
+        [routerLink]="['questionBanks']"
+        class="block w-100 focus:outline-none focus:ring-2 focus:ring-main rounded-xl"
+        aria-label="الانتقال إلى بنوك اسئلة"
       >
-        <ng-template #title>
-          <div class="text-center py-3">
-            <span
-              class="text-lg font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors"
-            >
-             بنوك الاسئلة
-            </span>
-          </div>
-        </ng-template>
-      </p-card>
-    </a>
+        <p-card
+          class="cursor-pointer border border-text-muted hover:border-main border-b-8 overflow-hidden rounded-xl shadow-md hover:shadow-accent-soft transition-all duration-300 transform hover:-translate-y-2 bg-surface"
+        >
+          <ng-template #title>
+            <div class="text-center py-3">
+              <span
+                class="text-lg font-semibold text-text-dark group-hover:text-main transition-colors"
+              >
+                بنوك الاسئلة
+              </span>
+            </div>
+          </ng-template>
+        </p-card>
+      </a>
+    </div>
+    <!-- btn go back -->
+    <div class="mb-4 p-4 flex items-center justify-center">
+      <p-button
+        label="رجوع"
+        icon="pi pi-arrow-left"
+        severity="secondary"
+        [routerLink]="['../']"
+        styleClass="rounded-xl shadow-md"
+      ></p-button>
+    </div>
   </div>
-</div>
 }

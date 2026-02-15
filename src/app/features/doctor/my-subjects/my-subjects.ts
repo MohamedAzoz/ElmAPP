@@ -1,16 +1,15 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common'; // الكومبوننت الخاص بالكارد
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { CurriulumCarde } from '../../../shared/Components/curriulum-carde/curriulum-carde';
 import { CurriulumFacade } from '../Services/curriulum-facade';
-import { Router } from '@angular/router';
 import { GlobalService } from '../../../core/Services/global-service';
 import { IdentitySignals } from '../../../core/Auth/services/identity-signals';
+import { Carde } from '../../../shared/Components/carde/carde';
 
 @Component({
   selector: 'app-my-subjects',
   standalone: true,
-  imports: [CommonModule, CurriulumCarde, ProgressSpinnerModule],
+  imports: [CommonModule, Carde, ProgressSpinnerModule],
   templateUrl: './my-subjects.html',
   styleUrl: './my-subjects.scss',
 })

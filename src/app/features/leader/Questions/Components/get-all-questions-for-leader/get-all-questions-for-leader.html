@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 md:p-6" [dir]="dir.currentDir()">
+<div class="min-h-screen bg-linear-to-br from-slate-50 to-blue-50 p-4 md:p-6" [dir]="dir.currentDir()">
   <!-- Confirm Dialog -->
   <p-confirmDialog></p-confirmDialog>
 
@@ -8,7 +8,7 @@
       <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <!-- Title Section -->
         <div class="flex items-center gap-4">
-          <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+          <div class="w-14 h-14 bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
             <i class="pi pi-question-circle text-white text-2xl"></i>
           </div>
           <div>
@@ -224,7 +224,7 @@
         <ng-template pTemplate="rowexpansion" let-question>
           <tr>
             <td colspan="6" class="p-0">
-              <div class="bg-gradient-to-r from-gray-50 to-blue-50 p-4 m-2 rounded-xl border border-gray-100">
+              <div class="bg-linear-to-r from-gray-50 to-blue-50 p-4 m-2 rounded-xl border border-gray-100">
                 <div class="flex items-center justify-between mb-4">
                   <h4 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
                     <i class="pi pi-list text-blue-500"></i>
@@ -455,7 +455,7 @@
             [formGroupName]="qi"
             styleClass="border border-gray-200 rounded-xl shadow-sm">
             <ng-template pTemplate="header">
-              <div class="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-xl">
+              <div class="flex items-center justify-between p-4 bg-linear-to-r from-blue-50 to-indigo-50 rounded-t-xl">
                 <span class="font-semibold text-gray-700">
                   <i class="pi pi-question-circle ml-2 text-blue-500"></i>
                   السؤال {{ qi + 1 }}
@@ -621,7 +621,7 @@
         mode="advanced"
         name="excelFile"
         accept=".xlsx,.xls"
-        [maxFileSize]="10000000"
+        [maxFileSize]="5242880"
         (onUpload)="onExcelUpload($event)"
         (onSelect)="onExcelUpload($event)"
         [customUpload]="true"
@@ -664,7 +664,7 @@
     @if (selectedQuestion()) {
       <div class="space-y-6">
         <!-- Question Preview -->
-        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-100">
+        <div class="bg-linear-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-100">
           <div class="flex items-start gap-3">
             <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
               <i class="pi pi-question-circle text-white"></i>

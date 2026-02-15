@@ -3,21 +3,21 @@ import { CollegeFacade } from '../college-facade';
 import { ActivatedRoute } from '@angular/router';
 import { YearFacade } from '../../Year/year-facade';
 import { Skeleton } from 'primeng/skeleton';
-import { YearCarde } from '../../../../shared/Components/year-carde/year-carde';
 import { GlobalService } from '../../../../core/Services/global-service';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { Carde } from '../../../../shared/Components/carde/carde';
 
 @Component({
   selector: 'app-home-college',
-  imports: [Skeleton, YearCarde],
+  imports: [Skeleton, Carde],
   templateUrl: './home-college.html',
   styleUrl: './home-college.scss',
 })
 export class HomeCollege implements OnInit {
- private collegeFacade = inject(CollegeFacade);
- private title = inject(GlobalService);
- private yearFacade = inject(YearFacade);
- private active = inject(ActivatedRoute);
+  private collegeFacade = inject(CollegeFacade);
+  private title = inject(GlobalService);
+  private yearFacade = inject(YearFacade);
+  private active = inject(ActivatedRoute);
 
   params = toSignal(this.active.paramMap);
   collegeId = computed(() => Number(this.params()?.get('collegeId')));

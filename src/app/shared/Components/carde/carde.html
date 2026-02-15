@@ -1,0 +1,21 @@
+<div class="mb-4 p-4 flex items-center justify-center ">
+  <a
+    [routerLink]="[url]"
+    class="block w-100 focus:outline-none focus:ring-2 focus:ring-main rounded-xl"
+    aria-label="الانتقال إلى {{ name }}"
+  >
+    <p-card
+      class="cursor-pointer border border-text-muted hover:border-main border-b-8 overflow-hidden rounded-xl shadow-md hover:shadow-accent-soft transition-all duration-300 transform hover:-translate-y-2 bg-surface"
+    >
+      <ng-template #title>
+        <div class="text-center py-3">
+          <span
+            class="text-lg font-semibold text-text-dark hover:text-main transition-colors"
+          >
+            {{ name }}
+          </span>
+        </div>
+      </ng-template>
+    </p-card>
+  </a>
+</div>

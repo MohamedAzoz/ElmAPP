@@ -11,19 +11,21 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { MenuModule } from 'primeng/menu';
 import { SignalNotificationService } from '../Services/signal-notification';
 import { IdentitySignals } from '../../../core/Auth/services/identity-signals';
+import { RouterLink } from "@angular/router";
 
 @Component({
     selector: 'app-notification-list',
     imports: [
-        CommonModule,
-        DatePipe,
-        ButtonModule,
-        BadgeModule,
-        TooltipModule,
-        ToastModule,
-        SkeletonModule,
-        MenuModule,
-    ],
+    CommonModule,
+    DatePipe,
+    ButtonModule,
+    BadgeModule,
+    TooltipModule,
+    ToastModule,
+    SkeletonModule,
+    MenuModule,
+    RouterLink
+],
     providers: [MessageService], // ✅ لازم تضيفه هنا أو في الـ Module
     templateUrl: './notification-list.html',
     styleUrl: './notification-list.scss',
@@ -84,12 +86,8 @@ export class NotificationList implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        // ✅ لا توقف SignalR هنا لو عايز الإشعارات تفضل شغالة في كل التطبيق
-        // لو عايز توقفه بس لما المستخدم يعمل logout:
-        // this.signalService.stopConnection();
-
-        // ✅ لكن لو الإشعارات خاصة بالصفحة دي بس:
         this.signalService.stopConnection();
+        this.messageService.clear();
     }
 
     markAllAsRead() {

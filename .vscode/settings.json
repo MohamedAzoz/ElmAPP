@@ -7,5 +7,13 @@
     "typescript": true,
     "html": true
   },
-  "files.autoSave": "afterDelay"
+  "files.autoSave": "afterDelay",
+  "files.associations": {
+    "*.css": "tailwindcss",
+    "*.scss": "tailwindcss"
+  },
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
+  "tailwindCSS.experimental.configFile": "src/styles.scss",
 }

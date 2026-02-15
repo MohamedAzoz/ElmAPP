@@ -19,10 +19,10 @@ export class DirectionService {
   }
 
   private getInitialDirection(): 'ltr' | 'rtl' {
-    const lang = localStorage.getItem('lang') || 'en';
+    const lang = localStorage.getItem('lang') || 'ar';
     return lang === 'ar' ? 'rtl' : 'ltr';
   }
-
+  
   setDirection(direction: 'ltr' | 'rtl'): void {
     localStorage.setItem('lang', direction === 'rtl' ? 'ar' : 'en');
     this.dir.set(direction);

@@ -1,28 +1,22 @@
 import { Injectable, signal } from '@angular/core';
 import {
+  QuestionWithOptions,
   StartTestCommand,
-  SubmitTestCommand,
   TestClient,
-  TestDataDto,
-} from '../../../core/api/clients';
+  } from '../../../core/api/clients';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TestFacade {
-  currentTestData = signal<TestDataDto | null>(null);
+  // المصفوفة مباشرة لأن الباك إند يرجع قائمة أسئلة
+  currentTestData = signal<QuestionWithOptions[]>([]);
   isStarting = signal<boolean>(false);
 
   constructor(private testClient: TestClient) {}
 
-  // في الملف test-facade.ts
   startTest(body: StartTestCommand) {
     this.isStarting.set(true);
-    // نرجع الـ Observable للمكون ليقرر أين يذهب بعد النجاح
     return this.testClient.start(body);
-  }
-
-  submitTest(body: SubmitTestCommand) {
-    return this.testClient.submit(body);
   }
 }
