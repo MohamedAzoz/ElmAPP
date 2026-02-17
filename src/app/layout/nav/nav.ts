@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, Renderer2, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, RouterLinkActive } from '@angular/router';
 import { IdentitySignals } from '../../core/Auth/services/identity-signals';
@@ -10,10 +10,11 @@ import { MenuItem } from 'primeng/api';
 import { PermissionFacade } from '../../core/Auth/services/permission-facade';
 import { ILink } from '../ilink';
 import { Theme } from '../../theme';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-nav',
-  imports: [CommonModule, RouterModule,RouterLinkActive, ButtonModule, MenuModule, AvatarModule],
+  imports: [CommonModule, RouterModule, RouterLinkActive, ButtonModule, MenuModule, AvatarModule],
   templateUrl: './nav.html',
   styleUrl: './nav.scss',
 })
@@ -22,9 +23,18 @@ export class Nav {
   private authFacade = inject(AuthFacade);
   private router = inject(Router);
   private permissionFacade = inject(PermissionFacade);
-  themeService = inject(Theme);
+  private location = inject(Location);
+
+  public themeService = inject(Theme);
 
   sidebarVisible = signal(false);
+
+  isLoggedIn = signal(false);
+  constructor() {
+    effect(() => {
+      this.isLoggedIn.set(this.identity.isAuthenticated);
+    });
+  }
 
   private allLinks: ILink[] = [
     {
@@ -87,13 +97,11 @@ export class Nav {
     return this.allLinks.filter((link) => this.can(link.permission!));
   });
 
-  isLoggedIn = computed(() => this.identity.isAuthenticated);
-
   userItems: MenuItem[] = [
     {
       label: 'تغيير كلمة المرور',
       icon: 'pi pi-key',
-      command: () => '/main/changePassword',
+      command: () => this.router.navigate(['/main/changePassword']),
     },
     { separator: true },
     { label: 'تسجيل الخروج', icon: 'pi pi-sign-out', command: () => this.logout() },
@@ -101,6 +109,11 @@ export class Nav {
 
   can(permission: string): boolean {
     return this.permissionFacade.hasPermission(permission);
+  }
+
+  goBack() {
+    this.location.back();
+    this.sidebarVisible.set(false);
   }
 
   logout() {

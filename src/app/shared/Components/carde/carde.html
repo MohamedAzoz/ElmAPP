@@ -1,21 +1,50 @@
-<div class="mb-4 p-4 flex items-center justify-center ">
+<div class="h-full drop-shadow-lg">
   <a
     [routerLink]="[url]"
-    class="block w-100 focus:outline-none focus:ring-2 focus:ring-main rounded-xl"
-    aria-label="الانتقال إلى {{ name }}"
+    class="group block h-full focus:outline-none focus:ring-2 focus:ring-main rounded-3xl transition-all"
+    [aria-label]="'الانتقال إلى ' + name"
   >
     <p-card
-      class="cursor-pointer border border-text-muted hover:border-main border-b-8 overflow-hidden rounded-xl shadow-md hover:shadow-accent-soft transition-all duration-300 transform hover:-translate-y-2 bg-surface"
+      styleClass="h-full border-0 overflow-hidden rounded-3xl bg-surface shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_25px_50px_rgba(37,99,235,0.12)] transition-all duration-500 transform group-hover:-translate-y-3 relative"
     >
-      <ng-template #title>
-        <div class="text-center py-3">
-          <span
-            class="text-lg md:text-xl lg:text-2xl font-semibold text-text-dark hover:text-main transition-colors"
+      <div
+        class="absolute top-0 left-0 right-0 h-32 bg-linear-to-br from-main/10 via-nav/20 to-transparent opacity-60"
+      >
+        <div
+          class="absolute -top-10 -left-10 w-32 h-32 bg-main/5 rounded-full blur-3xl group-hover:bg-main/10 transition-colors"
+        ></div>
+        <div
+          class="absolute top-5 right-5 w-12 h-12 bg-nav/20 rounded-full blur-xl animate-pulse"
+        ></div>
+      </div>
+
+      <ng-template #content>
+        <div class="relative z-10 flex flex-col items-center justify-center pt-10 pb-6 px-4">
+          <div
+            class="mb-8 w-20 h-20 rounded-2xl bg-white shadow-[0_8px_20px_rgba(0,0,0,0.04)] border border-nav/20 flex items-center justify-center text-main transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500"
+          >
+            <i class="pi pi-box text-3xl opacity-80 group-hover:opacity-100"></i>
+          </div>
+
+          <h3
+            class="text-2xl md:text-3xl font-extrabold text-text-dark group-hover:text-main text-center transition-colors duration-300 tracking-tight"
           >
             {{ name }}
-          </span>
+          </h3>
+
+          <div class="mt-10 flex items-center gap-1">
+            <span class="h-1.5 w-1.5 rounded-full bg-main/20"></span>
+            <div
+              class="h-1 w-12 bg-linear-to-r from-main/20 via-main to-main/20 group-hover:w-20 transition-all duration-500 rounded-full shadow-sm"
+            ></div>
+            <span class="h-1.5 w-1.5 rounded-full bg-main/20"></span>
+          </div>
         </div>
       </ng-template>
+
+      <div
+        class="absolute bottom-0 left-0 right-0 h-1 bg-linear-to-r from-transparent via-main to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"
+      ></div>
     </p-card>
   </a>
 </div>

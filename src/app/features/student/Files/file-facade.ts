@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { FilePublicClient, FileView } from '../../../core/api/clients';
 import { HttpClient } from '@angular/common/http';
 @Injectable({ providedIn: 'root' })
@@ -57,5 +57,4 @@ export class FileFacade {
       },
     });
   }
-
 }

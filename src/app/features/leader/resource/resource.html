@@ -1,56 +1,68 @@
 @if (curriulum()) {
-  <div class="flex flex-col gap-6 my-6">
-    <div class="mb-4 p-4 flex items-center justify-center">
-      <a
-        [routerLink]="['files']"
-        class="block w-100 focus:outline-none focus:ring-2 focus:ring-main rounded-xl"
-        aria-label="الانتقال إلى الملخصات"
-      >
-        <p-card
-          class="cursor-pointer border border-text-muted hover:border-main border-b-8 overflow-hidden rounded-xl shadow-md hover:shadow-accent-soft transition-all duration-300 transform hover:-translate-y-2 bg-surface"
-        >
-          <ng-template #title>
-            <div class="text-center py-3">
-              <span
-                class="text-lg font-semibold text-text-dark group-hover:text-main transition-colors"
-              >
-                ملخصات على المادة
-              </span>
-            </div>
-          </ng-template>
-        </p-card>
-      </a>
+<div class="max-w-4xl mx-auto px-4 py-8 animate-fadein">
+  
+  <div class="flex items-center gap-4 mb-10 pb-6 border-b border-gray-100">
+    <div class="w-12 h-12 bg-main/10 rounded-2xl flex items-center justify-center text-main shadow-sm">
+      <i class="pi pi-shield text-2xl"></i>
     </div>
-    <div class="mb-4 p-4 flex items-center justify-center">
-      <a
-        [routerLink]="['questionBanks']"
-        class="block w-100 focus:outline-none focus:ring-2 focus:ring-main rounded-xl"
-        aria-label="الانتقال إلى بنوك اسئلة"
-      >
-        <p-card
-          class="cursor-pointer border border-text-muted hover:border-main border-b-8 overflow-hidden rounded-xl shadow-md hover:shadow-accent-soft transition-all duration-300 transform hover:-translate-y-2 bg-surface"
-        >
-          <ng-template #title>
-            <div class="text-center py-3">
-              <span
-                class="text-lg font-semibold text-text-dark group-hover:text-main transition-colors"
-              >
-                بنوك الاسئلة
-              </span>
-            </div>
-          </ng-template>
-        </p-card>
-      </a>
-    </div>
-    <!-- btn go back -->
-    <div class="mb-4 p-4 flex items-center justify-center">
-      <p-button
-        label="رجوع"
-        icon="pi pi-arrow-left"
-        severity="secondary"
-        [routerLink]="['../']"
-        styleClass="rounded-xl shadow-md"
-      ></p-button>
+    <div>
+      <h1 class="text-2xl font-black text-gray-800">لوحة التحكم بالمادة</h1>
+      <p class="text-sm text-gray-500 font-medium">إدارة المحتوى التعليمي والأسئلة</p>
     </div>
   </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+    
+    <a [routerLink]="['files']" class="group outline-none">
+      <div class="relative h-full p-8 bg-white border border-gray-100 rounded-4xl shadow-sm hover:shadow-xl hover:shadow-main/5 hover:-translate-y-2 transition-all duration-500 overflow-hidden">
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-main/5 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+        
+        <div class="relative z-10 flex flex-col items-center text-center gap-4">
+          <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center group-hover:bg-main group-hover:text-white transition-colors duration-300 shadow-inner">
+            <i class="pi pi-file-pdf text-3xl"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">ملخصات المادة</h3>
+            <p class="text-sm text-gray-400 leading-relaxed">إدارة ورفع الملفات والملخصات الخاصة بالطلاب</p>
+          </div>
+          <div class="mt-2 inline-flex items-center gap-2 text-main font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+            دخول الآن <i class="pi pi-arrow-left text-xs"></i>
+          </div>
+        </div>
+        <div class="absolute bottom-0 left-0 w-full h-1.5 bg-linear-to-r from-blue-400 to-main"></div>
+      </div>
+    </a>
+
+    <a [routerLink]="['questionBanks']" class="group outline-none">
+      <div class="relative h-full p-8 bg-white border border-gray-100 rounded-4xl shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-2 transition-all duration-500 overflow-hidden">
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-50 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+
+        <div class="relative z-10 flex flex-col items-center text-center gap-4">
+          <div class="w-20 h-20 bg-indigo-50 text-indigo-600 rounded-3xl flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300 shadow-inner">
+            <i class="pi pi-database text-3xl"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">بنوك الأسئلة</h3>
+            <p class="text-sm text-gray-400 leading-relaxed">تنظيم بنوك الأسئلة وتجهيز الاختبارات التجريبية</p>
+          </div>
+          <div class="mt-2 inline-flex items-center gap-2 text-indigo-600 font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+            إدارة الأسئلة <i class="pi pi-arrow-left text-xs"></i>
+          </div>
+        </div>
+        <div class="absolute bottom-0 left-0 w-full h-1.5 bg-linear-to-r from-indigo-400 to-indigo-700"></div>
+      </div>
+    </a>
+
+  </div>
+
+  <div class="hidden lg:flex justify-center">
+    <button
+      pButton
+      label="الرجوع للسابق"
+      icon="pi pi-chevron-right"
+      [routerLink]="['../']"
+      class="p-button-text p-button-secondary font-bold hover:bg-gray-100 px-8 py-3 rounded-2xl transition-all"
+    ></button>
+  </div>
+</div>
 }

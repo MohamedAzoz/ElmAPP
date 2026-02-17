@@ -1,30 +1,33 @@
-<div class="mb-4 p-4 flex items-center justify-center">
-  <a
+<div class="h-full drop-shadow-lg"> <a
     [routerLink]="[college.id, 'years']"
-    class="block w-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-xl"
-    aria-label="الانتقال إلى السنوات المتاحة في كلية {{ college.name }}"
+    class="block h-full group focus:outline-none focus:ring-2 focus:ring-main rounded-3xl"
+    aria-label="الانتقال إلى سنوات كلية {{ college.name }}"
   >
     <p-card
-      class="cursor-pointer border border-text-muted hover:border-main border-b-8 rounded-xl overflow-hidden shadow-lg hover:shadow-accent-soft transition-all duration-300 transform hover:-translate-y-2"
+      styleClass="h-full bg-surface rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(37,99,235,0.08)] transition-all duration-500 border-0"
     >
       <ng-template #header>
-        <div class="relative overflow-hidden group">
+        <div class="relative h-56 overflow-hidden bg-linear-to-b from-accent-soft/60 to-surface flex items-center justify-center p-8">
+          <div class="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#2563EB_1px,transparent_1px)] bg-size-[16px_16px]"></div>
+          
           <img
             [alt]="college.name"
-            class="w-full h-48 object-contain transition-transform duration-500 group-hover:scale-105"
+            class="w-auto h-full max-h-40 object-contain drop-shadow-sm transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-2"
             [src]="college.url"
           />
-          <div
-            class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-          ></div>
         </div>
       </ng-template>
 
       <ng-template #title>
-        <div class="text-center py-3 hover:bg-accent-soft transition-all duration-300">
-          <span class="text-lg md:text-xl lg:text-2xl text-text-dark font-semibold">
+        <div class="flex flex-col items-center text-center pt-2 pb-6 px-4 relative z-10">
+          <h3 class="text-xl lg:text-2xl font-bold text-text-dark group-hover:text-main transition-colors duration-300">
             كلية {{ college.name }}
-          </span>
+          </h3>
+          
+          <div class="mt-4 flex items-center gap-2 text-sm font-semibold text-main opacity-0 transform translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 delay-75">
+            <span>استكشف الكلية</span>
+            <i class="pi pi-arrow-left text-xs animate-pulse"></i>
+          </div>
         </div>
       </ng-template>
     </p-card>

@@ -1,73 +1,110 @@
-<div class="mb-6 p-2 flex items-center justify-center">
+<div class="mb-8 p-2 flex items-center justify-center">
   @if (file) {
-    <div class="w-full max-w-7xl transition-all duration-300 hover:scale-[1.02]">
-      <p-card class="border border-text-muted hover:border-main border-b-8 shadow-lg rounded-2xl overflow-hidden">
+    <div class="w-full max-w-7xl group">
+      <p-card
+        class="border-0 overflow-hidden rounded-3xl bg-surface shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(37,99,235,0.1)] transition-all duration-500 relative"
+      >
+        <div
+          class="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-primary-500 via-primary-400 to-primary-500 shadow-sm"
+        ></div>
+
         <ng-template #header>
           <div
-            class="bg-accent-soft p-4 border-b border-gray-100 flex items-center gap-3"
+            class="bg-linear-to-b from-primary-50/50 to-white p-5 border-b border-gray-50 flex items-center gap-4"
           >
-            <i class="pi pi-file-pdf text-red-500 text-2xl"></i>
-            <h3 class="text-text-dark font-bold text-lg lg:text-xl truncate m-0" [title]="file.name">
-              {{ file.name }}
-            </h3>
+            <div
+              class="w-12 h-12 rounded-xl bg-primary-50 flex items-center justify-center text-primary-500 shadow-sm border border-primary-100"
+            >
+              <i class="pi pi-file-pdf text-2xl"></i>
+            </div>
+            <div class="flex flex-col overflow-hidden">
+              <h3
+                class="text-text-dark font-bold text-lg lg:text-xl truncate m-0 group-hover:text-main transition-colors"
+                [title]="file.name"
+              >
+                {{ file.name }}
+              </h3>
+              <span class="text-xs text-text-muted font-medium uppercase tracking-wider">ملخص</span>
+            </div>
           </div>
         </ng-template>
 
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-5 py-2">
           @if (file.doctorRatedName !== 'NotRated' || file.comment) {
-            <div class="bg-blue-50 border-s-4 border-blue-400 p-3 rounded-e-lg">
-              <div class="flex items-center gap-2 mb-1">
-                <i class="pi pi-star-fill text-yellow-500 text-sm"></i>
-                @if (isDoctorView) {
-                  <span class="text-sm font-bold text-blue-900"
-                    >تقييمك: {{ file.doctorRatedName }}</span
-                  >
-                } @else {
-                  <span class="text-sm font-bold text-blue-900"
-                    >تقييم الدكتور: {{ file.doctorRatedName }}</span
-                  >
-                }
+            <div class="bg-accent-soft/50 rounded-2xl p-4 border border-nav/20">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <div class="flex -space-x-1">
+                    <i class="pi pi-star-fill text-yellow-500 text-xs"></i>
+                    <i class="pi pi-star-fill text-yellow-500 text-xs"></i>
+                  </div>
+                  <span class="text-sm font-bold text-blue-900">
+                    {{ isDoctorView ? 'تقييمك للمحتوى:' : 'تقييم الدكتور:' }}
+                  </span>
+                </div>
+                <span
+                  class="px-3 py-1 bg-white text-main text-xs font-black rounded-full shadow-sm border border-nav/30"
+                >
+                  {{ file.doctorRatedName }}
+                </span>
               </div>
+
               @if (file.comment) {
-                <p class="text-sm text-text-muted leading-relaxed italic m-0">ملاحظات الدكتور: {{ file.comment }}</p>
+                <div class="relative mt-3 pt-3 border-t border-nav/20">
+                  <i
+                    class="pi pi-quote-right absolute -top-2 right-2 text-nav opacity-30 text-xl"
+                  ></i>
+                  <p class="text-sm text-text-main leading-relaxed italic m-0 pr-6">
+                    {{ file.comment }}
+                  </p>
+                </div>
               }
+              <div class="mt-3 text-[10px] text-text-muted flex items-center gap-1 justify-end">
+                <i class="pi pi-clock text-[10px]"></i>
+                {{ file.ratedAt | date: 'shortDate' }}
+              </div>
             </div>
           } @else {
-            <div class="text-center py-4 text-text-muted border border-dashed rounded-xl">
-              @if (isDoctorView) {
-                <p class="text-sm m-0">لم تقيم المحتوي بعد</p>
-              } @else {
-                <p class="text-sm m-0">لم يقيم الدكتور المحتوي بعد</p>
-              }
+            <div
+              class="py-6 flex flex-col items-center gap-2 border-2 border-dashed border-gray-100 rounded-2xl"
+            >
+              <i class="pi pi-info-circle text-nav text-xl opacity-40"></i>
+              <p class="text-sm text-text-muted m-0 font-medium">
+                {{ isDoctorView ? 'بانتظار تقييمك لهذا الملف' : 'لم يتم تقييم هذا الملف بعد' }}
+              </p>
             </div>
           }
         </div>
 
         <ng-template #footer>
-          <div class="flex flex-col gap-3 pt-2">
-            <div class="flex gap-2">
+          <div class="flex flex-col gap-3 pt-4">
+            <div class="flex gap-3">
               <p-button
                 label="معاينة"
                 icon="pi pi-eye"
-                styleClass="w-full p-button-outlined"
+                [text]="true"
+                styleClass="w-full py-3 font-bold border-2 hover:bg-gray-50 rounded-xl transition-all"
                 severity="secondary"
                 (onClick)="show(file.storageName!)"
               ></p-button>
+
               <p-button
                 label="تحميل"
                 icon="pi pi-download"
-                styleClass="w-full"
-                severity="primary"
+                styleClass="w-full py-3 font-bold shadow-md hover:shadow-lg rounded-xl transition-all bg-main border-0"
                 (onClick)="downLoad(file.storageName!)"
               ></p-button>
             </div>
 
-            @if (permissionFacade.hasPermission('RateFiles') && isDoctorView) {
+            @if (
+              permissionFacade.hasPermission('RateFiles') &&
+              isDoctorView &&
+              file.doctorRatedName === 'NotRated'
+            ) {
               <p-button
-                [disabled]="file.doctorRatedName !== 'NotRated'"
-                label="تقييم المحتوى"
+                label="إضافة تقييم الآن"
                 icon="pi pi-pencil"
-                styleClass="w-full p-button-raised p-button-warning"
+                styleClass="w-full py-3 font-bold p-button-warning p-button-raised rounded-xl"
                 (onClick)="goToRate()"
               ></p-button>
             }

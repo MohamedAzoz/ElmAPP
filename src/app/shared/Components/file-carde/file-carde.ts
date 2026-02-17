@@ -6,11 +6,11 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FileFacade } from '../../../features/student/Files/file-facade';
 import { PermissionFacade } from '../../../core/Auth/services/permission-facade';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-file-carde',
-  standalone: true,
-  imports: [CardModule, ButtonModule, SkeletonModule],
+  imports: [CardModule, ButtonModule, SkeletonModule, DatePipe],
   templateUrl: './file-carde.html',
   styleUrl: './file-carde.scss',
 })

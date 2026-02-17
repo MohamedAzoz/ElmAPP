@@ -1,8 +1,9 @@
-<div class="bg-gray-50 border border-main/30 rounded-2xl shadow-xl p-6 md:p-10 animate-fadein">
-  <div class="mb-8 border-b pb-6 border-gray-100">
-    <h2
-      class="text-xl md:text-2xl font-bold text-gray-800 leading-relaxed text-center md:text-start"
-    >
+<div class="bg-white border border-gray-100 rounded-4xl shadow-[0_20px_50px_rgba(0,0,0,0.03)] p-8 md:p-12">
+  <div class="mb-10">
+    <div class="inline-block px-4 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-black mb-4 uppercase tracking-widest">
+      Question Content
+    </div>
+    <h2 class="text-2xl md:text-3xl font-black text-gray-800 leading-[1.4] text-center md:text-start">
       {{ question.content }}
     </h2>
   </div>
@@ -12,20 +13,37 @@
       <button
         (click)="select(option)"
         [ngClass]="getOptionClass(option)"
-        class="w-full text-start p-4 rounded-xl border-2 transition-all duration-200 flex items-center justify-between group relative overflow-hidden"
+        class="option-card w-full text-start p-6 rounded-2xl border-2 border-gray-50 bg-gray-50/50 transition-all duration-300 flex items-center justify-between group relative overflow-hidden active:scale-[0.98]"
         [disabled]="!!selectedOptionId && !isTestMode"
       >
-        <span class="z-10 relative text-lg">{{ option.content }}</span>
+        <div class="flex items-center gap-4 z-10">
+            <div class="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center font-bold text-gray-400 group-hover:border-indigo-400 group-hover:text-indigo-600 transition-colors">
+                {{ ['A', 'B', 'C', 'D'][$index] }}
+            </div>
+            <span class="text-lg font-bold text-gray-700 group-hover:text-gray-900 leading-tight">
+                {{ option.content }}
+            </span>
+        </div>
 
-        @if (selectedOptionId === option.id) {
-          @if (option.isCorrect === true && !isTestMode) {
-            <i class="pi pi-check-circle text-green-600 text-xl"></i>
-          } @else if (option.isCorrect === false && !isTestMode) {
-            <i class="pi pi-times-circle text-red-600 text-xl"></i>
-          } @else {
-            <i class="pi pi-check text-blue-600 text-xl font-bold"></i>
+        <div class="z-10">
+          @if (selectedOptionId === option.id) {
+            @if (option.isCorrect === true && !isTestMode) {
+              <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-green-200">
+                <i class="pi pi-check text-sm font-bold"></i>
+              </div>
+            } @else if (option.isCorrect === false && !isTestMode) {
+              <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-red-200">
+                <i class="pi pi-times text-sm font-bold"></i>
+              </div>
+            } @else {
+              <div class="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+                <i class="pi pi-check text-sm font-bold"></i>
+              </div>
+            }
           }
-        }
+        </div>
+
+        <div class="absolute inset-0 bg-linear-to-r from-indigo-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
       </button>
     }
   </div>

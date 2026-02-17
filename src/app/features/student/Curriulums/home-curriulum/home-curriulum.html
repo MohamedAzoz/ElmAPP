@@ -1,67 +1,56 @@
 @if (curriulum()) {
-  <div class="mt-14 mb-7 text-center grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-  <div class="mb-4 p-4 flex items-center justify-center">
-    <a
-      [routerLink]="[`F`]"
-      class="block w-100 rounded-xl"
-      aria-label="الانتقال إلى الملخصات"
-    >
-      <p-card
-        class="cursor-pointer  border border-text-muted hover:border-main border-b-8 overflow-hidden rounded-xl shadow-md hover:shadow-accent-soft transition-all duration-300 transform hover:-translate-y-2"
-      >
-        <ng-template #title>
-          <div class="text-center py-3">
-            <span
-              class="text-lg md:text-xl lg:text-2xl font-semibold text-text-dark"
-            >
-             ملخصات على المادة
-            </span>
+<div class="mt-14 mb-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-4 max-w-7xl mx-auto">
+  
+  <a [routerLink]="['F']" class="group block h-full focus:outline-none focus:ring-2 focus:ring-main rounded-3xl transition-all">
+    <p-card styleClass="h-full border-0 overflow-hidden rounded-3xl bg-surface shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_25px_50px_rgba(37,99,235,0.12)] transition-all duration-500 transform group-hover:-translate-y-3 relative">
+      <div class="absolute top-0 left-0 right-0 h-24 bg-linear-to-br from-blue-500/10 to-transparent opacity-60"></div>
+      <ng-template #content>
+        <div class="relative z-10 flex flex-col items-center justify-center pt-8 pb-6">
+          <div class="mb-6 w-16 h-16 rounded-2xl bg-white shadow-sm border border-nav/30 flex items-center justify-center text-main transform group-hover:rotate-6 group-hover:scale-110 transition-all duration-500">
+            <i class="pi pi-file-pdf text-3xl"></i>
           </div>
-        </ng-template>
-      </p-card>
-    </a>
-  </div>
-  <div class="mb-4 p-4 flex items-center justify-center">
-    <a
-      [routerLink]="[`QB`]"
-      class="block w-100 rounded-xl"
-      aria-label="الانتقال إلى بنوك اسئلة"
-    >
-      <p-card
-        class="cursor-pointer border border-text-muted hover:border-main border-b-8 overflow-hidden rounded-xl shadow-md hover:shadow-accent-soft transition-all duration-300 transform hover:-translate-y-2"
-      >
-        <ng-template #title>
-          <div class="text-center py-3">
-            <span
-              class="text-lg md:text-xl lg:text-2xl font-semibold text-text-dark"
-            >
-             بنوك الاسئلة
-            </span>
+          <h3 class="text-xl md:text-2xl font-extrabold text-text-dark group-hover:text-main text-center transition-colors duration-300">
+            ملخصات المادة
+          </h3>
+          <div class="mt-6 h-1 w-8 bg-nav group-hover:w-16 group-hover:bg-main transition-all duration-500 rounded-full"></div>
+        </div>
+      </ng-template>
+    </p-card>
+  </a>
+
+  <a [routerLink]="['QB']" class="group block h-full focus:outline-none focus:ring-2 focus:ring-main rounded-3xl transition-all">
+    <p-card styleClass="h-full border-0 overflow-hidden rounded-3xl bg-surface shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_25px_50px_rgba(37,99,235,0.12)] transition-all duration-500 transform group-hover:-translate-y-3 relative">
+      <div class="absolute top-0 left-0 right-0 h-24 bg-linear-to-br from-indigo-500/10 to-transparent opacity-60"></div>
+      <ng-template #content>
+        <div class="relative z-10 flex flex-col items-center justify-center pt-8 pb-6">
+          <div class="mb-6 w-16 h-16 rounded-2xl bg-white shadow-sm border border-nav/30 flex items-center justify-center text-main transform group-hover:-rotate-6 group-hover:scale-110 transition-all duration-500">
+            <i class="pi pi-database text-3xl"></i>
           </div>
-        </ng-template>
-      </p-card>
-    </a>
-  </div>
-  <div class="mb-4 p-4 flex items-center justify-center">
-    <a
-      [routerLink]="['T']"
-      class="block w-100 rounded-xl"
-     aria-label="الانتقال إلى الاختبارات"
-    >
-      <p-card
-        class="cursor-pointer border border-text-muted hover:border-main border-b-8 overflow-hidden rounded-xl shadow-md hover:shadow-accent-soft transition-all duration-300 transform hover:-translate-y-2"
-      >
-        <ng-template #title>
-          <div class="text-center py-3">
-            <span
-              class="text-lg md:text-xl lg:text-2xl font-semibold text-text-dark"
-            >
-             اعمل اختبار
-            </span>
+          <h3 class="text-xl md:text-2xl font-extrabold text-text-dark group-hover:text-main text-center transition-colors duration-300">
+            بنوك الأسئلة
+          </h3>
+          <div class="mt-6 h-1 w-8 bg-nav group-hover:w-16 group-hover:bg-main transition-all duration-500 rounded-full"></div>
+        </div>
+      </ng-template>
+    </p-card>
+  </a>
+
+  <a [routerLink]="['T']" class="group block h-full focus:outline-none focus:ring-2 focus:ring-main rounded-3xl transition-all">
+    <p-card styleClass="h-full border-0 overflow-hidden rounded-3xl bg-surface shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_25px_50px_rgba(37,99,235,0.12)] transition-all duration-500 transform group-hover:-translate-y-3 relative">
+      <div class="absolute top-0 left-0 right-0 h-24 bg-linear-to-br from-purple-500/10 to-transparent opacity-60"></div>
+      <ng-template #content>
+        <div class="relative z-10 flex flex-col items-center justify-center pt-8 pb-6">
+          <div class="mb-6 w-16 h-16 rounded-2xl bg-white shadow-sm border border-nav/30 flex items-center justify-center text-main transform group-hover:scale-125 transition-all duration-500">
+            <i class="pi pi-stopwatch text-3xl animate-pulse"></i>
           </div>
-        </ng-template>
-      </p-card>
-    </a>
-  </div>
+          <h3 class="text-xl md:text-2xl font-extrabold text-text-dark group-hover:text-main text-center transition-colors duration-300">
+            اعمل اختبار
+          </h3>
+          <div class="mt-6 h-1 w-8 bg-nav group-hover:w-16 group-hover:bg-main transition-all duration-500 rounded-full"></div>
+        </div>
+      </ng-template>
+    </p-card>
+  </a>
+
 </div>
 }

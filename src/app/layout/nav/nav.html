@@ -1,5 +1,5 @@
-<nav class="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 xl:px-8">
+<nav class="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm w-full">
+  <div class="w-full md:mx-auto px-4 sm:px-6 xl:px-8">
     <div class="flex justify-between h-20">
       <div class="flex items-center gap-8">
         <a [routerLink]="['/main/home']" class="flex items-center gap-3 group">
@@ -14,7 +14,7 @@
           </div>
         </a>
 
-        <div class="hidden xl:flex items-center gap-1">
+        <div class="hidden lg:flex items-center gap-1">
           <a
             [routerLink]="['/main/colleges']"
             routerLinkActive="bg-nav text-main"
@@ -73,62 +73,101 @@
 </nav>
 
 <div
-  class="fixed inset-0 z-40 bg-black/30 transition-opacity duration-300"
+  class="fixed inset-0 z-60 bg-black/40 backdrop-blur-sm transition-opacity duration-300"
   [class.opacity-0]="!sidebarVisible()"
   [class.pointer-events-none]="!sidebarVisible()"
   (click)="sidebarVisible.set(false)"
 ></div>
 
 <aside
-  class="fixed top-0 right-0 z-50 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out lg:hidden"
+  [hidden]="!sidebarVisible()"
+  class="fixed top-0 right-0 z-70 h-full w-80 bg-white shadow-[-10px_0_30px_rgba(0,0,0,0.1)] transform transition-transform duration-500 ease-out lg:hidden"
   [class.translate-x-0]="sidebarVisible()"
   [class.translate-x-full]="!sidebarVisible()"
 >
-  <div class="p-5">
-    <div class="flex items-center justify-between mb-8 border-b pb-4">
-      <div class="flex items-center gap-2">
-        <i class="pi pi-list text-indigo-600 text-xl"></i>
-        <span class="font-bold text-xl text-indigo-800">القائمة</span>
+  <div class="p-6 border-b border-gray-50 bg-linear-to-l from-gray-50 to-white">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-main/10 rounded-xl flex items-center justify-center text-main">
+          <i class="pi pi-list text-xl"></i>
+        </div>
+        <span class="font-black text-xl text-gray-800">القائمة</span>
       </div>
-      <button (click)="sidebarVisible.set(false)" class="text-gray-400 hover:text-red-500">
-        <i class="pi pi-times text-xl"></i>
+      <button
+        (click)="sidebarVisible.set(false)"
+        class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
+      >
+        <i class="pi pi-times text-lg"></i>
       </button>
     </div>
+  </div>
 
-    <div class="flex flex-col gap-2">
-      <a
-        [routerLink]="['/main/colleges']"
-        (click)="sidebarVisible.set(false)"
-        routerLinkActive="bg-nav text-main"
-        [routerLinkActiveOptions]="{ exact: true }"
-        class="p-4 hover:bg-nav-hover rounded-xl font-bold text-text-main flex items-center gap-3 transition-all"
-      >
-        <i class="pi pi-building text-indigo-500"></i> الكليات والملخصات
-      </a>
-
-      @for (link of filteredLinks(); track link.label) {
-        <a
-          [routerLink]="[link.command()]"
-          (click)="sidebarVisible.set(false)"
-          routerLinkActive="bg-nav text-main"
-          [routerLinkActiveOptions]="{ exact: true }"
-          class="p-4 hover:bg-nav-hover hover:text-text-main rounded-xl font-bold text-main-hover flex items-center gap-3 transition-all cursor-pointer"
-        >
-          <i [class]="link.icon + ' text-main'"></i> {{ link.label }}
-        </a>
-      }
-
-      @if (!isLoggedIn()) {
-        <div class="mt-4 border-t pt-6">
-          <button
-            pButton
-            label="تسجيل الدخول"
-            [routerLink]="['/main/login']"
-            (click)="sidebarVisible.set(false)"
-            class="w-full p-button-indigo rounded-xl"
-          ></button>
+  <div class="p-4 flex flex-col gap-2 h-[calc(100%-90px)] overflow-y-auto">
+    @if (isLoggedIn()) {
+      <div class="mb-4 p-4 bg-nav/20 rounded-2xl flex items-center gap-3 border border-nav/30">
+        <p-avatar icon="pi pi-user" styleClass="bg-main text-white" shape="circle"></p-avatar>
+        <div class="flex flex-col overflow-hidden">
+          <span class="font-bold text-sm text-gray-800 truncate">{{ identity.fullName }}</span>
+          <span class="text-[10px] text-main font-medium">{{ identity.roles[0].name }}</span>
         </div>
-      }
+      </div>
+    }
+
+    <a
+      [routerLink]="['/main/colleges']"
+      (click)="sidebarVisible.set(false)"
+      routerLinkActive="bg-main/10 text-main ring-1 ring-main/20"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="p-4 rounded-2xl font-bold text-gray-700 flex items-center gap-4 transition-all active:scale-95"
+    >
+      <i class="pi pi-building text-lg"></i> الكليات والملخصات
+    </a>
+
+    @for (link of filteredLinks(); track link.label) {
+      <a
+        [routerLink]="[link.command()]"
+        (click)="sidebarVisible.set(false)"
+        routerLinkActive="bg-main/10 text-main ring-1 ring-main/20"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="p-4 rounded-2xl font-bold text-gray-700 flex items-center gap-4 transition-all active:scale-95"
+      >
+        <i [class]="link.icon + ' text-lg'"></i> {{ link.label }}
+      </a>
+    }
+    <!-- btn goback -->
+    <div class="my-auto mt-4">
+      <a
+        (click)="goBack()"
+        class="p-4 rounded-2xl font-semibold text-center bg-accent-soft text-main flex items-center gap-4 transition-all active:scale-95"
+      >
+        <i class="pi pi-arrow-left text-lg"></i> رجوع
+      </a>
     </div>
+
+    @if (isLoggedIn()) {
+      <button
+        (click)="logout()"
+        class="mt-auto p-4 text-red-500 font-bold flex items-center gap-4 rounded-2xl hover:bg-red-50 transition-all"
+      >
+        <i class="pi pi-sign-out"></i> تسجيل الخروج
+      </button>
+      <!-- change password -->
+      <button
+        [routerLink]="['/main/change-password']"
+        (click)="sidebarVisible.set(false)"
+        class="mt-auto p-4 text-main font-bold flex items-center gap-4 rounded-2xl hover:bg-main/10 transition-all"
+      >
+        <i class="pi pi-key"></i> تغيير كلمة المرور
+      </button>
+    } @else {
+      <div class="mt-4 pt-4 border-t border-gray-100">
+        <button
+          pButton
+          label="تسجيل الدخول"
+          [routerLink]="['/main/login']"
+          class="w-full py-4 rounded-2xl shadow-lg bg-main border-0 font-bold"
+        ></button>
+      </div>
+    }
   </div>
 </aside>

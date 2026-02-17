@@ -9,7 +9,7 @@ import { GlobalService } from '../../../core/Services/global-service';
 
 @Component({
   selector: 'app-files',
-  imports: [ FileCarde, ProgressSpinnerModule],
+  imports: [FileCarde, ProgressSpinnerModule],
   templateUrl: './files.html',
   styleUrl: './files.scss',
 })

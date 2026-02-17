@@ -1,43 +1,41 @@
 <p-confirmDialog></p-confirmDialog>
 
-<section class="min-h-screen bg-gray-100 py-8 px-4 flex flex-col items-center">
-  <div
-    class="w-full max-w-4xl flex flex-wrap border border-main/30 md:justify-between justify-center items-center gap-2 mb-6 p-4 rounded-xl shadow-lg"
-  >
-    <div class="flex items-center gap-2 bg-white border border-main py-1 px-2 rounded-xl">
-      <i class="pi pi-clock text-main text-xl"></i>
-      <span class="text-2xl font-mono font-semibold text-text-dark tracking-wider">
-        {{ quizState.timerString() }}
-      </span>
+<section class="min-h-screen bg-gray-50 py-12 px-4 flex flex-col items-center">
+  <div class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 items-center gap-6 mb-8 p-6 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
+    
+    <div class="flex items-center gap-3 justify-center md:justify-start">
+      <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+        <i class="pi pi-clock text-xl animate-pulse"></i>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">الوقت المتبقي</span>
+        <span class="text-2xl font-mono font-black text-gray-800 tracking-tighter">
+          {{ quizState.timerString() }}
+        </span>
+      </div>
     </div>
-    <!-- add btn toggle between test and direct mode -->
-    <div class="flex justify-center bg-white border border-main/30 p-1 rounded-xl">
-      <p-selectbutton
-        [options]="[
-          { label: 'AR', value: 'rtl' },
-          { label: 'EN', value: 'ltr' },
-        ]"
-        [(ngModel)]="isTestMode"
-        optionLabel="label"
-        optionValue="value"
-        aria-labelledby="basic"
-      />
+
+    <div class="flex justify-center">
+      <div class="bg-gray-50 p-1.5 rounded-xl border border-gray-200">
+        <p-selectbutton 
+          [options]="[{ label: 'AR', value: 'rtl' }, { label: 'EN', value: 'ltr' }]"
+          [(ngModel)]="isTestMode"
+          optionLabel="label"
+          optionValue="value"
+          class="custom-select-button"
+        />
+      </div>
     </div>
-    <div class="text-text-muted font-semibold">
-      سؤال {{ currentIndex() + 1 }} من {{ questions().length }}
+
+    <div class="flex flex-col items-center md:items-end justify-center">
+        <span class="text-sm font-bold text-gray-800">سؤال {{ currentIndex() + 1 }} <span class="text-gray-400">/ {{ questions().length }}</span></span>
+        <div class="w-32 mt-2">
+            <p-progressBar [value]="progress()" [showValue]="false" class="h-1.5 rounded-full overflow-hidden"></p-progressBar>
+        </div>
     </div>
   </div>
 
-  <div class="w-full max-w-4xl mb-8">
-    <p-progressBar
-      [value]="progress()"
-      [showValue]="false"
-      class="h-2"
-      color="var(--color-main)"
-    ></p-progressBar>
-  </div>
-
-  <div class="w-full max-w-4xl relative min-h-[400px]" [dir]="isTestMode()">
+  <div class="w-full max-w-4xl relative transition-all duration-500" [dir]="isTestMode()">
     @if (currentQuestion(); as question) {
       <app-question-carde
         [question]="question"
@@ -45,18 +43,19 @@
         (answerSelect)="onAnswerSelected($event)"
       />
     } @else {
-      <div class="flex justify-center items-center h-64">
-        <i class="pi pi-spin pi-spinner text-4xl text-main"></i>
+      <div class="flex flex-col justify-center items-center h-80 bg-white rounded-3xl shadow-sm w-full">
+        <div class="animate-spin h-12 w-12 border-4 border-indigo-600 border-t-transparent rounded-full mb-4"></div>
+        <p class="text-gray-500 font-medium">نجهز لك السؤال التالي...</p>
       </div>
     }
   </div>
 
-  <div class="w-full max-w-4xl flex justify-between mt-8" [dir]="isTestMode()">
+  <div class="w-full max-w-4xl flex justify-between mt-10" [dir]="isTestMode()">
     <button
       pButton
       label="السابق"
-      icon="pi pi-arrow-right"
-      class="p-button-outlined p-button-main shadow-xl px-6"
+      icon="pi pi-chevron-right"
+      class="p-button-text p-button-lg font-bold text-gray-600 hover:text-indigo-600 transition-colors"
       [disabled]="isFirstQuestion()"
       (click)="prev()"
     ></button>
@@ -65,9 +64,9 @@
       <button
         pButton
         label="التالي"
-        icon="pi pi-arrow-left"
+        icon="pi pi-chevron-left"
         iconPos="right"
-        class="p-button-main shadow-xl px-8"
+        class="px-10 py-4 bg-indigo-600 border-none rounded-2xl shadow-[0_10px_20px_rgba(79,70,229,0.3)] hover:bg-indigo-700 hover:-translate-y-1 transition-all"
         (click)="next()"
       ></button>
     } @else {
@@ -75,7 +74,7 @@
         pButton
         label="إنهاء الاختبار"
         severity="danger"
-        class="px-8 shadow-xl"
+        class="px-10 py-4 rounded-2xl shadow-[0_10px_20px_rgba(239,68,68,0.3)] hover:-translate-y-1 transition-all"
         (click)="confirmEnd($event)"
       ></button>
     }
