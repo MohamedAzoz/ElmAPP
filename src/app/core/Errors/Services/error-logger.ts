@@ -27,14 +27,14 @@ export class ErrorLogger {
     };
 
     // Log to console in development
-    if (!environment.production) {
-      console.group('🔴 Error Log');
-      console.error('Message:', message);
-      if (stackTrace) console.error('Stack:', stackTrace);
-      console.log('URL:', errorLog.url);
-      console.log('Time:', errorLog.timestamp);
-      console.groupEnd();
-    }
+    // if (!environment.production) {
+    //   console.group('🔴 Error Log');
+    //   console.error('Message:', message);
+    //   if (stackTrace) console.error('Stack:', stackTrace);
+    //   console.log('URL:', errorLog.url);
+    //   console.log('Time:', errorLog.timestamp);
+    //   console.groupEnd();
+    // }
 
     // Send to server in production
   //   if (environment.production) {

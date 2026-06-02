@@ -1,11 +1,15 @@
 import { Routes } from '@angular/router';
-import { permissionGuard } from '../../core/Auth/Guards/permission-guard';
 
+import { Roles } from '../../core/Const/Roles';
+import { roleGuard } from '../../core/Auth/Guards/role-guard';
 export const leaderRoutes: Routes = [
   { path: '', redirectTo: 'my-subjects', pathMatch: 'full' },
   {
     path: 'my-subjects',
-    canActivate: [permissionGuard],
+    canActivate: [roleGuard],
+    data: {
+      role: [Roles.Leader],
+    },
     children: [
       {
         path: '',
@@ -15,10 +19,10 @@ export const leaderRoutes: Routes = [
       },
       {
         path: ':curriculumId',
+        canActivate: [roleGuard],
         data: {
-          permission: 'QuestionBanks&Files',
+          role: [Roles.Leader],
         },
-        canActivate: [permissionGuard],
         children: [
           {
             path: '',
@@ -27,8 +31,9 @@ export const leaderRoutes: Routes = [
           },
           {
             path: 'questionBanks',
+            canActivate: [roleGuard],
             data: {
-              permission: 'QuestionBanks',
+              role: [Roles.Leader],
             },
             children: [
               {
@@ -62,8 +67,9 @@ export const leaderRoutes: Routes = [
               import('./Files/get-all-files-for-leader/get-all-files-for-leader').then(
                 (m) => m.GetAllFilesForLeader,
               ),
+            canActivate: [roleGuard],
             data: {
-              permission: 'Files',
+              role: [Roles.Leader],
             },
           },
         ],

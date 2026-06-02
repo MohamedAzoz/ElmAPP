@@ -16,7 +16,7 @@
       ></p-button>
     </div>
 
-    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-y">
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-y-auto">
       <p-table 
         [value]="yearFacade.years()" 
         [loading]="yearFacade.isLoading()" 
@@ -26,7 +26,7 @@
         [stripedRows]="true"
         [reorderableColumns]="true"
         [rowHover]="true"      
-        styleClass="p-datatable-lg p-datatable-striped"
+        class="p-datatable-lg p-datatable-striped"
       >
         <ng-template pTemplate="header">
           <tr>
@@ -78,6 +78,7 @@
   [modal]="true" 
   [style]="{width: '450px'}" 
   styleClass="rounded-3xl"
+  appendTo="body"
 >
   <div class="flex flex-col gap-4 pt-4">
     <div class="flex flex-col gap-2">

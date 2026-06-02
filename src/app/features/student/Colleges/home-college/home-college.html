@@ -19,7 +19,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           @for (year of years(); track $index) {
             @defer (on viewport; prefetch on idle) {
-              <app-carde [data]="year" Link="departments"/>
+              <app-carde [data]="year" Link="departments" />
             } @placeholder {
               <p-skeleton width="25rem" height="250px"></p-skeleton>
             }

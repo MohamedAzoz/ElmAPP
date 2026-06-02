@@ -1,102 +1,201 @@
-<div class="p-6 rtl">
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-xl font-bold">إدارة ربط المنهج (Curriculum)</h1>
-    <p-button label="إضافة ربط جديد" icon="pi pi-plus" (onClick)="openAddDialog()"></p-button>
+<div class="p-6 bg-slate-50 min-h-screen rtl">
+  <div class="max-w-6xl mx-auto">
+    <div
+      class="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-3xl shadow-sm mb-6 border border-slate-100 gap-4"
+    >
+      <div>
+        <h1 class="text-2xl font-black text-text-dark">إدارة المقرارات المادة</h1>
+        <p class="text-text-muted">تحكم في المقرارات</p>
+      </div>
+      <p-button
+        label="إضافة قسم جديد"
+        icon="pi pi-plus"
+        (onClick)="openAddDialog()"
+        styleClass="rounded-2xl px-6 py-3 font-bold"
+      ></p-button>
+    </div>
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-y-auto">
+      <p-table
+        [value]="curriculumFacade.curriculums()"
+        [loading]="curriculumFacade.isLoading()"
+        [showGridlines]="true"
+        [stripedRows]="true"
+        [resizableColumns]="true"
+        [reorderableColumns]="true"
+        [rowHover]="true"
+        [paginator]="true"
+        [rows]="rows()"
+        [lazy]="true"
+        (onLazyLoad)="loadCurriculums($event)"
+        [rowsPerPageOptions]="[5, 10, 25, 50]"
+        [tableStyle]="{ minWidth: '50rem' }"
+        [totalRecords]="curriculumFacade.totalCount()"
+        styleClass="p-datatable-gridlines p-datatable-striped"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>القسم</th>
+            <th>المستوى الدراسي</th>
+            <th>الدكتور المحاضر</th>
+            <th>شهر البداية</th>
+            <th>شهر النهاية</th>
+            <th>الحالة (Publish)</th>
+            <th>الإجراءات</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-cur>
+          <tr>
+            <td>{{ cur.departmentName }}</td>
+            <td>{{ cur.yearName }}</td>
+            <td>{{ cur.doctorName }}</td>
+            <td>{{ cur.startMonth }}</td>
+            <td>{{ cur.endMonth }}</td>
+            <td>{{ cur.status }}</td>
+            <td>
+              <!-- btn isPublish -->
+              <button
+                pButton
+                [icon]="cur.status == 'Active' ? 'pi pi-eye' : 'pi pi-eye-slash'"
+                [class]="
+                  cur.status == 'Active'
+                    ? 'p-button-text p-button-success'
+                    : 'p-button-text p-button-primary'
+                "
+                (click)="togglePublish(cur.id)"
+              ></button>
+              <!-- btn edit date -->
+              <button
+                pButton
+                icon="pi pi-calendar"
+                class="p-button-text p-button-primary"
+                (click)="editDate(cur)"
+              ></button>
+              <!-- btn edit -->
+              <button
+                pButton
+                icon="pi pi-pencil"
+                class="p-button-text p-button-primary"
+                (click)="edit(cur)"
+              ></button>
+              <button
+                pButton
+                icon="pi pi-trash"
+                class="p-button-text p-button-danger"
+                (click)="delete(cur.id)"
+              ></button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
   </div>
 
-  <p-table
-    [value]="curriculumFacade.curriculums()"
-    [loading]="curriculumFacade.isLoading()"
-    [paginator]="true"
-    [rows]="rows()"
-    [lazy]="true"
-    [rowsPerPageOptions]="[10, 25, 50]"
-    [totalRecords]="curriculumFacade.totalCount()"
-    (onLazyLoad)="loadCurriculums($event)"
-    [rowHover]="true"
-    [showGridlines]="true"
-    [stripedRows]="true"
+  <p-dialog
+    [(visible)]="displayDialog"
+    [header]="
+      isEditMode()
+        ? isEditDateMode()
+          ? 'تعديل تاريخ المادة لمنهج'
+          : 'تعديل المادة لمنهج'
+        : 'تخصيص المادة لمنهج'
+    "
+    [modal]="true"
+    [style]="{ width: '500px' }"
+    appendTo="body"
   >
-    <ng-template pTemplate="header">
-      <tr>
-        <th>القسم</th>
-        <th>المستوى الدراسي</th>
-        <th>الدكتور المحاضر</th>
-        <th>الإجراءات</th>
-      </tr>
+    <div class="grid gap-4 mt-4">
+      <div class="flex flex-col gap-2" [hidden]="isEditDateMode()">
+        <label>اختر الكلية</label>
+        <p-select
+          [options]="collegeFacade.colleges()"
+          [(ngModel)]="selectedCollegeId"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="اختر الكلية"
+          filter="true"
+          appendTo="body"
+        ></p-select>
+      </div>
+
+      <div class="flex flex-col gap-2" [hidden]="isEditDateMode()">
+        <label>اختر القسم</label>
+        <p-select
+          [options]="departmentFacade.departments()"
+          [disabled]="selectedCollegeId() === null"
+          [(ngModel)]="curriculumForm.departmentId"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="اختر القسم"
+          filter="true"
+          appendTo="body"
+        ></p-select>
+      </div>
+
+      <div class="flex flex-col gap-2" [hidden]="isEditDateMode()">
+        <label>اختر المستوى</label>
+        <p-select
+          [options]="yearFacade.years()"
+          [disabled]="selectedCollegeId() === null"
+          [(ngModel)]="curriculumForm.yearId"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="اختر المستوى"
+          filter="true"
+          appendTo="body"
+        ></p-select>
+      </div>
+
+      <div class="flex flex-col gap-2" [hidden]="isEditDateMode()">
+        <label>اختر الدكتور</label>
+        <p-select
+          [options]="curriculumFacade.doctors()"
+          [(ngModel)]="curriculumForm.doctorId"
+          optionLabel="fullName"
+          optionValue="doctorId"
+          placeholder="اختر الدكتور"
+          filter="true"
+          appendTo="body"
+        ></p-select>
+      </div>
+      <!-- start month -->
+      <div class="flex flex-col gap-2" [hidden]="!isEditDateMode() && isEditMode()">
+        <label>شهر البداية</label>
+        <p-inputNumber
+          [(ngModel)]="curriculumForm.startMonth"
+          [min]="1"
+          [max]="12"
+          [showButtons]="true"
+          buttonLayout="horizontal"
+          spinnerMode="horizontal"
+          inputStyleClass="text-center border-x-0"
+          class="w-full"
+          incrementButtonClass="p-button-secondary rounded-e-xl"
+          decrementButtonClass="p-button-secondary"
+          incrementButtonIcon="pi pi-plus"
+          decrementButtonIcon="pi pi-minus"
+        ></p-inputNumber>
+      </div>
+      <!-- end month -->
+      <div class="flex flex-col gap-2" [hidden]="!isEditDateMode() && isEditMode()">
+        <label>شهر النهاية</label>
+        <p-inputNumber
+          [(ngModel)]="curriculumForm.endMonth"
+          [min]="1"
+          [max]="12"
+          [showButtons]="true"
+          buttonLayout="horizontal"
+          spinnerMode="horizontal"
+          inputStyleClass="text-center border-x-0"
+          class="w-full"
+          incrementButtonClass="p-button-secondary rounded-e-xl"
+          decrementButtonClass="p-button-secondary"
+          incrementButtonIcon="pi pi-plus"
+          decrementButtonIcon="pi pi-minus"
+        ></p-inputNumber>
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <p-button label="حفظ الربط" icon="pi pi-check" (onClick)="save()"></p-button>
     </ng-template>
-    <ng-template pTemplate="body" let-cur>
-      <tr>
-        <td>{{ cur.departmentName }}</td>
-        <td>{{ cur.yearName }}</td>
-        <td>{{ cur.doctorName }}</td>
-        <td>
-          <button
-            pButton
-            icon="pi pi-trash"
-            class="p-button-text p-button-danger"
-            (click)="delete(cur.id)"
-          ></button>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
+  </p-dialog>
 </div>
-
-<p-dialog
-  [(visible)]="displayDialog"
-  header="تخصيص المادة لمنهج"
-  [modal]="true"
-  [style]="{ width: '500px' }"
->
-  <div class="grid gap-4 mt-4">
-    <div class="flex flex-col gap-2">
-      <label>اختر الكلية</label>
-      <p-select
-        [options]="collegeFacade.colleges()"
-        [(ngModel)]="selectedCollegeId"
-        optionLabel="name"
-        optionValue="id"
-        placeholder="اختر الكلية"
-      ></p-select>
-    </div>
-
-    <div class="flex flex-col gap-2">
-      <label>اختر القسم</label>
-      <p-select
-        [options]="departmentFacade.departments()"
-        [disabled]="selectedCollegeId() === null"
-        [(ngModel)]="curriculumForm.departmentId"
-        optionLabel="name"
-        optionValue="id"
-        placeholder="اختر القسم"
-      ></p-select>
-    </div>
-
-    <div class="flex flex-col gap-2">
-      <label>اختر المستوى</label>
-      <p-select
-        [options]="yearFacade.years()"
-        [disabled]="selectedCollegeId() === null"
-        [(ngModel)]="curriculumForm.yearId"
-        optionLabel="name"
-        optionValue="id"
-        placeholder="اختر المستوى"
-      ></p-select>
-    </div>
-
-    <div class="flex flex-col gap-2">
-      <label>اختر الدكتور</label>
-      <p-select
-        [options]="curriculumFacade.doctors()"
-        [(ngModel)]="curriculumForm.doctorId"
-        optionLabel="fullName"
-        optionValue="doctorId"
-        placeholder="اختر الدكتور"
-      ></p-select>
-    </div>
-  </div>
-  <ng-template pTemplate="footer">
-    <p-button label="حفظ الربط" icon="pi pi-check" (onClick)="save()"></p-button>
-  </ng-template>
-</p-dialog>

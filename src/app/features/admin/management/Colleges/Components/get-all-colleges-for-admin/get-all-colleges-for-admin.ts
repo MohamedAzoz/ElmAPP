@@ -7,14 +7,27 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { FileUploadModule } from 'primeng/fileupload';
 import { ImageFacade } from '../../../Images/image-facade';
 import { GetCollegeDto } from '../../../../../../core/api/clients';
-import { PrimengadminModule } from '../../../../../../shared/Models/primengadmin/primengadmin-module';
+import { DialogModule } from 'primeng/dialog';
+import { ButtonModule } from 'primeng/button';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TableModule } from 'primeng/table';
+import { FormsModule } from '@angular/forms';
+import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
-  selector: 'app-get-all-colleges-for-admin',
-  imports: [FileUploadModule, RouterLink, PrimengadminModule],
+  imports: [
+    FileUploadModule,
+    RouterLink,
+    DialogModule,
+    ButtonModule,
+    ConfirmDialogModule,
+    TableModule,
+    FormsModule,
+    InputTextModule,
+  ],
   providers: [ConfirmationService],
   templateUrl: './get-all-colleges-for-admin.html',
-  styleUrl: './get-all-colleges-for-admin.scss',
+  styleUrl: './get-all-colleges-for-admin.css',
 })
 export class GetAllCollegesForAdmin implements OnInit {
   public collegeFacade = inject(CollegeFacade);

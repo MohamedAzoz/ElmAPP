@@ -1,14 +1,19 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpContextToken, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { finalize } from 'rxjs';
-import { NgxSpinnerService } from 'ngx-spinner';
+import { LoadingService } from '../Services/loading-service';
 
+export const SkipLoading = new HttpContextToken<boolean>(() => false);
 export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
-  const spinner = inject(NgxSpinnerService);
-  spinner.show();
+  const loadingService = inject(LoadingService);
+  if (req.context.get(SkipLoading)) {
+    return next(req);
+  }
+  loadingService.show();
+
   return next(req).pipe(
     finalize(() => {
-      spinner.hide();
+      loadingService.hide();
     }),
   );
 };

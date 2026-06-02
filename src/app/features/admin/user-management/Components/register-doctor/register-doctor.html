@@ -121,6 +121,7 @@
   [style]="{ width: '500px' }"
   styleClass="rounded-3xl overflow-hidden shadow-2xl"
   [draggable]="false"
+  appendTo="body"
 >
   <div class="flex flex-col gap-6 pt-6">
     <div class="flex flex-col gap-2">
@@ -160,7 +161,7 @@
           [(ngModel)]="doctorForm.password"
           [toggleMask]="true"
           [feedback]="false"
-          styleClass="w-full"
+          class="w-full"
           inputStyleClass="w-full p-3 rounded-xl"
         ></p-password>
       </div>
@@ -170,7 +171,7 @@
           [(ngModel)]="doctorForm.confirmPassword"
           [toggleMask]="true"
           [feedback]="false"
-          styleClass="w-full"
+          class="w-full"
           inputStyleClass="w-full p-3 rounded-xl"
         ></p-password>
       </div>
@@ -195,6 +196,6 @@
         "
         styleClass="rounded-xl px-6"
       ></p-button>
-    </div>
+    </div> 
   </div>
 </p-dialog>

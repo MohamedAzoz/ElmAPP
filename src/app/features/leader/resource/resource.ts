@@ -1,7 +1,6 @@
-import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { GlobalService } from '../../../core/Services/global-service';
 import { RouterLink } from '@angular/router';
 import { CardModule } from 'primeng/card';
 import { CurriulumFacade } from '../../student/Curriulums/curriulum-facade';
@@ -11,11 +10,10 @@ import { ButtonModule } from 'primeng/button';
   selector: 'app-resource',
   imports: [RouterLink, CardModule, ButtonModule],
   templateUrl: './resource.html',
-  styleUrl: './resource.scss',
+  styleUrl: './resource.css',
 })
-export class Resource implements OnInit {
+export class Resource {
   private active = inject(ActivatedRoute);
-  private title = inject(GlobalService);
   private curriulumFacade = inject(CurriulumFacade);
 
   private lastLoadedId = signal<number | null>(null);
@@ -31,9 +29,5 @@ export class Resource implements OnInit {
       this.curriulumFacade.getCurriulum(id);
       this.lastLoadedId.set(id);
     });
-  }
-
-  ngOnInit(): void {
-    this.title.setTitle('المصادر');
   }
 }

@@ -27,11 +27,11 @@ import { DirectionService } from '../../../../core/Services/direction';
     DialogModule,
     ToastModule,
     ConfirmDialogModule,
-    RouterLink
-],
+    RouterLink,
+  ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './get-all-question-banks-for-leader.html',
-  styleUrl: './get-all-question-banks-for-leader.scss',
+  styleUrl: './get-all-question-banks-for-leader.css',
 })
 export class GetAllQuestionBanksForLeader implements OnInit {
   public facade = inject(QuestionBankFacade);

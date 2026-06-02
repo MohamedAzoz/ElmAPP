@@ -7,10 +7,10 @@ export const roleGuard: CanActivateFn = (route) => {
   const router = inject(Router);
 
   // الأدوار المسموح بيها للـ Route ده
-  const allowedRoles: string[] = route.data?.['roles'] || [];
+  const allowedRoles: string[] = route.data?.['role'] || [];
 
   // دور المستخدم الحالي
-  const userRole = identity.roles[0].name;
+  const userRole = identity.roles;
 
   if (userRole && allowedRoles.includes(userRole)) {
     return true;

@@ -5,16 +5,29 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 // PrimeNG
 import { AddSubjectCommand, UpdateSubjectCommand } from '../../../../../../core/api/clients';
 import { RouterLink } from '@angular/router';
-import { PrimengadminModule } from '../../../../../../shared/Models/primengadmin/primengadmin-module';
 import { DirectionService } from '../../../../../../core/Services/direction';
+import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
+import { TableModule } from 'primeng/table';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-get-all-subjects-for-admin',
   standalone: true,
-  imports: [RouterLink, PrimengadminModule],
+  imports: [
+    RouterLink,
+    ButtonModule,
+    DialogModule,
+    TableModule,
+    ConfirmDialogModule,
+    InputTextModule,
+    FormsModule,
+  ],
   providers: [ConfirmationService],
   templateUrl: './get-all-subjects-for-admin.html',
-  styleUrl: './get-all-subjects-for-admin.scss',
+  styleUrl: './get-all-subjects-for-admin.css',
 })
 export class GetAllSubjectsForAdmin {
   public facade = inject(SubjectFacade);

@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
-import { permissionGuard } from '../../core/Auth/Guards/permission-guard';
+import { roleGuard } from '../../core/Auth/Guards/role-guard';
+import { Roles } from '../../core/Const/Roles';
 export const doctorRoutes: Routes = [
   {
     path: '',
@@ -8,9 +9,9 @@ export const doctorRoutes: Routes = [
   },
   {
     path: 'subjects',
-    canActivate: [permissionGuard],
+    canActivate: [roleGuard],
     data: {
-      permission: 'RateFiles',
+      role: [Roles.Doctor],
     },
     children: [
       {
@@ -44,7 +45,7 @@ export const doctorRoutes: Routes = [
   {
     path: 'notifications',
     title: 'الاشعارات',
-    canActivate: [permissionGuard],
+    // canActivate: [permissionGuard],
     data: {
       permission: 'Notifications',
     },

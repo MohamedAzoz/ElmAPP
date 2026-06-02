@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, computed, signal, effect } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, computed, signal, effect } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { QuestionFacade } from '../question-facade';
 import { QuizStateService } from '../../Result_Exam/quiz-state-service';
@@ -6,31 +6,34 @@ import { QuestionCarde } from '../../../../shared/Components/question-carde/ques
 import { ProgressBarModule } from 'primeng/progressbar';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { PrimengBtnModule } from '../../../../shared/Models/primeng-btn/primeng-btn-module';
-import { GlobalService } from '../../../../core/Services/global-service';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ProgressSpinner } from 'primeng/progressspinner';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { ButtonModule } from 'primeng/button';
+import { TooltipModule } from 'primeng/tooltip';
+import { KeyboardNavigation } from '../../../../shared/Directives/keyboard-navigation';
 
 @Component({
   selector: 'app-get-all-questions',
   imports: [
-    PrimengBtnModule,
+    CommonModule,
+    ButtonModule,
+    TooltipModule,
     ProgressBarModule,
     ConfirmDialogModule,
     QuestionCarde,
     SelectButtonModule,
-    FormsModule
+    FormsModule,
+    KeyboardNavigation,
   ],
   providers: [ConfirmationService],
   templateUrl: './get-all-questions.html',
-  styleUrl: './get-all-questions.scss',
+  styleUrl: './get-all-questions.css',
 })
-export class GetAllQuestions implements OnInit {
+export class GetAllQuestions implements OnInit, OnDestroy {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private title = inject(GlobalService);
   private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
   private questionFacade = inject(QuestionFacade);
@@ -38,7 +41,7 @@ export class GetAllQuestions implements OnInit {
 
   questions = this.questionFacade.questions;
   isLoading = this.questionFacade.isLoading;
-  
+
   // 1. تحديد المعايير القادمة من الرابط مباشرة كـ Signals
   private params = toSignal(this.route.paramMap);
   private bankId = computed(() => Number(this.params()?.get('bankId')));
@@ -79,8 +82,26 @@ export class GetAllQuestions implements OnInit {
   }
 
   ngOnInit() {
-    this.title.setTitle('الأسئلة');
+    // Check if the page is being reloaded
+    const navigationEntries = window.performance.getEntriesByType('navigation');
+    const isReload =
+      navigationEntries.length > 0 &&
+      (navigationEntries[0] as PerformanceNavigationTiming).type === 'reload';
+
+    if (!isReload) {
+      // Clear old bank quiz data to start fresh if it's a new entry
+      this.quizState.clearBankQuiz();
+      this.questionFacade.questions.set([]);
+    }
+    // Set isBankTest to true so the correct answers map is retrieved/saved
+    this.quizState.isBankTest.set(true);
+
     this.quizState.startTimer();
+  }
+
+  ngOnDestroy() {
+    this.quizState.clearBankQuiz();
+    this.questionFacade.questions.set([]);
   }
 
   // التنقل يعتمد على إرسال الـ ID الجديد للرابط فقط
@@ -105,27 +126,43 @@ export class GetAllQuestions implements OnInit {
     // الانتقال لـ '../' + id سيبدل الـ questionId ويحافظ على الـ bankId
     this.router.navigate(['../', id], {
       relativeTo: this.route,
-      replaceUrl: true // اختياري: لمنع تراكم تاريخ المتصفح عند كل سؤال
+      replaceUrl: true, // اختياري: لمنع تراكم تاريخ المتصفح عند كل سؤال
     });
   }
 
   onAnswerSelected(optionId: number) {
     const qId = this.currentQuestion()?.id;
     if (qId) {
-      this.quizState.saveAnswer(qId, optionId);
+      this.quizState.saveBankAnswer(qId, optionId);
     }
   }
 
-  confirmEnd(event: Event) {
+  selectOptionByIndex(index: number) {
+    const question = this.currentQuestion();
+    if (question && question.options && question.options[index]) {
+      const optionId = question.options[index].id;
+      if (optionId !== undefined) {
+        this.onAnswerSelected(optionId);
+      }
+    }
+  }
+
+  onSubmitKeyboard() {
+    if (this.isLastQuestion()) {
+      this.confirmEnd();
+    }
+  }
+
+  confirmEnd(event?: Event) {
     this.confirmationService.confirm({
-      target: event.target as EventTarget,
-      message: 'هل أنت متأكد من إنهاء الاختبار؟ سيتم احتساب الدرجة فوراً.',
+      target: event?.target as EventTarget,
+      message: 'هل أنت متأكد من إنهاء الامتحان؟ سيتم احتساب النتيجة فوراً.',
       header: 'تأكيد الإنهاء',
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'نعم، أنهِ الاختبار',
+      acceptLabel: 'نعم، أنهِ الامتحان',
       rejectLabel: 'إلغاء',
       accept: () => {
-        this.quizState.saveTestResult(this.questions());
+        this.quizState.saveTestResult(this.questions(), true);
         this.messageService.add({
           severity: 'success',
           summary: 'تم الحفظ',
@@ -134,7 +171,7 @@ export class GetAllQuestions implements OnInit {
 
         setTimeout(() => {
           this.router.navigate(['../../../result'], { relativeTo: this.route });
-        }, 800);
+        }, 750);
       },
     });
   }

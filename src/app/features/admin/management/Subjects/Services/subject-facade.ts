@@ -45,4 +45,5 @@ export class SubjectFacade {
   deleteSubject(subjectId: number) {
     return this.adminClient.deleteSubject(subjectId);
   }
+  
 }

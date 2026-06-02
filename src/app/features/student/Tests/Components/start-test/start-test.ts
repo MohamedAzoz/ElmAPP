@@ -1,21 +1,19 @@
-import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TestFacade } from '../../test-facade';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'primeng/select';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { PrimengBtnModule } from '../../../../../shared/Models/primeng-btn/primeng-btn-module';
 import { CardModule } from 'primeng/card';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { QuestionBankFacade } from '../../../QuestionBanks/question-bank-facade';
-import { GlobalService } from '../../../../../core/Services/global-service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { StartTestCommand } from '../../../../../core/api/clients';
 import { LocalStorage } from '../../../../../core/Services/local-storage';
 import { RateLimitService } from '../../../../../core/Services/rate-limit-service';
 import { LockUi } from '../../../../../shared/Components/lock-ui/lock-ui';
 import { MessageService } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
 @Component({
   selector: 'app-start-test',
   standalone: true,
@@ -23,19 +21,18 @@ import { MessageService } from 'primeng/api';
     FormsModule,
     SelectModule,
     InputNumberModule,
-    PrimengBtnModule,
     CardModule,
     FloatLabelModule,
     LockUi,
+    ButtonModule,
   ],
   templateUrl: './start-test.html',
-  styleUrl: './start-test.scss',
+  styleUrl: './start-test.css',
 })
-export class StartTest implements OnInit {
+export class StartTest {
   private route = inject(ActivatedRoute);
   public rateLimitService = inject(RateLimitService);
   private router = inject(Router);
-  private title = inject(GlobalService);
   private localStorage = inject(LocalStorage);
   private messageService = inject(MessageService);
   bankFacade = inject(QuestionBankFacade);
@@ -59,15 +56,12 @@ export class StartTest implements OnInit {
 
       if (col?.id) {
         this.bankFacade.countQuestions(col.id);
-        const count = Math.round(this.bankFacade.countQuestionsInBank() / 3);
+        const count = Math.round(this.bankFacade.countQuestionsInBank() * 0.25);
         this.numQuestions.set(count);
       }
     });
   }
 
-  ngOnInit() {
-    this.title.setTitle('بدء الاختبار');
-  }
   onStart() {
     if (!this.selectedBank()) return;
 

@@ -4,11 +4,11 @@
     aria-label="الانتقال إلى سنوات كلية {{ college.name }}"
   >
     <p-card
-      styleClass="h-full bg-surface rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(37,99,235,0.08)] transition-all duration-500 border-0"
+      class="h-full rounded-3xl overflow-hidden shadow-main drop-shadow-lg hover:shadow-main-hover transition-all duration-500 border-0"
     >
       <ng-template #header>
-        <div class="relative h-56 overflow-hidden bg-linear-to-b from-accent-soft/60 to-surface flex items-center justify-center p-8">
-          <div class="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#2563EB_1px,transparent_1px)] bg-size-[16px_16px]"></div>
+        <div class="relative h-56 overflow-hidden bg-linear-to-b from-primary-500/60 to-surface flex items-center justify-center p-8">
+          <div class="absolute inset-0 opacity-5 bg-main bg-size-[16px_16px]"></div>
           
           <img
             [alt]="college.name"
@@ -19,7 +19,7 @@
       </ng-template>
 
       <ng-template #title>
-        <div class="flex flex-col items-center text-center pt-2 pb-6 px-4 relative z-10">
+        <div class="flex flex-col items-center text-center py-3 px-4 relative z-10">
           <h3 class="text-xl lg:text-2xl font-bold text-text-dark group-hover:text-main transition-colors duration-300">
             كلية {{ college.name }}
           </h3>

@@ -4,7 +4,7 @@ import { Location } from '@angular/common';
   selector: 'app-access-denied',
   imports: [],
   templateUrl: './access-denied.html',
-  styleUrl: './access-denied.scss',
+  styleUrl: './access-denied.css',
 })
 export class AccessDenied {
   constructor(private location: Location) {}

@@ -8,7 +8,7 @@
         <h1 class="text-2xl font-bold text-text-dark m-0">إدارة بنوك الأسئلة</h1>
         <p class="text-text-muted">قم بإضافة وتعديل بنوك الأسئلة لهذا المنهج</p>
       </div>
-      <!-- back button -->
+
       <div class="flex gap-2">
         <p-button 
           label="رجوع" 
@@ -35,8 +35,7 @@
         [loading]="facade.isLoading()"
         [rows]="10" 
         [paginator]="true"
-        styleClass="p-datatable-striped"
-        responsiveLayout="stack"
+        class="p-datatable-striped"
       >
         <ng-template pTemplate="header">
           <tr class="bg-slate-50">
@@ -99,6 +98,7 @@
   [modal]="true" 
   [style]="{width: '450px'}" 
   styleClass="rounded-2xl"
+  appendTo="body"
 >
   <div class="flex flex-col gap-4 mt-2">
     <div class="flex flex-col gap-2">

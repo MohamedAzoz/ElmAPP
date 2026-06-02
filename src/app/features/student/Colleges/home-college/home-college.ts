@@ -1,9 +1,8 @@
-import { Component, computed, effect, inject, OnInit } from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
 import { CollegeFacade } from '../college-facade';
 import { ActivatedRoute } from '@angular/router';
 import { YearFacade } from '../../Year/year-facade';
 import { Skeleton } from 'primeng/skeleton';
-import { GlobalService } from '../../../../core/Services/global-service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Carde } from '../../../../shared/Components/carde/carde';
 
@@ -11,11 +10,10 @@ import { Carde } from '../../../../shared/Components/carde/carde';
   selector: 'app-home-college',
   imports: [Skeleton, Carde],
   templateUrl: './home-college.html',
-  styleUrl: './home-college.scss',
+  styleUrl: './home-college.css',
 })
-export class HomeCollege implements OnInit {
+export class HomeCollege {
   private collegeFacade = inject(CollegeFacade);
-  private title = inject(GlobalService);
   private yearFacade = inject(YearFacade);
   private active = inject(ActivatedRoute);
 
@@ -33,8 +31,5 @@ export class HomeCollege implements OnInit {
         this.yearFacade.getAllYears(col);
       }
     });
-  }
-  ngOnInit(): void {
-    this.title.setTitle('الكليات');
   }
 }

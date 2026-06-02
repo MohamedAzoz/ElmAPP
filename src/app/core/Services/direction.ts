@@ -1,9 +1,11 @@
-import { Injectable, signal, effect } from '@angular/core';
+import { Injectable, signal, effect, inject } from '@angular/core';
+import { LocalStorage } from './local-storage';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DirectionService {
+  private localStorage = inject(LocalStorage);
   private dir = signal<'ltr' | 'rtl'>(this.getInitialDirection());
   readonly currentDir = this.dir.asReadonly();
 
@@ -19,12 +21,12 @@ export class DirectionService {
   }
 
   private getInitialDirection(): 'ltr' | 'rtl' {
-    const lang = localStorage.getItem('lang') || 'ar';
+    const lang = this.localStorage.get('lang') || 'ar';
     return lang === 'ar' ? 'rtl' : 'ltr';
   }
   
   setDirection(direction: 'ltr' | 'rtl'): void {
-    localStorage.setItem('lang', direction === 'rtl' ? 'ar' : 'en');
+    this.localStorage.set('lang', direction === 'rtl' ? 'ar' : 'en');
     this.dir.set(direction);
   }
 }

@@ -1,28 +1,33 @@
 <p-confirmDialog></p-confirmDialog>
 
 <div class="p-6 bg-slate-50 min-h-screen rtl">
-  <div class="max-w-6xl mx-auto">
-    
-    <div class="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-3xl shadow-sm mb-6 border border-slate-100 gap-4">
+  <div class="max-w-7xl mx-auto">
+    <div
+      class="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-3xl shadow-sm mb-6 border border-slate-100 gap-4"
+    >
       <div>
         <h1 class="text-2xl font-black text-text-dark">إدارة أقسام الكلية</h1>
         <p class="text-text-muted">تحكم في أنواع الأقسام، الرسوم، والبيانات التابعة لها</p>
       </div>
-      <p-button label="إضافة قسم جديد" icon="pi pi-plus" (onClick)="openAddDialog()" styleClass="rounded-2xl px-6 py-3 font-bold"></p-button>
+      <p-button
+        label="إضافة قسم جديد"
+        icon="pi pi-plus"
+        (onClick)="openAddDialog()"
+        styleClass="rounded-2xl px-6 py-3 font-bold"
+      ></p-button>
     </div>
 
-    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-y">
-      <p-table 
-        [value]="departmentFacade.departments()" 
-        [loading]="departmentFacade.isLoading()" 
-        [rows]="rows()" 
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-y-auto">
+      <p-table
+        [value]="departmentFacade.departments()"
+        [loading]="departmentFacade.isLoading()"
+        [rows]="rows()"
         [paginator]="true"
         [totalRecords]="departmentFacade.totalCount()"
         [lazy]="true"
         (onLazyLoad)="loadDepartments($event)"
-        [rowsPerPageOptions]="[10, 20, 50, 100]"
-        [showCurrentPageReport]="true"
-        [showGridlines]="true" 
+        [rowsPerPageOptions]="[5, 10, 25, 50]"
+        [showGridlines]="true"
         [stripedRows]="true"
         [resizableColumns]="true"
         [reorderableColumns]="true"
@@ -34,6 +39,7 @@
             <th class="py-4 px-6 text-right">اسم القسم</th>
             <th class="text-center">الحالة (مدفوع)</th>
             <th class="text-center">النوع (Type)</th>
+            <th class="text-center">الحالة (Publish)</th>
             <th class="text-center">الإجراءات</th>
           </tr>
         </ng-template>
@@ -42,17 +48,45 @@
           <tr class="hover:bg-slate-50/50 transition-colors">
             <td class="py-4 px-6 font-bold text-slate-700">{{ dept.name }}</td>
             <td class="text-center">
-              <p-tag 
-                [severity]="dept.isPaid ? 'success' : 'info'" 
-                [value]="dept.isPaid ? 'مدفوع' : 'مجاني'" 
-                styleClass="px-3 py-1 rounded-lg">
+              <p-tag
+                [severity]="dept.isPaid ? 'success' : 'info'"
+                [value]="dept.isPaid ? 'مدفوع' : 'مجاني'"
+                styleClass="px-3 py-1 rounded-lg"
+              >
               </p-tag>
             </td>
             <td class="text-center text-text-muted font-mono">{{ dept.type }}</td>
             <td class="text-center">
+              <p-tag
+                [severity]="dept.status == 'Published' ? 'success' : 'info'"
+                [value]="dept.status == 'Published' ? 'منشور' : 'غير منشور'"
+                styleClass="px-3 py-1 rounded-lg"
+              >
+              </p-tag>
+            </td>
+            <td class="text-center">
               <div class="flex justify-center gap-2">
-                <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-info" (click)="openEditDialog(dept)"></button>
-                <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" (click)="confirmDelete(dept.id)"></button>
+                <button
+                  pButton
+                  [icon]="dept.status == 'Published' ? 'pi pi-eye' : 'pi pi-eye-slash'"
+                  [severity]="dept.status == 'Published' ? 'success' : 'info'"
+                  [pTooltip]="dept.status == 'Published' ? 'إخفاء' : 'إظهار'"
+                  tooltipPosition="top"
+                  (click)="togglePublish(dept.id)"
+                  class="p-button-rounded p-button-text"
+                ></button>
+                <button
+                  pButton
+                  icon="pi pi-pencil"
+                  class="p-button-rounded p-button-text p-button-info"
+                  (click)="openEditDialog(dept)"
+                ></button>
+                <button
+                  pButton
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-text p-button-danger"
+                  (click)="confirmDelete(dept.id)"
+                ></button>
               </div>
             </td>
           </tr>
@@ -62,40 +96,63 @@
   </div>
 </div>
 
-<p-dialog 
-  [(visible)]="displayDialog" 
-  [header]="isEditMode() ? 'تعديل القسم' : 'إضافة قسم جديد'" 
-  [modal]="true" 
-  [style]="{ 'width': '500px' }"
+<p-dialog
+  [(visible)]="displayDialog"
+  [header]="isEditMode() ? 'تعديل القسم' : 'إضافة قسم جديد'"
+  [modal]="true"
+  [style]="{ width: '50vw' }"
   styleClass="rounded-3xl"
+  appendTo="body"
 >
   <div class="flex flex-col gap-6 pt-5">
-    
     <div class="flex flex-col gap-2">
       <label class="font-bold text-slate-600">اسم القسم</label>
-      <input pInputText [(ngModel)]="deptForm.name" placeholder="أدخل اسم القسم..." class="w-full p-3 rounded-xl border-slate-200" />
+      <input
+        pInputText
+        [(ngModel)]="deptForm.name"
+        placeholder="أدخل اسم القسم..."
+        class="w-full p-3 rounded-xl border-slate-200"
+      />
     </div>
 
     <div class="grid grid-cols-2 gap-4">
       <div class="flex flex-col gap-2">
         <label class="font-bold text-slate-600">النوع (Type)</label>
-        <p-select [(ngModel)]="deptForm.type" [options]="[  { label: 'General', value: 0 }, { label: 'Special', value: 1 } ]" styleClass="w-full" class="rounded-xl"></p-select>
+        <p-select
+          [(ngModel)]="deptForm.type"
+          [options]="[
+            { label: 'General', value: 0 },
+            { label: 'Special', value: 1 },
+          ]"
+          class="rounded-xl w-full"
+          appendTo="body"
+        ></p-select>
       </div>
 
       <div class="flex flex-col gap-2">
         <label class="font-bold text-slate-600">هل القسم مدفوع؟</label>
-        <p-toggleButton 
-          [(ngModel)]="deptForm.isPaid" 
-          onLabel="نعم (مدفوع)" 
-          offLabel="لا (مجاني)"  
+        <p-toggleButton
+          [(ngModel)]="deptForm.isPaid"
+          onLabel="نعم (مدفوع)"
+          offLabel="لا (مجاني)"
           class="w-full rounded-xl"
         ></p-toggleButton>
       </div>
     </div>
 
     <div class="flex justify-end gap-2 mt-4 border-t pt-4">
-      <p-button label="إلغاء" [text]="true" severity="secondary" (onClick)="displayDialog.set(false)"></p-button>
-      <p-button [label]="isEditMode() ? 'حفظ التعديلات' : 'إنشاء القسم'" icon="pi pi-check" (onClick)="save()" [disabled]="!deptForm.name"></p-button>
+      <p-button
+        label="إلغاء"
+        [text]="true"
+        severity="secondary"
+        (onClick)="displayDialog.set(false)"
+      ></p-button>
+      <p-button
+        [label]="isEditMode() ? 'حفظ التعديلات' : 'إنشاء القسم'"
+        icon="pi pi-check"
+        (onClick)="save()"
+        [disabled]="!deptForm.name"
+      ></p-button>
     </div>
   </div>
 </p-dialog>

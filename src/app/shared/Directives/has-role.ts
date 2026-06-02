@@ -1,5 +1,5 @@
 import { Directive, Input } from '@angular/core';
-import { PermissionFacade } from '../../core/Auth/services/permission-facade';
+
 import { RoleFacade } from '../../core/Auth/services/role-facade';
 
 @Directive({

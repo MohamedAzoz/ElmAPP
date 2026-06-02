@@ -7,7 +7,7 @@ import { DirectionService } from '../../core/Services/direction';
   standalone: true,
   imports: [DatePipe],
   templateUrl: './footer.html',
-  styleUrl: './footer.scss',
+  styleUrl: './footer.css',
 })
 export class Footer {
   dirService = inject(DirectionService);

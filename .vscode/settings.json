@@ -10,10 +10,10 @@
   "files.autoSave": "afterDelay",
   "files.associations": {
     "*.css": "tailwindcss",
-    "*.scss": "tailwindcss"
+    "*.css": "tailwindcss"
   },
   "editor.quickSuggestions": {
     "strings": "on"
   },
-  "tailwindCSS.experimental.configFile": "src/styles.scss",
+  "tailwindCSS.experimental.configFile": "src/styles.css"
 }

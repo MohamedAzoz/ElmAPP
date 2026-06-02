@@ -1,9 +1,11 @@
-import { effect, Injectable, signal } from '@angular/core';
+import { effect, inject, Injectable, signal } from '@angular/core';
+import { LocalStorage } from './local-storage';
 
 @Injectable({
   providedIn: 'root',
 })
 export class Language {
+  private localStorage = inject(LocalStorage);
   private language = signal<'en' | 'ar'>(this.getCurrentLanguage());
   readonly currentLanguage = this.language.asReadonly();
 
@@ -14,11 +16,11 @@ export class Language {
     });
   }
   getCurrentLanguage(): 'en' | 'ar' {
-    const lang = localStorage.getItem('lang') || 'en';
+    const lang = this.localStorage.get('lang') || 'en';
     return lang === 'ar' ? 'ar' : 'en';
   }
   setLanguage(lang: 'en' | 'ar'): void {
-    localStorage.setItem('lang', lang);
+    this.localStorage.set('lang', lang);
     this.language.set(lang);
   }
 }

@@ -11,11 +11,10 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmDialogModule, ConfirmDialog } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { FileUploadModule } from 'primeng/fileupload';
 import { DirectionService } from '../../../../core/Services/direction';
-import { PrimengModule } from '../../../../shared/Models/primeng/primeng-module';
 import { IdentitySignals } from '../../../../core/Auth/services/identity-signals';
 
 @Component({
@@ -26,13 +25,14 @@ import { IdentitySignals } from '../../../../core/Auth/services/identity-signals
     DialogModule,
     TooltipModule,
     FileUploadModule,
-    PrimengModule,
     DatePipe,
     RouterLink,
+    ButtonModule,
+    ConfirmDialog,
   ],
   providers: [ConfirmationService],
   templateUrl: './get-all-files-for-leader.html',
-  styleUrl: './get-all-files-for-leader.scss',
+  styleUrl: './get-all-files-for-leader.css',
 })
 export class GetAllFilesForLeader implements OnInit {
   public facade = inject(FileFacade);
@@ -53,7 +53,7 @@ export class GetAllFilesForLeader implements OnInit {
   };
 
   ngOnInit() {
-    this.leaderId = this.identity.userId;
+    // this.leaderId = this.identity.userId;
     this.curriculumId = Number(this.route.snapshot.paramMap.get('curriculumId'));
     this.loadFiles();
   }

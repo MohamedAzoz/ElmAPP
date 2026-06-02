@@ -1,21 +1,37 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnChanges,
+  SimpleChanges,
+  input,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 // نضيف الواجهات الجديدة لضمان التوافق (اختياري لكن مفضل)
 import { QuestionsDto2 } from '../../../core/api/clients';
 
 @Component({
   selector: 'app-question-carde',
-  standalone: true,
   imports: [CommonModule],
   templateUrl: './question-carde.html',
-  styleUrl: './question-carde.scss',
+  styleUrl: './question-carde.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QuestionCarde implements OnChanges {
   // نقبل النوعين (سؤال بنك أو سؤال اختبار)
+  // change to input type , output type guard from core and من نفس الملف  الى فية ال signal
+  // question = input.required<QuestionsDto2>();
+  // savedAnswerId = input<number | undefined>();
+  // isTestMode = input<boolean>(false);
+  // answerSelect = output<any>();
+  @Input() index!: number;
   @Input({ required: true }) question!: QuestionsDto2;
   @Input() savedAnswerId: number | undefined;
   @Input() isTestMode: boolean = false;
-  @Output() answerSelect = new EventEmitter<number>();
+  @Output() answerSelect = new EventEmitter<any>();
 
   selectedOptionId: number | null = null;
 
@@ -65,6 +81,4 @@ export class QuestionCarde implements OnChanges {
 
     return 'bg-gray-50 border-gray-200 text-gray-400 opacity-70';
   }
-
-
 }

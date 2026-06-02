@@ -46,4 +46,7 @@ export class DepartmentFacade {
   deleteDepartment(id: number) {
     return this.departmentAdmin.deleteDepartment(id);
   }
+  isPublish(departmentId: number) {
+    return this.departmentAdmin.togglePublishDepartment(departmentId);
+  }
 }

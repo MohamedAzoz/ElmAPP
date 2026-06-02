@@ -62,7 +62,7 @@
                 icon="pi pi-users"
                 class="p-button-outlined p-button-secondary p-button-sm rounded-lg"
                 [routerLink]="['/main/admin/management/user-permissions']"
-                [queryParams]="{userId: leader.userId ,userName: leader.userName }"
+                [queryParams]="{ userId: leader.userId, userName: leader.userName }"
               ></button>
             </td>
             <td class="p-4 text-center">
@@ -114,9 +114,10 @@
 <p-dialog
   [(visible)]="displayDialog"
   [modal]="true"
-  [style]="{ width: '500px' }"
+  [style]="{ width: '500px', height: 'auto', overflow: 'auto' }"
   styleClass="rounded-2xl shadow-xl"
   [draggable]="false"
+  appendTo="body"
 >
   <ng-template pTemplate="header">
     <div class="flex items-center gap-2">
@@ -125,7 +126,7 @@
     </div>
   </ng-template>
 
-  <div class="flex flex-col gap-4 pt-4">
+  <div class="flex flex-col flex-wrap flex-auto gap-4 py-4">
     <div class="flex flex-col gap-2">
       <label class="font-semibold text-slate-700">اسم المستخدم</label>
       <input
@@ -146,14 +147,14 @@
       />
     </div>
 
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <div class="flex flex-col gap-2">
         <label class="font-semibold text-slate-700">كلمة المرور</label>
         <p-password
           [(ngModel)]="registerLeaderForm.password"
           [toggleMask]="true"
           [feedback]="false"
-          styleClass="w-full"
+          class="w-full"
           inputStyleClass="w-full p-3 rounded-xl"
         ></p-password>
       </div>
@@ -164,43 +165,65 @@
           [(ngModel)]="registerLeaderForm.confirmPassword"
           [toggleMask]="true"
           [feedback]="false"
-          styleClass="w-full"
+          class="w-full"
           inputStyleClass="w-full p-3 rounded-xl"
         ></p-password>
       </div>
     </div>
+    </div>
 
-    <div class="grid grid-cols-2 gap-4">
-      <div class="flex flex-col gap-2">
+    <!-- select college -->
+    <div class="flex flex-col grow gap-3 pb-3">
+      <div class="flex flex-col ">
+        <label class="font-semibold text-slate-700">الكلية</label>
+        <p-select
+          [filter]="true"
+          [filterBy]="'name'"
+          [options]="collegeService.colleges()"
+          [(ngModel)]="collegeId"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="اختر الكلية"
+          class="w-full p-2 rounded-xl"
+          appendTo="body"
+        ></p-select>
+      </div>
+
+      <div class="flex flex-col">
         <label class="font-semibold text-slate-700">المستوى الدراسي</label>
         <p-select
+          [disabled]="!collegeId"
+          [filter]="true"
+          [filterBy]="'name'"
           [options]="yearService.years()"
           [(ngModel)]="registerLeaderForm.yearId"
           optionLabel="name"
           optionValue="id"
           placeholder="اختر المستوى"
-          [showClear]="true"
-          styleClass="w-full p-3 rounded-xl"
+          class="w-full p-2 rounded-xl"
+          appendTo="body"
         ></p-select>
       </div>
 
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col">
         <label class="font-semibold text-slate-700">القسم</label>
         <p-select
+          [disabled]="!collegeId"
+          [filter]="true"
+          [filterBy]="'name'"
           [options]="departmentService.departments()"
           [(ngModel)]="registerLeaderForm.departmentId"
           optionLabel="name"
           optionValue="id"
           placeholder="اختر القسم"
-          [showClear]="true"
-          styleClass="w-full p-3 rounded-xl"
+          class="w-full p-2 rounded-xl"
+          appendTo="body"
         ></p-select>
       </div>
     </div>
-  </div>
 
   <ng-template pTemplate="footer">
-    <div class="flex justify-end gap-3">
+    <div class="flex justify-end gap-3 mt-3">
       <p-button
         label="إلغاء"
         icon="pi pi-times"
@@ -218,4 +241,3 @@
     </div>
   </ng-template>
 </p-dialog>
-

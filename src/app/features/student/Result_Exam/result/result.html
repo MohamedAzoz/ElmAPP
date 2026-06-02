@@ -84,40 +84,41 @@
 
       @for (item of scoreData()?.details; track $index) {
         <div
-          class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all hover:shadow-md"
+          class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all hover:shadow-md text-start"
+          [dir]="getTextDir(item.content)"
         >
           <div class="flex justify-between items-start gap-4 mb-4">
-            <h3 class="font-bold text-text-main leading-relaxed text-right">
+            <h3 class="font-bold text-text-main leading-relaxed">
               {{ $index + 1 }}. {{ item.content }}
             </h3>
-            <span
-              [class]="item.isCorrect ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'"
-              class="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap"
-            >
-              {{ item.isCorrect ? 'صحيحة' : 'خاطئة' }}
-            </span>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-right">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div
-              class="p-3 rounded-xl border"
+              class="p-3 rounded-xl border text-start"
               [class]="item.isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'"
             >
               <span class="text-[10px] uppercase font-bold text-text-muted block mb-1">إجابتك</span>
               <p
-                class="text-sm font-semibold"
+                class="text-sm font-semibold text-start"
                 [class]="item.isCorrect ? 'text-green-700' : 'text-red-700'"
+                [dir]="getTextDir(item.selectedOptionContent)"
               >
                 {{ item.selectedOptionContent }}
               </p>
             </div>
 
             @if (!item.isCorrect) {
-              <div class="p-3 rounded-xl border bg-blue-50 border-blue-200">
+              <div class="p-3 rounded-xl border bg-blue-50 border-blue-200 text-start">
                 <span class="text-[10px] uppercase font-bold text-text-muted block mb-1"
                   >الإجابة الصحيحة</span
                 >
-                <p class="text-sm font-semibold text-blue-700">{{ item.correctOptionContent }}</p>
+                <p
+                  class="text-sm font-semibold text-blue-700 text-start"
+                  [dir]="getTextDir(item.correctOptionContent)"
+                >
+                  {{ item.correctOptionContent }}
+                </p>
               </div>
             }
           </div>

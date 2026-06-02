@@ -1,21 +1,36 @@
-import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { DepartmentFacade } from '../../Services/department-facade';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
 // PrimeNG
 import { AddDepartmentCommand, UpdateDepartmentCommand } from '../../../../../../core/api/clients';
-import { PrimengadminModule } from '../../../../../../shared/Models/primengadmin/primengadmin-module';
+
 import { DirectionService } from '../../../../../../core/Services/direction';
+import { TooltipModule } from 'primeng/tooltip';
+import { ButtonModule } from 'primeng/button';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
+import { FormsModule } from '@angular/forms';
+import { TableModule } from 'primeng/table';
+import { TagModule } from 'primeng/tag';
+import { SelectModule } from 'primeng/select';
 
 @Component({
   selector: 'app-get-all-departments-for-admin',
   imports: [
-    PrimengadminModule
+    TableModule,
+    FormsModule,
+    ButtonModule,
+    DialogModule,
+    ConfirmDialogModule,
+    TooltipModule,
+    TagModule,
+    SelectModule,
   ],
   providers: [ConfirmationService],
   templateUrl: './get-all-departments-for-admin.html',
-  styleUrl: './get-all-departments-for-admin.scss',
+  styleUrl: './get-all-departments-for-admin.css',
 })
 export class GetAllDepartmentsForAdmin {
   public departmentFacade = inject(DepartmentFacade);
@@ -23,20 +38,20 @@ export class GetAllDepartmentsForAdmin {
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
   private dir = inject(DirectionService);
-  params= computed(() => this.route.snapshot.paramMap);
+  params = computed(() => this.route.snapshot.paramMap);
   collegeId = 0;
   displayDialog = signal(false);
   isEditMode = signal(false);
-   rows = signal(10);
-   first = signal(1);
-   constructor() {
+  rows = signal(10);
+  first = signal(1);
+  constructor() {
     effect(() => {
       this.collegeId = Number(this.params()?.get('collegeId'));
-      if(this.collegeId){
+      if (this.collegeId) {
         this.departmentFacade.getDepartmentsByCollege(this.collegeId, this.first(), this.rows());
       }
-    })
-   }
+    });
+  }
   // Form Model
   deptForm = {
     id: 0,
@@ -45,13 +60,12 @@ export class GetAllDepartmentsForAdmin {
     type: 0,
   };
 
-
   loadDepartments(event: any) {
-     const pageNumber = event.first / event.rows + 1;
+    const pageNumber = event.first / event.rows + 1;
     const pageSize = event.rows;
     this.departmentFacade.getDepartmentsByCollege(this.collegeId, pageNumber, pageSize);
   }
-  
+
   openAddDialog() {
     this.isEditMode.set(false);
     this.deptForm = { id: 0, name: '', isPaid: false, type: 0 };
@@ -69,9 +83,14 @@ export class GetAllDepartmentsForAdmin {
     this.displayDialog.set(true);
   }
 
+  togglePublish(id: number) {
+    this.departmentFacade.isPublish(id).subscribe(() => {
+      this.onSuccess('تم تحديث حالة القسم');
+    });
+  }
   save() {
     if (this.isEditMode()) {
-      const command: UpdateDepartmentCommand = { ...this.deptForm, collegeId: this.collegeId };
+      const command: UpdateDepartmentCommand = { ...this.deptForm };
       this.departmentFacade.updateDepartment(command).subscribe(() => {
         this.onSuccess('تم تحديث القسم بنجاح');
       });

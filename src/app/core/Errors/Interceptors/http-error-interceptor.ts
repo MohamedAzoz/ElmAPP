@@ -90,7 +90,7 @@ function handleRateLimit(
     const lockType = detectLockType(url);
 
     rateLimitService.startLock(finalSeconds, message, lockType);
-    notification.showWarning(message, 'تقييد الطلبات');
+    // notification.showWarning(message, 'تقييد الطلبات');
 }
 
 /**

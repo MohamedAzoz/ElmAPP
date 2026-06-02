@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { FilePublicClient, FileView } from '../../../core/api/clients';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment.development';
 @Injectable({ providedIn: 'root' })
 export class FileFacade {
   files = signal<FileView[]>([]);
@@ -9,11 +10,11 @@ export class FileFacade {
     private filePublicService: FilePublicClient,
     private http: HttpClient,
   ) {}
-  private baseUrl = 'https://elm.runasp.net'; // رابط السيرفر
+  // private baseUrl = 'https://elmapi-dgf0aggzbbhjagdk.polandcentral-01.azurewebsites.net'; // رابط السيرفر
 
   // دالة العرض (حل مشكلة SyntaxError)
   showFile(storageName: string) {
-    const url = `${this.baseUrl}/api/FilePublic/ShowFileFromUrl/${storageName}`;
+    const url = `${environment.apiUrl}api/FilePublic/ShowFileFromUrl/${storageName}`;
 
     // نطلب الملف كـ blob مباشرة لنتجنب محاولة NSwag لتحويله لـ JSON
     this.http.get(url, { responseType: 'blob' }).subscribe({
@@ -26,7 +27,7 @@ export class FileFacade {
   }
   // دالة التحميل (ستكشف لك سبب خطأ 500)
   downloadFile(storageName: string) {
-    const url = `${this.baseUrl}/api/FilePublic/DownloadFile/${storageName}`;
+    const url = `${environment.apiUrl}api/FilePublic/DownloadFile/${storageName}`;
 
     this.http.get(url, { responseType: 'blob' }).subscribe({
       next: (blob) => {

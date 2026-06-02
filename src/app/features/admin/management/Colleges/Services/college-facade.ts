@@ -30,7 +30,9 @@ export class CollegeFacade {
       .getAllColleges(this.universityId)
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
-        next: (res) => this.colleges.set(res.data || []),
+        next: (res) => {
+          this.colleges.set(res.data || []);
+        },
         error: () => this.colleges.set([]),
       });
   }

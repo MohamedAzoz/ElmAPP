@@ -1,24 +1,41 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" translate="no">
   <head>
-    <meta charset="utf-8" />
-    <title>المعرفة الجامعية</title>
-    <base href="/" />
-     <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Rubik">
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/x-icon" href="svgviewer-output.svg" />
-  </head>
+    <meta charset="utf-8"/>
+    <title>علم</title>
+    <base href="/"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Rubik"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="google" content="notranslate"/>
+    <link rel="icon" type="image/x-icon" href="svgviewer-output.svg"/>
+    <link rel="manifest" href="manifest.webmanifest">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="manifest" href="manifest.webmanifest">
+</head>
   <body>
     <app-root></app-root>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-GLBVMX59LE"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script>
+      if (window.location.hostname !== 'localhost') {
+        const loadGtag = () => {
+          const script = document.createElement('script');
+          script.src = 'https://www.googletagmanager.com/gtag/js?id=G-GLBVMX59LE';
+          script.async = true;
+          document.head.appendChild(script);
 
-  gtag('config', 'G-GLBVMX59LE');
-</script>
-  </body>
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-GLBVMX59LE');
+        };
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(() => loadGtag(), { timeout: 3000 });
+        } else {
+          setTimeout(loadGtag, 2000);
+        }
+      }
+    </script>
+    <noscript>Please enable JavaScript to continue using this application.</noscript>
+</body>
 </html>

@@ -1,26 +1,38 @@
-
-
-
 <p-toast class="custom-toast" position="top-right"> </p-toast>
 
 <router-outlet></router-outlet>
- 
-<ngx-spinner
-  bdColor="rgba(0, 21, 41, 0.9)"
-  size="medium"
-  color="#fff"
-  [fullScreen]="true"
-  type="ball-clip-rotate-multiple"
->
-  <div class="academic-loader">
-    <div class="outer-ring"></div>
+@if (loadingService.isLoading()) {
+  <div
+    class="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-[#001529]/90 backdrop-blur-sm select-none"
+  >
+    <div class="relative flex items-center justify-center w-44 h-44">
+      <div
+        class="absolute w-36 h-36 rounded-full border-4 border-solid border-transparent border-t-amber-400 border-b-amber-400 animate-spin"
+      ></div>
 
-    <div class="icon-container">
-      <svg width="80" height="80" viewBox="0 0 4 4" fill="none" xmlns="http://www.w3.org/2000/svg" class="cap-icon">
-        <path d="M4 1.57a.31.31 0 0 0-.155-.268l-1.685-1.32a.32.32 0 0 0-.32 0l-1.688 1a.313.313 0 0 0 0 .537l.48.28v.703a.32.32 0 0 0 .155.273l1.063.613a.32.32 0 0 0 .31 0l1.063-.613a.32.32 0 0 0 .155-.273v-.71l.31-.182v.68H4zm-.932 1.25L2 3.435.945 2.822v-.517l.895.532a.32.32 0 0 0 .32 0l.905-.54zM2 2.567l-1.688-1L2 .565l1.688 1z" fill="#FFD700"/>
-      </svg>
+      <div
+        class="absolute w-28 h-28 rounded-full border-4 border-solid border-transparent border-r-white border-l-white animate-[spin_1.5s_linear_infinite_reverse]"
+      ></div>
+
+      <div class="absolute flex items-center justify-center">
+        <svg
+          width="80"
+          height="80"
+          viewBox="0 0 4 4"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-16 h-16 transform transition-transform duration-300"
+        >
+          <path
+            d="M4 1.57a.31.31 0 0 0-.155-.268l-1.685-1.32a.32.32 0 0 0-.32 0l-1.688 1a.313.313 0 0 0 0 .537l.48.28v.703a.32.32 0 0 0 .155.273l1.063.613a.32.32 0 0 0 .31 0l1.063-.613a.32.32 0 0 0 .155-.273v-.71l.31-.182v.68H4zm-.932 1.25L2 3.435.945 2.822v-.517l.895.532a.32.32 0 0 0 .32 0l.905-.54zM2 2.567l-1.688-1L2 .565l1.688 1z"
+            fill="#FFD700"
+          />
+        </svg>
+      </div>
     </div>
 
-    <p class="loading-text">جاري تحضير المحتوى الأكاديمي...</p>
+    <p class="mt-4 text-white text-lg font-medium tracking-wide animate-pulse">
+      جاري تحضير المحتوى الأكاديمي...
+    </p>
   </div>
-</ngx-spinner>
+}

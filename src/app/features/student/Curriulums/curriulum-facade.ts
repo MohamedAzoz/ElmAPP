@@ -11,7 +11,7 @@ export class CurriulumFacade {
 
   constructor(private curriulumPublicClient: CurriulumPublicClient) {}
 
-  getAllCurriulums(departmentId: number, yearId?: number) {
+  getAllCurriulums(departmentId: number, yearId: number) {
     return this.curriulumPublicClient.getAllByDeptIdAndYearId(departmentId, yearId).subscribe({
       next: (res) => {
         this.curriulums.set(res.data || []);

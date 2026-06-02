@@ -17,13 +17,13 @@
       ></p-button>
     </div>
 
-    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-y">
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-y-auto">
       <p-table
         [value]="collegeFacade.colleges()"
         [loading]="collegeFacade.isLoading()"
         [rows]="10"
         [paginator]="true"
-        styleClass="p-datatable-lg"
+        class="p-datatable-lg"
       >
         <ng-template pTemplate="header">
           <tr>
@@ -118,6 +118,7 @@
   [modal]="true"
   [style]="{ width: '400px' }"
   styleClass="rounded-3xl"
+  appendTo="body"
 >
   <div class="flex flex-col gap-4 pt-4">
     <div class="flex flex-col gap-2">
@@ -152,6 +153,7 @@
   [modal]="true"
   [style]="{ width: '400px' }"
   styleClass="rounded-3xl"
+  appendTo="body"
 >
   <div class="flex flex-col items-center gap-6 py-6 text-center">
     <div class="p-4 bg-gray-50 rounded-2xl">

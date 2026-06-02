@@ -7,22 +7,21 @@ import { ButtonModule } from 'primeng/button';
 import { MenuModule } from 'primeng/menu';
 import { AvatarModule } from 'primeng/avatar';
 import { MenuItem } from 'primeng/api';
-import { PermissionFacade } from '../../core/Auth/services/permission-facade';
 import { ILink } from '../ilink';
 import { Theme } from '../../theme';
 import { Location } from '@angular/common';
+import { Roles } from '../../core/Const/Roles';
 
 @Component({
   selector: 'app-nav',
   imports: [CommonModule, RouterModule, RouterLinkActive, ButtonModule, MenuModule, AvatarModule],
   templateUrl: './nav.html',
-  styleUrl: './nav.scss',
+  styleUrl: './nav.css',
 })
 export class Nav {
   public identity = inject(IdentitySignals);
   private authFacade = inject(AuthFacade);
   private router = inject(Router);
-  private permissionFacade = inject(PermissionFacade);
   private location = inject(Location);
 
   public themeService = inject(Theme);
@@ -40,61 +39,55 @@ export class Nav {
     {
       label: 'إدارة الكليات',
       icon: 'pi pi-building',
-      permission: 'Colleges',
+      role: Roles.SuperAdmin,
       command: () => '/main/admin/colleges',
     },
     {
       label: 'إدارة المواد',
       icon: 'pi pi-book',
-      permission: 'Subjects',
+      role: Roles.SuperAdmin,
       command: () => '/main/admin/subjects',
     },
     {
       label: 'ادارة الدكاترة',
       icon: 'pi pi-users',
-      permission: 'Doctors',
+      role: Roles.SuperAdmin,
       command: () => '/main/admin/management',
     },
     {
       label: 'ادارة الطلاب',
       icon: 'pi pi-users',
-      permission: 'Leaders',
+      role: Roles.SuperAdmin,
       command: () => '/main/admin/management/leaders',
     },
     {
-      label: 'ادارة الصلاحيات',
-      icon: 'pi pi-users',
-      permission: 'Permissions',
-      command: () => '/main/admin/management/permissions',
-    },
-    {
-      label: 'الادوار',
-      icon: 'pi pi-shield',
-      permission: 'Roles',
-      command: () => '/main/admin/management/roles',
+      label: 'الاعدادات',
+      icon: 'pi pi-cog',
+      role: Roles.SuperAdmin,
+      command: () => '/main/admin/settings',
     },
     {
       label: 'المواد',
       icon: 'pi pi-check-circle',
-      permission: 'RateFiles',
+      role: Roles.Doctor,
       command: () => '/main/doctor/subjects',
     },
     {
       label: 'الإشعارات',
       icon: 'pi pi-bell',
-      permission: 'Notifications',
+      role: Roles.Doctor,
       command: () => '/main/doctor/notifications',
     },
     {
       label: 'موادي',
       icon: 'pi pi-briefcase',
-      permission: 'QuestionBanks',
+      role: Roles.Leader,
       command: () => '/main/leader/my-subjects',
     },
   ];
 
   filteredLinks = computed(() => {
-    return this.allLinks.filter((link) => this.can(link.permission!));
+    return this.allLinks.filter((link) => this.can(link.role!));
   });
 
   userItems: MenuItem[] = [
@@ -107,8 +100,8 @@ export class Nav {
     { label: 'تسجيل الخروج', icon: 'pi pi-sign-out', command: () => this.logout() },
   ];
 
-  can(permission: string): boolean {
-    return this.permissionFacade.hasPermission(permission);
+  can(role: string): boolean {
+    return this.identity.roles === role;
   }
 
   goBack() {

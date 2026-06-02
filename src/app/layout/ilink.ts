@@ -1,6 +1,6 @@
 export interface ILink {
     label: string;
     icon: string;
-    permission?: string ;
+    role?: string ;
     command: () => string;
 }

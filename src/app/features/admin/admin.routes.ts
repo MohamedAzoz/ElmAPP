@@ -1,13 +1,14 @@
 import { Routes } from '@angular/router';
-import { permissionGuard } from '../../core/Auth/Guards/permission-guard';
+import { roleGuard } from '../../core/Auth/Guards/role-guard';
+import { Roles } from '../../core/Const/Roles';
 
 export const adminRoutes: Routes = [
   { path: '', redirectTo: 'colleges', pathMatch: 'full' },
   {
     path: 'colleges',
-    canActivate: [permissionGuard],
+    canActivate: [roleGuard],
     data: {
-      permission: 'Colleges',
+      role: [Roles.SuperAdmin],
     },
     children: [
       {
@@ -43,9 +44,9 @@ export const adminRoutes: Routes = [
   },
   {
     path: 'subjects',
-    canActivate: [permissionGuard],
+    canActivate: [roleGuard],
     data: {
-      permission: 'Subjects',
+      role: [Roles.SuperAdmin],
     },
     children: [
       {
@@ -72,9 +73,9 @@ export const adminRoutes: Routes = [
       {
         path: '',
         title: 'ادارة الدكاترة',
-        canActivate: [permissionGuard],
-          data: {
-          permission: 'Doctors',
+        canActivate: [roleGuard],
+        data: {
+          permission: [Roles.SuperAdmin],
         },
         loadComponent: () =>
           import('./user-management/Components/register-doctor/register-doctor').then(
@@ -84,63 +85,28 @@ export const adminRoutes: Routes = [
       {
         path: 'leaders',
         title: 'ادارة القادة',
-        canActivate: [permissionGuard],
+        canActivate: [roleGuard],
         data: {
-          permission: 'Leaders',
+          role: [Roles.SuperAdmin],
         },
         loadComponent: () =>
           import('./user-management/Components/register-student/register-student').then(
             (m) => m.RegisterStudent,
           ),
       },
+    ],
+  },
+  {
+    path: 'settings',
+    canActivate: [roleGuard],
+    data: {
+      role: [Roles.SuperAdmin],
+    },
+    children: [
       {
-        path: 'user-permissions',
-        title: 'ادارة صلاحيات المستخدم',
-        canActivate: [permissionGuard],
-        data: {
-          permission: 'UserPermissions',
-        },
-        loadComponent: () =>
-          import('./user-management/Components/user-permissions/user-permissions').then(
-            (m) => m.UserPermissions,
-          ),
-      },
-      {
-        path: 'permissions',
-        title: 'ادارة الصلاحيات',
-        canActivate: [permissionGuard],
-        data: {
-          permission: 'Permissions',
-        },
-        loadComponent: () =>
-          import('./user-management/Components/permissions/permissions').then((m) => m.Permissions),
-      },
-      {
-        path: 'roles',
-        canActivate: [permissionGuard],
-        data: {
-          permission: 'Roles',
-        },
-        children: [
-          {
-            path: '',
-            title: 'ادارة الادوار',
-            loadComponent: () =>
-              import('./user-management/Components/roles/roles').then((m) => m.Roles),
-          },
-          {
-            path: 'role-permissions',
-            title: 'ادارة صلاحيات الادوار',
-            canActivate: [permissionGuard],
-            data: {
-              permission: 'RolePermissions',
-            },
-            loadComponent: () =>
-              import('./user-management/Components/role-permissions/role-permissions').then(
-                (m) => m.RolePermissions,
-              ),
-          },
-        ],  
+        path: '',
+        title: 'ادارة الاعدادات',
+        loadComponent: () => import('./management/Setting/setting/setting').then((m) => m.Setting),
       },
     ],
   },

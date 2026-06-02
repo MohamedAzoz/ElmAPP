@@ -16,13 +16,12 @@
         styleClass="rounded-2xl shadow-md p-button-primary px-6"
       ></p-button>
     </div>
-    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-y p-2">
+    <div class="bg-white rounded-3xl shadow-sm overflow-y-auto">
       <p-table
-        #dt
         [value]="facade.subjects()"
         [paginator]="true"
         [rows]="rows()"
-        [rowsPerPageOptions]="[10, 25, 50]"
+        [rowsPerPageOptions]="[5,10, 25, 50]"
         [dir]="dir.currentDir()"
         [showGridlines]="true" 
         [stripedRows]="true"
@@ -82,75 +81,13 @@
   </div>
 </div>
 
-<!-- <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-  <p-table
-    [value]="facade.subjects()"
-    [loading]="facade.isLoading()"
-    [rows]="rows"
-    [paginator]="true"
-    [totalRecords]="facade.totalCount()"
-    [lazy]="true"
-    (onLazyLoad)="loadSubjects($event)"
-    [showCurrentPageReport]="true"
-    currentPageReportTemplate="عرض {first} إلى {last} من إجمالي {totalRecords} مادة"
-    styleClass="p-datatable-lg"
-  >
-    <ng-template pTemplate="header">
-      <tr>
-        <th class="py-4 px-6 text-right">كود المادة</th>
-        <th class="py-4 px-6 text-right">اسم المادة</th>
-        <th class="text-center">المناهج</th>
-        <th class="text-center">الإجراءات</th>
-      </tr>
-    </ng-template>
-
-    <ng-template pTemplate="body" let-subject>
-      <tr class="hover:bg-slate-50 transition-colors">
-        <td class="py-4 px-6">
-          <span class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-lg font-mono font-bold border border-indigo-100">
-            {{ subject.code }}
-          </span>
-        </td>
-        <td class="py-4 px-6">
-          <span class="font-bold text-slate-700">{{ subject.name }}</span>
-        </td>
-        
-        <td class="text-center">
-          <button
-            pButton
-            icon="pi pi-sitemap"
-            class="p-button-rounded p-button-text p-button-secondary"
-            [routerLink]="[subject.id, 'curriculums']"
-            pTooltip="عرض المناهج المرتبطة"
-          ></button>
-        </td>
-
-        <td class="text-center">
-          <div class="flex justify-center gap-2">
-            <button
-              pButton
-              icon="pi pi-pencil"
-              class="p-button-rounded p-button-text p-button-info"
-              (click)="openEditDialog(subject)"
-            ></button>
-            <button
-              pButton
-              icon="pi pi-trash"
-              class="p-button-rounded p-button-text p-button-danger"
-              (click)="confirmDelete(subject.id)"
-            ></button>
-          </div>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
-</div> -->
 <p-dialog
   [(visible)]="displayDialog"
   [header]="isEditMode() ? 'تعديل مادة' : 'إضافة مادة'"
   [modal]="true"
   [style]="{ width: '450px' }"
   styleClass="rounded-3xl shadow-2xl"
+  appendTo="body"
 >
   <div class="flex flex-col gap-5 pt-4">
     <div class="flex flex-col gap-2">

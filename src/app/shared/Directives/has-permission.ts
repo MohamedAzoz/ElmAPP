@@ -1,12 +1,12 @@
 import { Directive, inject, TemplateRef, ViewContainerRef, Input, effect, signal } from "@angular/core";
-import { PermissionFacade } from "../../core/Auth/services/permission-facade";
+// import { PermissionFacade } from "../../core/Auth/services/permission-facade";
 
 @Directive({
   selector: '[appHasPermission]',
   standalone: true // ضروري جداً
 })
 export class HasPermission {
-  private permissionFacade = inject(PermissionFacade);
+  // private permissionFacade = inject(PermissionFacade);
   private templateRef = inject(TemplateRef<any>);
   private viewContainer = inject(ViewContainerRef);
   
@@ -20,12 +20,12 @@ export class HasPermission {
     effect(() => {
       // الـ effect الآن يراقب شيئين: اسم الصلاحية وتغيرات الـ Permissions في الـ facade
       const currentPerm = this.pName();
-      const hasAccess = this.permissionFacade.hasPermission(currentPerm);
+      // const hasAccess = this.permissionFacade.hasPermission(currentPerm);
       
       this.viewContainer.clear();
-      if (hasAccess) {
+      // if (hasAccess) {
         this.viewContainer.createEmbeddedView(this.templateRef);
-      }
+      // }
     });
   }
 }

@@ -1,36 +1,43 @@
 import { Component, inject, OnInit, computed, signal, effect } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PrimengBtnModule } from '../../../../../shared/Models/primeng-btn/primeng-btn-module';
 import { QuestionCarde } from '../../../../../shared/Components/question-carde/question-carde';
 import { QuizStateService } from '../../../Result_Exam/quiz-state-service';
 import { TestFacade } from '../../test-facade';
-import { GlobalService } from '../../../../../core/Services/global-service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { LocalStorage } from '../../../../../core/Services/local-storage';
 import { FormsModule } from '@angular/forms';
-import { SelectModule } from 'primeng/select';
 import { SelectButtonModule } from 'primeng/selectbutton';
+import { CommonModule } from '@angular/common';
+import { ButtonModule } from 'primeng/button';
+import { TooltipModule } from 'primeng/tooltip';
+import { KeyboardNavigation } from '../../../../../shared/Directives/keyboard-navigation';
 
 @Component({
   selector: 'app-test-session',
-  imports: [PrimengBtnModule, QuestionCarde, FormsModule, SelectButtonModule],
+  imports: [
+    CommonModule,
+    ButtonModule,
+    TooltipModule,
+    QuestionCarde,
+    FormsModule,
+    SelectButtonModule,
+    KeyboardNavigation,
+  ],
   templateUrl: './test-session.html',
-  styleUrl: './test-session.scss',
+  styleUrl: './test-session.css',
 })
 export class TestSession implements OnInit {
   testFacade = inject(TestFacade);
   quizState = inject(QuizStateService);
-  title = inject(GlobalService);
   private route = inject(ActivatedRoute);
   private localStorage = inject(LocalStorage);
   private router = inject(Router);
 
-  // البيانات هي مصفوفة الأسئلة مباشرة كما في الـ Facade
   data = this.testFacade.currentTestData;
   currentQuesId = signal<number>(0);
   markedQuestions = signal<Set<number>>(new Set());
   dir = signal<string>('ltr');
-  // المرجع الحالي للسؤال المعروض
+  screenSize = signal<number>(window.innerWidth);
   currentQuestion = computed(() => {
     const questions = this.data() || [];
     const id = this.currentQuesId();
@@ -40,27 +47,48 @@ export class TestSession implements OnInit {
   private params = toSignal(this.route.paramMap);
   private questionId = computed(() => Number(this.params()?.get('questionId')));
   endTest = signal<boolean>(false);
+
   constructor() {
+    // Effect 1: مراقبة تغيير الـ ID في الرابط
     effect(() => {
       const id = this.questionId();
       if (id) {
         this.currentQuesId.set(id);
-        if (this.quizState.timerTest() === '00:00') {
+      }
+    });
+
+    // Effect 2: مراقبة الوقت لإنهاء الاختبار تلقائياً
+    effect(() => {
+      const timeLeft = this.quizState.timeLeft();
+      const questionsLoaded = this.data()?.length > 0;
+
+      // إذا وصل الوقت لصفر وكان الاختبار قد بدأ فعلاً (يوجد أسئلة)
+      if (questionsLoaded && timeLeft === 0) {
+        // التأكد من أن العداد انتهى فعلياً وليس مجرد حالة ابتدائية
+        const expiryTime = Number(this.localStorage.get('quiz_timer_expire'));
+        if (expiryTime && Date.now() >= expiryTime) {
           this.finishTest();
         }
       }
     });
   }
-
   ngOnInit() {
-    this.title.setTitle('الاختبار');
-    const totalTestDurationSeconds = (this.data()?.length || 0) * 120;
-
-    this.quizState.startCountdown(totalTestDurationSeconds);
-
+    // Set isBankTest to false so we are in the real exam session context
+    this.quizState.isBankTest.set(false);
+    // استعادة البيانات إذا حدث Refresh
     if (this.data().length === 0 && this.localStorage.get('current_session')) {
       const savedData = this.localStorage.get('current_session');
       this.testFacade.currentTestData.set(savedData);
+    }
+
+    const questions = this.data() || [];
+    if (questions.length > 0) {
+      const totalTestDurationSeconds = questions.length * 120;
+      this.quizState.startCountdown(totalTestDurationSeconds);
+      this.testFacade.setTotalTestDurationSeconds(totalTestDurationSeconds);
+
+      const timeNow = Date.now();
+      this.testFacade.endDuration(timeNow + totalTestDurationSeconds * 1000);
     }
   }
 
@@ -72,6 +100,16 @@ export class TestSession implements OnInit {
 
   jumpTo(id: number) {
     this.router.navigate(['../', id], { relativeTo: this.route });
+  }
+
+  selectOptionByIndex(index: number) {
+    const question = this.currentQuestion();
+    if (question && question.options && question.options[index]) {
+      const optionId = question.options[index].id;
+      if (optionId !== undefined) {
+        this.quizState.saveAnswer(question.id!, optionId);
+      }
+    }
   }
 
   jumpToNext() {
@@ -90,12 +128,10 @@ export class TestSession implements OnInit {
     }
   }
 
-  // دالة مطلوبة للـ HTML لتلوين الخلية إذا تم الإجابة عليها
   isAnswered(qId: number): boolean {
     return !!this.quizState.getAnswer(qId);
   }
 
-  // دالة مطلوبة للـ HTML للتحقق من وجود علامة المراجعة
   isMarked(qId: number): boolean {
     return this.markedQuestions().has(qId);
   }
@@ -110,14 +146,14 @@ export class TestSession implements OnInit {
 
   finishTest() {
     const questions = this.data();
+    if (!questions || questions.length === 0) return;
+
     const userAnswers = this.quizState.userAnswers();
     let correctCount = 0;
 
     const details = questions.map((q) => {
       const selectedOptionId = userAnswers.get(q.id);
       const correctOption = q.options.find((o) => o.isCorrect === true);
-
-      // البحث عن نص الخيار الذي اختاره المستخدم
       const selectedOption = q.options.find((o) => o.id === selectedOptionId);
       const isRight = selectedOptionId === correctOption?.id;
 
@@ -125,9 +161,9 @@ export class TestSession implements OnInit {
 
       return {
         questionId: q.id,
-        content: q.content, // نص السؤال
-        selectedOptionContent: selectedOption?.content || 'لم يتم الإجابة', // نص إجابة الطالب
-        correctOptionContent: correctOption?.content, // نص الإجابة الصحيحة
+        content: q.content,
+        selectedOptionContent: selectedOption?.content || 'لم يتم الإجابة',
+        correctOptionContent: correctOption?.content,
         isCorrect: isRight,
       };
     });
@@ -135,7 +171,7 @@ export class TestSession implements OnInit {
     const finalResult = {
       totalQuestions: questions.length,
       correctAnswers: correctCount,
-      gradePercentage: questions.length > 0 ? (correctCount / questions.length) * 100 : 0,
+      gradePercentage: (correctCount / questions.length) * 100,
       details: details,
     };
 

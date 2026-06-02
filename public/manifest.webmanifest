@@ -1,0 +1,7 @@
+{
+  "name": "ElmAPP",
+  "short_name": "ElmAPP",
+  "display": "standalone",
+  "scope": "./",
+  "start_url": "./"
+}

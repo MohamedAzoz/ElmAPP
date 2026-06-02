@@ -34,7 +34,7 @@
         [loading]="facade.isFileLoading()"
         [rows]="10"
         [paginator]="true"
-        styleClass="p-datatable-lg"
+        class="p-datatable-lg"
       >
         <ng-template pTemplate="header">
           <tr>
@@ -113,6 +113,7 @@
   [modal]="true"
   [style]="{ width: '500px' }"
   styleClass="rounded-2xl"
+  appendTo="body"
 >
   <div class="flex flex-col gap-5 mt-4">
     <div class="flex flex-col gap-2">

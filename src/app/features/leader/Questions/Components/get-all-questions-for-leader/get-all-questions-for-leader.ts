@@ -1,26 +1,8 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import {
-  FormsModule,
-  ReactiveFormsModule,
-  FormBuilder,
-  FormGroup,
-  FormArray,
-  Validators,
-} from '@angular/forms';
-
+import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 // PrimeNG Imports
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
 import { FileUploadModule } from 'primeng/fileupload';
-import { ToastModule } from 'primeng/toast';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { TooltipModule } from 'primeng/tooltip';
-import { TagModule } from 'primeng/tag';
 import { AccordionModule } from 'primeng/accordion';
-import { CheckboxModule } from 'primeng/checkbox';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MenuModule } from 'primeng/menu';
 import { SplitButtonModule } from 'primeng/splitbutton';
@@ -30,9 +12,6 @@ import { DividerModule } from 'primeng/divider';
 import { ConfirmationService, MessageService, MenuItem } from 'primeng/api';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
-
-// Services
-
 // Types
 import {
   QuestionsDto2,
@@ -46,11 +25,18 @@ import {
 import { OptionFacade } from '../../Services/option-facade';
 import { QuestionFacade } from '../../Services/question-facade';
 import { TextareaModule } from 'primeng/textarea';
-import { SelectModule } from 'primeng/select';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { HttpResponse } from '@angular/common/http';
 import { DirectionService } from '../../../../../core/Services/direction';
+import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
+import { TableModule } from 'primeng/table';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { CheckboxModule } from 'primeng/checkbox';
+import { InputTextModule } from 'primeng/inputtext';
+import { TagModule } from 'primeng/tag';
+import { SelectModule } from 'primeng/select';
 
 interface QuestionType {
   label: string;
@@ -60,22 +46,10 @@ interface QuestionType {
 
 @Component({
   selector: 'app-question-management',
-  standalone: true,
   imports: [
-    CommonModule,
-    FormsModule,
     ReactiveFormsModule,
-    TableModule,
-    ButtonModule,
-    DialogModule,
-    InputTextModule,
     FileUploadModule,
-    ToastModule,
-    ConfirmDialogModule,
-    TooltipModule,
-    TagModule,
     AccordionModule,
-    CheckboxModule,
     ProgressSpinnerModule,
     MenuModule,
     SplitButtonModule,
@@ -85,11 +59,18 @@ interface QuestionType {
     InputGroupModule,
     InputGroupAddonModule,
     TextareaModule,
+    ButtonModule,
+    DialogModule,
+    TableModule,
+    ConfirmDialogModule,
+    CheckboxModule,
+    InputTextModule,
+    TagModule,
     SelectModule,
   ],
-  providers: [MessageService, ConfirmationService],
+  providers: [ConfirmationService],
   templateUrl: './get-all-questions-for-leader.html',
-  styleUrl: './get-all-questions-for-leader.scss',
+  styleUrl: './get-all-questions-for-leader.css',
 })
 export class GetAllQuestionForLeader implements OnInit {
   // Dependency Injection
@@ -100,7 +81,7 @@ export class GetAllQuestionForLeader implements OnInit {
   private confirmationService = inject(ConfirmationService);
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
-public dir = inject(DirectionService);
+  public dir = inject(DirectionService);
   // Signals
   questions = this.questionFacade.questions;
   isLoading = this.questionFacade.isLoading;
@@ -257,92 +238,7 @@ public dir = inject(DirectionService);
     if (this.optionsArray.length > 2) {
       this.optionsArray.removeAt(index);
     } else {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'تنبيه',
-        detail: 'يجب أن يحتوي السؤال على خيارين على الأقل',
-      });
-    }
-  }
-
-  saveQuestion(): void {
-    if (this.questionForm.invalid) {
-      this.questionForm.markAllAsTouched();
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'تنبيه',
-        detail: 'يرجى ملء جميع الحقول المطلوبة',
-      });
-      return;
-    }
-
-    this.isSubmitting.set(true);
-    const formValue = this.questionForm.value;
-
-    if (this.editingQuestion()) {
-      // Update existing question
-      const updateCommand: UpdateQuestionCommand = {
-        id: formValue.id,
-        content: formValue.content,
-        questionType: formValue.questionType,
-      };
-
-      this.questionLeaderFacade.updateQuestion(updateCommand).subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'نجاح',
-            detail: 'تم تحديث السؤال بنجاح',
-          });
-          this.showAddQuestionDialog.set(false);
-          this.loadQuestions();
-        },
-        error: () => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'خطأ',
-            detail: 'فشل في تحديث السؤال',
-          });
-        },
-        complete: () => this.isSubmitting.set(false),
-      });
-    } else {
-      // Add new question AddQuestionCommand
-
-      const addCommand: AddQuestionsDto = {
-        content: formValue.content,
-        questionType: formValue.questionType,
-        questionBankId: this.questionBankId,
-        options: formValue.options.map((opt: any) => ({
-          content: opt.content,
-          isCorrect: opt.isCorrect,
-        })),
-      };
-
-      const Command: AddQuestionCommand = {
-        questionBankId: this.questionBankId(),
-        questionsDto: addCommand,
-      };
-
-      this.questionLeaderFacade.addQuestion(Command).subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'نجاح',
-            detail: 'تم إضافة السؤال بنجاح',
-          });
-          this.showAddQuestionDialog.set(false);
-          this.loadQuestions();
-        },
-        error: () => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'خطأ',
-            detail: 'فشل في إضافة السؤال',
-          });
-        },
-        complete: () => this.isSubmitting.set(false),
-      });
+      this.refreshAndNotify('يجب أن يحتوي السؤال على خيارين على الأقل', 'تنبيه', 'warn');
     }
   }
 
@@ -357,26 +253,133 @@ public dir = inject(DirectionService);
       accept: () => {
         this.questionLeaderFacade.deleteQuestion(question.id!).subscribe({
           next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'نجاح',
-              detail: 'تم حذف السؤال بنجاح',
-            });
-            this.loadQuestions();
+            this.refreshAndNotify('تم حذف السؤال بنجاح', 'تم حذف السؤال بنجاح', 'success');
           },
           error: () => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'خطأ',
-              detail: 'فشل في حذف السؤال',
-            });
+            this.refreshAndNotify('فشل في حذف السؤال', 'فشل في حذف السؤال', 'error');
           },
         });
       },
     });
   }
+  saveQuestion(): void {
+    if (this.questionForm.invalid) {
+      this.questionForm.markAllAsTouched();
+      this.refreshAndNotify('يرجى ملء جميع الحقول المطلوبة', 'تنبيه', 'warn');
+      return;
+    }
 
-  // ========== Bulk Questions Operations ==========
+    this.isSubmitting.set(true);
+    const formValue = this.questionForm.value;
+
+    if (this.editingQuestion()) {
+      const updateCommand: UpdateQuestionCommand = {
+        id: formValue.id,
+        content: formValue.content,
+        questionType: formValue.questionType,
+      };
+
+      this.questionLeaderFacade.updateQuestion(updateCommand).subscribe({
+        next: () => {
+          this.refreshAndNotify('تم تحديث السؤال بنجاح', 'نجاح', 'success');
+          this.showAddQuestionDialog.set(false);
+        },
+        error: () => this.refreshAndNotify('فشل في تحديث السؤال', 'خطأ', 'error'),
+        complete: () => this.isSubmitting.set(false),
+      });
+    } else {
+      // منطق الإضافة الجديد (AddRing لضمان إضافة السؤال بخياراته)
+      const addCommand: AddQuestionsDto = {
+        content: formValue.content,
+        questionType: formValue.questionType,
+        options: formValue.options.map((opt: any) => ({
+          content: opt.content,
+          isCorrect: opt.isCorrect,
+        })),
+      };
+
+      // نستخدم addRing لضمان إرسال السؤال مع الخيارات في مصفوفة كما يتوقع السيرفر عادة
+      this.questionLeaderFacade.addRingToQuestion(this.questionBankId(), [addCommand]).subscribe({
+        next: () => {
+          this.refreshAndNotify('تم إضافة السؤال بنجاح', 'نجاح', 'success');
+          this.showAddQuestionDialog.set(false);
+        },
+        error: () => this.refreshAndNotify('فشل في إضافة السؤال', 'خطأ', 'error'),
+        complete: () => this.isSubmitting.set(false),
+      });
+    }
+  }
+
+  // ========== خيارات السؤال (Options) ==========
+
+  openEditOptionDialog(option: OptionsDto2): void {
+    this.selectedOption.set(option);
+    this.optionForm.patchValue({
+      id: option.id,
+      content: option.content,
+      isCorrect: option.isCorrect,
+      questionId: this.selectedQuestion()?.id,
+    });
+    this.showAddOptionDialog.set(true); // تأكد من استخدام نفس الاسم في HTML
+  }
+
+  saveOption(): void {
+    if (this.optionForm.invalid) {
+      this.optionForm.markAllAsTouched();
+      return;
+    }
+
+    this.isSubmitting.set(true);
+    const formValue = this.optionForm.value;
+
+    if (this.selectedOption()) {
+      // تعديل خيار موجود
+      const updateCommand: UpdateOptionCommand = {
+        optionId: formValue.id,
+        content: formValue.content,
+        isCorrect: formValue.isCorrect,
+      };
+
+      this.optionFacade.updateOption(updateCommand).subscribe({
+        next: () => {
+          this.showAddOptionDialog.set(false);
+          this.refreshAndNotify('تم تحديث الإجابة بنجاح', 'نجاح', 'success');
+          this.refreshSelectedQuestion(); // تحديث السؤال المفتوح حالياً
+        },
+        error: () => this.refreshAndNotify('فشل في تحديث الإجابة', 'خطأ', 'error'),
+        complete: () => this.isSubmitting.set(false),
+      });
+    } else {
+      // إضافة خيار جديد
+      const addCommand: AddOptionCommand = {
+        content: formValue.content,
+        isCorrect: formValue.isCorrect,
+        questionId: this.selectedQuestion()?.id!,
+      };
+
+      this.optionFacade.addOption(addCommand).subscribe({
+        next: () => {
+          this.showAddOptionDialog.set(false);
+          this.refreshAndNotify('تم إضافة الإجابة بنجاح', 'نجاح', 'success');
+          this.refreshSelectedQuestion();
+        },
+        error: () => this.refreshAndNotify('فشل في إضافة الإجابة', 'خطأ', 'error'),
+        complete: () => this.isSubmitting.set(false),
+      });
+    }
+  }
+
+  // دالة مساعدة لتحديث السؤال المختار بعد تغيير خياراته
+  private refreshSelectedQuestion() {
+    const currentId = this.selectedQuestion()?.id;
+    if (currentId) {
+      // ابحث عن السؤال المحدث في القائمة الكلية للأسئلة
+      const updatedQ = this.questions().find((q) => q.id === currentId);
+      if (updatedQ) this.selectedQuestion.set(updatedQ);
+    }
+  }
+
+  //#region  ========== Bulk Questions Operations ==========
 
   openBulkAddDialog(): void {
     this.bulkQuestionsArray.clear();
@@ -418,47 +421,37 @@ public dir = inject(DirectionService);
       options.removeAt(optionIndex);
     }
   }
-
   saveBulkQuestions(): void {
     if (this.bulkQuestionsForm.invalid) {
       this.bulkQuestionsForm.markAllAsTouched();
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'تنبيه',
-        detail: 'يرجى ملء جميع الحقول المطلوبة',
-      });
+      this.refreshAndNotify('يرجى ملء جميع الحقول المطلوبة', 'تنبيه', 'warn');
       return;
     }
-
     this.isSubmitting.set(true);
     const questions: AddQuestionsDto[] = this.bulkQuestionsArray.value.map((q: any) => ({
       content: q.content,
       questionType: q.questionType,
-      options: q.options,
+      options: q.options.map((opt: any) => ({
+        content: opt.content,
+        isCorrect: opt.isCorrect,
+      })),
     }));
-
     this.questionLeaderFacade.addRingToQuestion(this.questionBankId(), questions).subscribe({
       next: () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'نجاح',
-          detail: `تم إضافة ${questions.length} سؤال بنجاح`,
-        });
+        this.refreshAndNotify(`تم إضافة ${questions.length} سؤال بنجاح`, 'نجاح', 'success');
         this.showBulkAddDialog.set(false);
-        this.loadQuestions();
       },
-      error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'خطأ',
-          detail: 'فشل في إضافة الأسئلة',
-        });
+      error: (err) => {
+        console.error(err);
+        this.refreshAndNotify('فشل في إضافة الأسئلة', 'خطأ', 'error');
       },
       complete: () => this.isSubmitting.set(false),
     });
   }
 
-  // ========== Excel Operations ==========
+  //#endregion
+
+  //#region  ========== Excel Operations ==========
 
   openExcelUploadDialog(): void {
     this.showExcelUploadDialog.set(true);
@@ -470,60 +463,45 @@ public dir = inject(DirectionService);
 
     this.questionLeaderFacade.uploadExcel(this.questionBankId(), file).subscribe({
       next: (response: any) => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'نجاح',
-          detail: 'تم رفع الأسئلة من ملف Excel بنجاح',
-        });
+        this.refreshAndNotify('تم رفع الأسئلة من ملف Excel بنجاح', 'نجاح', 'success');
         this.showExcelUploadDialog.set(false);
-        this.loadQuestions();
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'خطأ',
-          detail: 'فشل في رفع ملف Excel',
-        });
+        this.refreshAndNotify('فشل في رفع ملف Excel', 'خطأ', 'error');
       },
       complete: () => this.isSubmitting.set(false),
     });
   }
 
   downloadExcelTemplate(): void {
-  this.questionLeaderFacade.exportTemplate(this.questionBankId()).subscribe({
-    next: (response: HttpResponse<Blob>) => { // الـ response هنا هو الـ Blob نفسه
-      if (response.body) {
-        const url = window.URL.createObjectURL(response.body);
-        const link = document.createElement('a');
-        link.href = url;
-        
-        // حدد اسم الملف يدوياً أو استخرجه من الهيدر (سنحدده يدوياً للتبسيط)
-        link.download = 'questions_template.xlsx';
-        
-        link.click();
-        
-        // تنظيف الذاكرة
-        window.URL.revokeObjectURL(url);
-        link.remove();
+    this.questionLeaderFacade.exportTemplate(this.questionBankId()).subscribe({
+      next: (response: HttpResponse<Blob>) => {
+        // الـ response هنا هو الـ Blob نفسه
+        if (response.body) {
+          const url = window.URL.createObjectURL(response.body);
+          const link = document.createElement('a');
+          link.href = url;
 
-        this.messageService.add({
-          severity: 'success',
-          summary: 'نجاح',
-          detail: 'تم تحميل نموذج Excel بنجاح',
-        });
-      }
-    },
-    error: (err) => {
-      console.error('Download Error:', err);
-      this.messageService.add({
-        severity: 'error',
-        summary: 'خطأ',
-        detail: 'فشل في تحميل النموذج من السيرفر',
-      });
-    },
-  });
-}
-  // ========== Options Operations ==========
+          // حدد اسم الملف يدوياً أو استخرجه من الهيدر (سنحدده يدوياً للتبسيط)
+          link.download = 'questions_template.xlsx';
+
+          link.click();
+
+          // تنظيف الذاكرة
+          window.URL.revokeObjectURL(url);
+          link.remove();
+
+          this.refreshAndNotify('تم تحميل نموذج Excel بنجاح', 'نجاح', 'success');
+        }
+      },
+      error: (err) => {
+        this.refreshAndNotify('فشل في تحميل النموذج من السيرفر', 'خطأ', 'error');
+      },
+    });
+  }
+
+  //#endregion
+  //#region  ========== Options Operations ==========
 
   openOptionsDialog(question: QuestionsDto2): void {
     this.selectedQuestion.set(question);
@@ -539,84 +517,7 @@ public dir = inject(DirectionService);
     this.showAddOptionDialog.set(true);
   }
 
-  openEditOptionDialog(option: OptionsDto2): void {
-    this.selectedOption.set(option);
-    this.optionForm.patchValue({
-      id: option.id,
-      content: option.content,
-      isCorrect: option.isCorrect,
-      questionId: this.selectedQuestion()?.id,
-    });
-    this.showEditOptionDialog.set(true);
-  }
-
-  saveOption(): void {
-    if (this.optionForm.invalid) {
-      this.optionForm.markAllAsTouched();
-      return;
-    }
-
-    this.isSubmitting.set(true);
-    const formValue = this.optionForm.value;
-
-    if (this.selectedOption()) {
-      // Update option
-      const updateCommand: UpdateOptionCommand = {
-        optionId: formValue.id,
-        content: formValue.content,
-        isCorrect: formValue.isCorrect,
-      };
-
-      this.optionFacade.updateOption(updateCommand).subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'نجاح',
-            detail: 'تم تحديث الإجابة بنجاح',
-          });
-          this.showEditOptionDialog.set(false);
-          this.loadQuestions();
-        },
-        error: () => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'خطأ',
-            detail: 'فشل في تحديث الإجابة',
-          });
-        },
-        complete: () => this.isSubmitting.set(false),
-      });
-    } else {
-      // Add option
-      const addCommand: AddOptionCommand = {
-        content: formValue.content,
-        isCorrect: formValue.isCorrect,
-        questionId: this.selectedQuestion()?.id!,
-      };
-
-      this.optionFacade.addOption(addCommand).subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'نجاح',
-            detail: 'تم إضافة الإجابة بنجاح',
-          });
-          this.showAddOptionDialog.set(false);
-          this.loadQuestions();
-        },
-        error: () => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'خطأ',
-            detail: 'فشل في إضافة الإجابة',
-          });
-        },
-        complete: () => this.isSubmitting.set(false),
-      });
-    }
-  }
-
-  deleteOption(option: OptionsDto2): void {
+  deleteOption(id: number): void {
     this.confirmationService.confirm({
       message: `هل أنت متأكد من حذف هذه الإجابة؟`,
       header: 'تأكيد الحذف',
@@ -625,28 +526,29 @@ public dir = inject(DirectionService);
       rejectLabel: 'إلغاء',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.optionFacade.deleteOption(option.id!).subscribe({
+        this.optionFacade.deleteOption(id).subscribe({
           next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'نجاح',
-              detail: 'تم حذف الإجابة بنجاح',
-            });
-            this.loadQuestions();
+            this.refreshAndNotify('تم حذف الإجابة بنجاح', 'نجاح', 'success');
           },
           error: () => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'خطأ',
-              detail: 'فشل في حذف الإجابة',
-            });
+            this.refreshAndNotify('فشل في حذف الإجابة', 'خطأ', 'error');
           },
         });
       },
     });
   }
 
-  // ========== Helper Methods ==========
+  private refreshAndNotify(msg: string, summary: string, severity: string = 'success') {
+    this.loadQuestions();
+    this.messageService.add({
+      severity,
+      summary,
+      detail: msg,
+    });
+  }
+
+  //#endregion
+  //#region  ========== Helper Methods ==========
 
   getQuestionTypeLabel(type: string | undefined): string {
     return this.questionTypes.find((t) => t.value === type)?.label || type || '';
@@ -656,20 +558,16 @@ public dir = inject(DirectionService);
     return this.questionTypes.find((t) => t.value === type)?.icon || 'pi pi-question';
   }
 
-  getQuestionTypeSeverity(
-    type: string | undefined,
-  ): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
+  getQuestionTypeSeverity(type: string | undefined): 'success' | 'info' {
     switch (type) {
       case 'MCQ':
         return 'info';
       case 'TrueFalse':
         return 'success';
-      case 'ShortAnswer':
-        return 'warn';
-      case 'Essay':
-        return 'secondary';
       default:
         return 'info';
     }
   }
+
+  //#endregion
 }

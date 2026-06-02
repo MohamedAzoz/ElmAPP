@@ -1,12 +1,14 @@
 import { inject, Injectable } from '@angular/core';
 import { AuthFacade } from './auth-facade';
 import { RoleDto } from '../../api/clients';
+import { LocalStorage } from '../../Services/local-storage';
 
 @Injectable({
   providedIn: 'root',
 })
 export class IdentitySignals {
   private authFacade = inject(AuthFacade);
+  private localStorage = inject(LocalStorage);
 
   get userData() {
     return this.authFacade.userDataStore();
@@ -19,58 +21,38 @@ export class IdentitySignals {
     // 💡 إصلاح طريقة التحقق من التواريخ لمنع خطأ Invalid Date
     const expString = this.expiresOn;
     if (!expString) return false;
-    const refreshTokenExpiration = this.refreshTokenExpiration;
-    if (!refreshTokenExpiration) return false;
 
     const expiresOn = new Date(expString);
-    const refreshTokenExpirationDate = new Date(refreshTokenExpiration);
     // إذا كان التاريخ غير صالح أو منتهي
     if (isNaN(expiresOn.getTime()) || expiresOn <= new Date()) {
-      return false;
-    }
-    if (isNaN(refreshTokenExpirationDate.getTime()) || refreshTokenExpirationDate <= new Date()) {
       return false;
     }
     return true; // طالما التوكن موجود والتاريخ لم ينتهِ، فهو مسجل دخول
   }
 
-  get userId() {
-    return this.userData?.userId ?? localStorage.getItem('userId') ?? '';
-  }
-
-  get userName() {
-    return this.userData?.userName ?? localStorage.getItem('userName') ?? '';
-  }
-
   get fullName() {
-    return this.userData?.fullName ?? localStorage.getItem('fullName') ?? '';
+    return this.userData?.fullName ?? this.localStorage.get('fullName') ?? '';
   }
 
-  get roles(): RoleDto[] {
+  get roles(): string {
     try {
       // استخدمنا try-catch لأن قراءة JSON خاطئ توقف التطبيق
-      const rolesStr = localStorage.getItem('roles');
-      return this.userData?.roles ?? (rolesStr ? JSON.parse(rolesStr) : []);
+      const rolesStr = this.localStorage.get('role');
+      return rolesStr;
     } catch {
-      return [];
-    }
+      return "";
+    } 
   }
 
   hasRole(name: string): boolean {
-    return this.roles.some((role) => role.name?.toLowerCase() === name.toLowerCase());
+    return this.roles === name;
   }
 
   get token() {
-    return this.userData?.token ?? localStorage.getItem('access_token') ?? '';
+    return this.userData?.token ?? this.localStorage.get('access_token') ?? '';
   }
 
   get expiresOn() {
-    return this.userData?.expiresOn ?? localStorage.getItem('expires_on') ?? '';
-  }
-
-  get refreshTokenExpiration() {
-    return (
-      this.userData?.refreshTokenExpiration ?? localStorage.getItem('refreshTokenExpiration') ?? ''
-    );
+    return this.localStorage.get('expires_on') ?? '';
   }
 }

@@ -1,7 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import {
   ResultOfUniversityDetialsDto,
-  UniversityDetialsDto,
+  UniversityDetialsDto, 
   UniversityPublicClient,
 } from '../../../core/api/clients';
 

@@ -5,21 +5,40 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 // PrimeNG Imports
 import { TooltipModule } from 'primeng/tooltip';
 import { Auth } from '../../Services/auth';
-import { PrimengadminModule } from '../../../../../shared/Models/primengadmin/primengadmin-module';
+
 import { DirectionService } from '../../../../../core/Services/direction';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RegisterLeaderCommand } from '../../../../../core/api/clients';
 import { YearFacade } from '../../../management/Year/Services/year-facade';
 import { DepartmentFacade } from '../../../management/Department/Services/department-facade';
 import { CollegeFacade } from '../../../management/Colleges/Services/college-facade';
 import { RouterLink } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
+import { SelectModule } from 'primeng/select';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { PasswordModule } from 'primeng/password';
+import { DialogModule } from 'primeng/dialog';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TableModule } from 'primeng/table';
+import { TagModule } from 'primeng/tag';
 
 @Component({
   selector: 'app-register-student',
-  imports: [TooltipModule, PrimengadminModule, RouterLink],
+  imports: [
+    TooltipModule,
+    CommonModule,
+    PasswordModule,
+    DialogModule,
+    RouterLink,
+    ButtonModule,
+    SelectModule,
+    FormsModule,
+    ConfirmDialogModule,
+    TableModule,
+    TagModule,
+  ],
   providers: [ConfirmationService],
   templateUrl: './register-student.html',
-  styleUrl: './register-student.scss',
+  styleUrl: './register-student.css',
 })
 export class RegisterStudent {
   public authService = inject(Auth);
@@ -30,6 +49,7 @@ export class RegisterStudent {
   departmentService = inject(DepartmentFacade);
   dir = inject(DirectionService);
   displayDialog = signal(false);
+  collegeId = signal(0);
 
   registerLeaderForm = {
     userName: '',
@@ -45,7 +65,12 @@ export class RegisterStudent {
   first = signal(1);
   constructor() {
     effect(() => {
+      if (this.collegeId()) {
+        this.yearService.getAllYears(this.collegeId());
+        this.departmentService.getDepartmentsByCollege(this.collegeId());
+      }
       this.authService.getAllLeader(this.rows(), this.first());
+      this.collegeService.getColleges();
     });
   }
 

@@ -1,36 +1,43 @@
-import { Component, OnInit, effect, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Component, effect, inject, signal } from '@angular/core';
 import { Auth } from '../../Services/auth'; // تأكد من المسار
 import { MessageService, ConfirmationService } from 'primeng/api';
 
 // PrimeNG Imports
-import { TableModule } from 'primeng/table';
+import { TooltipModule } from 'primeng/tooltip';
+import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
+import { TableModule } from 'primeng/table';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
-import { ToastModule } from 'primeng/toast';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-import { PaginatorModule } from 'primeng/paginator';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { PrimengadminModule } from '../../../../../shared/Models/primengadmin/primengadmin-module';
 
 @Component({
   selector: 'app-register-doctor',
-  standalone: true,
-  imports: [PrimengadminModule, TooltipModule, RouterLink],
+  imports: [
+    TooltipModule,
+    RouterLink,
+    ButtonModule,
+    DialogModule,
+    TableModule,
+    ConfirmDialogModule,
+    InputTextModule,
+    PasswordModule,
+    FormsModule,
+    CommonModule,
+    TagModule,
+  ],
   providers: [ConfirmationService],
   templateUrl: './register-doctor.html',
-  styleUrl: './register-doctor.scss',
+  styleUrl: './register-doctor.css',
 })
 export class RegisterDoctor {
   public auth = inject(Auth);
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
-  private router = inject(Router);
   displayDialog = signal(false);
   first = signal(1);
   rows = signal(10);

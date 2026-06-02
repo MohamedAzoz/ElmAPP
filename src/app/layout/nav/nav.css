@@ -1,0 +1,34 @@
+
+:host {
+  display: block;
+}
+
+:host ::ng-deep .p-sidebar-header {
+   justify-content: space-between;
+  flex-direction: row-reverse; 
+ }
+.toggle-button {
+  display: none;
+}
+.pi-graduation-cap{
+  font-size: 1.5rem;
+}
+
+
+@media (max-width: 1024px) {
+  .toggle-button {
+    display: block;
+  }
+}
+
+
+@utility nav-link {
+  cursor: pointer;
+  transition: all 0.35s ease-in-out;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+:host ::ng-deep .p-menu-overlay {
+  background-color: var(--color-nav);
+}

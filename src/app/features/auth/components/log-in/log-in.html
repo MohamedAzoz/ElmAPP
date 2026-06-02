@@ -1,17 +1,18 @@
 @if (rateLimitService.isLoginLocked()) {
   <app-lock-ui type="login"></app-lock-ui>
 } @else {
-<div class="min-h-screen flex items-stretch bg-surface" dir="ltr">
+  <div class="min-h-screen flex items-stretch bg-surface" dir="ltr">
     <div
       class="hidden lg:flex lg:w-1/2 bg-linear-to-br from-indigo-700 via-blue-800 to-indigo-900 items-center justify-center p-12 relative overflow-hidden"
     >
       <div class="relative text-center z-10" dir="ltr">
         <div class="bg-white/10 backdrop-blur-lg p-8 rounded-3xl border border-white/20 shadow-2xl">
           <i class="pi pi-graduation-cap text-white mb-6 block drop-shadow-lg"></i>
-          <h1 class="text-4xl font-black text-white mb-4 tracking-tight">منصة الجامعة الذكية</h1>
-          <p class="text-blue-100 text-lg leading-relaxed max-w-md mx-auto">
-            مرحباً بك في بوابتك الأكاديمية الرقمية. تابع دروسك، اختباراتك، وتواصل مع كليتك بكل
-            سهولة.
+          <h1 class="text-3xl lg:text-4xl font-black text-white mb-4 tracking-tight">
+            منصة الجامعة الذكية
+          </h1>
+          <p class="text-blue-100 text-lg lg:text-xl leading-relaxed max-w-md mx-auto">
+            مرحباً بك في بوابتك الأكاديمية الرقمية. تواصل مع كليتك بكل سهولة.
           </p>
         </div>
       </div>
@@ -38,41 +39,73 @@
         }
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="mt-8 space-y-6">
           <div class="space-y-4">
-            <div class="flex flex-col gap-2">
-              <label class="text-sm font-semibold text-gray-700 ml-1">اسم المستخدم</label>
-              <span class="p-input-icon-left w-full">
-                <i class="pi pi-user text-gray-400"></i>
+            <div class="flex flex-col gap-0.5">
+              <label class="text-sm font-semibold text-gray-700">اسم المستخدم</label>
+              <div class="w-full flex justify-center items-center">
+                <i
+                  class="pi pi-user p-3 text-gray-400 bg-white/30 border-2 border-gray-200 rounded-l-lg"
+                ></i>
                 <input
                   type="text"
                   pInputText
                   formControlName="userName"
                   placeholder="أدخل اسم المستخدم"
-                  class="w-full p-3 border-gray-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 rounded-xl transition-all shadow-sm"
-                  pattern="^[a-zA-Z][a-zA-Z0-9@#$!%*?&]{6,15}$"
+                  class="w-full border-gray-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 rounded-r-lg transition-all shadow-sm"
+                  [invalid]="
+                    loginForm.get('userName')?.touched &&
+                    (loginForm.get('userName')?.hasError('required') ||
+                      loginForm.get('userName')?.hasError('pattern'))
+                  "
+                  pattern="^[a-zA-Z][a-zA-Z0-9@#$!%*?&]{6,25}$"
                 />
-              </span>
-              <!-- pattern('^[a-zA-Z][a-zA-Z0-9@#$!%*?&]{7,15}$') -->
-              @if (loginForm.get('userName')?.touched && loginForm.get('userName')?.invalid) {
+              </div>
+              @if (
+                loginForm.get('userName')?.touched &&
+                loginForm.get('userName')?.hasError('required')
+              ) {
                 <small class="text-red-500 font-medium ml-1 animate-fadein"
-                  >اسم المستخدم مطلوب (6 أحرف على الأقل)</small
+                  >اسم المستخدم مطلوب</small
+                >
+              }
+              @if (loginForm.get('userName')?.hasError('pattern')) {
+                <small class="text-red-500 font-medium ml-1 animate-fadein"
+                  >اسم المستخدم يجب ان يحتوى على حرف كبير وصغير ورقم ورمز واحد على الاقل</small
                 >
               }
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label class="text-sm font-semibold text-gray-700 ml-1">كلمة المرور</label>
-              <p-password
-                formControlName="password"
-                [toggleMask]="true"
-                [feedback]="false"
-                placeholder="••••••••"
-                styleClass="w-full"
-                inputStyleClass="w-full p-3 rounded-xl border-gray-200 focus:border-indigo-500 shadow-sm"
-                pattern="^[a-zA-Z][a-zA-Z0-9@#$!%*?&]{6,15}$"
-              ></p-password>
-              @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
+            <div class="flex flex-col gap-0.5">
+              <label class="text-sm font-semibold text-gray-700">كلمة المرور</label>
+              <div class="w-full flex justify-center items-center">
+                <i
+                  class="pi pi-lock p-3 text-gray-400 bg-white/30 border-2 border-gray-200 rounded-l-lg"
+                ></i>
+                <p-password
+                  formControlName="password"
+                  [toggleMask]="true"
+                  [feedback]="false"
+                  placeholder="••••••••"
+                  styleClass="w-full"
+                  inputStyleClass="w-full p-3 rounded-xl border-gray-200 focus:border-indigo-500 shadow-sm"
+                  [invalid]="
+                    loginForm.get('password')?.touched &&
+                    (loginForm.get('password')?.value.length < 6 ||
+                      loginForm.get('password')?.hasError('required'))
+                  "
+                  pattern="^[a-zA-Z][a-zA-Z0-9@#$!%*?&]{6,25}$"
+                ></p-password>
+              </div>
+              @if (
+                loginForm.get('password')?.touched &&
+                loginForm.get('password')?.hasError('required')
+              ) {
                 <small class="text-red-500 font-medium ml-1 animate-fadein"
                   >كلمة المرور مطلوبة (6 أحرف على الأقل)</small
+                >
+              }
+              @if (loginForm.get('password')?.hasError('pattern')) {
+                <small class="text-red-500 font-medium ml-1 animate-fadein"
+                  >كلمة المرور يجب ان تحتوى على حرف كبير وصغير ورقم ورمز واحد على الاقل</small
                 >
               }
             </div>

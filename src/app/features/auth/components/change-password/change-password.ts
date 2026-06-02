@@ -10,37 +10,37 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { AuthFacade } from '../../../../core/Auth/services/auth-facade';
 import { MessageService } from 'primeng/api';
-import { GlobalService } from '../../../../core/Services/global-service';
-import { PrimengModule } from '../../../../shared/Models/primeng/primeng-module';
-import { DirectionService } from '../../../../core/Services/direction';
-import { IdentitySignals } from '../../../../core/Auth/services/identity-signals'; // لجلب الـ userId
+import { IdentitySignals } from '../../../../core/Auth/services/identity-signals';
+import { PasswordModule } from 'primeng/password';
+import { ButtonModule } from 'primeng/button';
+import { MessageModule } from 'primeng/message';
 
 @Component({
   selector: 'app-change-password',
-  imports: [PrimengModule, ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, PasswordModule, ButtonModule, MessageModule],
   templateUrl: './change-password.html',
-  styleUrl: './change-password.scss',
+  styleUrl: './change-password.css',
 })
 export class ChangePassword implements OnInit {
   private fb = inject(FormBuilder);
-  // private router = inject(Router);
   private messageService = inject(MessageService);
-  private globalService = inject(GlobalService);
   private identity = inject(IdentitySignals);
   public authFacade = inject(AuthFacade);
-  // public dir = inject(DirectionService);
   private router = inject(Router);
 
   changePasswordForm!: FormGroup;
 
   ngOnInit() {
-    this.globalService.setTitle('تغيير كلمة المرور');
-
     this.changePasswordForm = this.fb.group(
       {
-        userId: [this.identity.userId || '', [Validators.required]],
-        currentPassword: ['', [Validators.required]],
-        newPassword: ['', [Validators.required, Validators.minLength(6)]],
+        currentPassword: [
+          '',
+          [Validators.required, Validators.pattern('^[a-zA-Z][a-zA-Z0-9@#$!%*?&]{6,20}$')],
+        ],
+        newPassword: [
+          '',
+          [Validators.required, Validators.pattern('^[a-zA-Z][a-zA-Z0-9@#$!%*?&]{6,20}$')],
+        ],
         confidentialPassword: ['', [Validators.required]],
       },
       { validators: this.passwordMatchValidator },

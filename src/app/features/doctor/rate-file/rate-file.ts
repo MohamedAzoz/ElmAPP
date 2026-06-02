@@ -22,7 +22,7 @@ import { IdentitySignals } from '../../../core/Auth/services/identity-signals';
     CardModule,
   ],
   templateUrl: './rate-file.html',
-  styleUrl: './rate-file.scss',
+  styleUrl: './rate-file.css',
 })
 export class RateFile implements OnInit {
   private fb = inject(FormBuilder);
@@ -37,7 +37,7 @@ export class RateFile implements OnInit {
 
   ngOnInit() {
     const fileId = Number(this.route.snapshot.paramMap.get('fileId'));
-    const doctorId = this.identity.userId;
+    const doctorId = '';
 
     this.rateForm = this.fb.group({
       fileId: [fileId, Validators.required],
@@ -46,7 +46,6 @@ export class RateFile implements OnInit {
       comment: [''],
     });
     console.log(this.rateForm.value);
-    
   }
 
   submitRating() {

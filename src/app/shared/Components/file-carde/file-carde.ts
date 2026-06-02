@@ -5,20 +5,19 @@ import { CardModule } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FileFacade } from '../../../features/student/Files/file-facade';
-import { PermissionFacade } from '../../../core/Auth/services/permission-facade';
+
 import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-file-carde',
   imports: [CardModule, ButtonModule, SkeletonModule, DatePipe],
   templateUrl: './file-carde.html',
-  styleUrl: './file-carde.scss',
+  styleUrl: './file-carde.css',
 })
 export class FileCarde {
   @Input({ required: true }) file!: FileView;
 
   fileFacade = inject(FileFacade);
-  permissionFacade = inject(PermissionFacade);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 

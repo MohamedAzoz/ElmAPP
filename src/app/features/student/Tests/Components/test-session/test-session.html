@@ -1,28 +1,43 @@
-<div class="min-h-screen bg-bg-page p-4 md:p-8" dir="ltr">
-  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+<div
+  class="min-h-screen bg-bg-page p-4 md:p-8"
+  dir="ltr"
+  appKeyboardNavigation 
+  [optionsLength]="currentQuestion().options.length || 0"
+  (selectOption)="selectOptionByIndex($event)"
+  (nextQuestion)="jumpToNext()"
+  (prevQuestion)="jumpToPrev()"
+  (submitQuiz)="finishTest()" 
+>
+  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 lg:gap-6 gap-3">
     <div class="lg:col-span-3 order-1 lg:order-2">
-      <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 sticky top-8">
-        <div class="flex mb-2 justify-center bg-accent-soft border border-main/30 rounded-xl">
-            <p-selectbutton
-        [options]="[
-          { label: 'AR', value: 'rtl' },
-          { label: 'EN', value: 'ltr' },
-        ]"
-        [(ngModel)]="dir"
-        optionLabel="label"
-        optionValue="value"
-        class="border border-main text-white"
-        aria-labelledby="basic"
-      />
+      <div class="sticky top-0 bg-white rounded-3xl shadow-sm border border-gray-100 lg:p-6 p-3">
+        <div
+          class="hidden lg:flex mb-1 lg:mb-2 justify-center text-base bg-accent-soft border border-main/30 rounded-xl"
+        >
+          <p-selectbutton
+            [options]="[
+              { label: 'AR', value: 'rtl' },
+              { label: 'EN', value: 'ltr' },
+            ]"
+            [(ngModel)]="dir"
+            optionLabel="label"
+            optionValue="value"
+            class="border border-main text-white"
+            aria-labelledby="basic"
+          />
         </div>
-        <div class="bg-blue-50 rounded-2xl p-4 text-center mb-6 border border-blue-100">
-          <span class="text-sm text-main font-bold block mb-1">الوقت المتبقي</span>
-          <span class="text-3xl font-mono font-black text-main/40 tracking-tighter">
+        <div
+          class="bg-primary-50 rounded-2xl p-1.5 md:p-2.5 lg:p-4 text-center lg:mb-6 mb-2 border border-primary-100"
+        >
+          <span class="text-xs md:text-sm lg:text-base text-main font-bold block mb-1"
+            >الوقت المتبقي</span
+          >
+          <span class="text-xl lg:text-2xl font-mono font-black text-main/40 tracking-tighter">
             {{ quizState.timerTest() }}
           </span>
         </div>
-        
-        <div class="grid grid-cols-4 gap-3 mb-8">
+
+        <div class="grid grid-cols-5 lg:grid-cols-4 gap-2 lg:gap-3 mb-2 md:mb-4 lg:mb-8">
           @for (q of data(); track q.id; let i = $index) {
             <button
               (click)="jumpTo(q.id!)"
@@ -33,7 +48,7 @@
                     ? 'bg-green-100 text-green-700 border-green-200'
                     : 'bg-gray-50 text-gray-400 border-gray-200'
               "
-              class="w-full aspect-square rounded-xl font-bold transition-all border flex items-center justify-center relative hover:shadow-md"
+              class="cursor-pointer w-full aspect-square rounded-xl font-semibold text-xs md:text-sm lg:text-base transition-all border flex items-center justify-center relative hover:shadow-md"
             >
               {{ i + 1 }}
               @if (isMarked(q.id!)) {
@@ -51,10 +66,18 @@
         <button
           pButton
           label="إنهاء الاختبار"
-          class="w-full p-button-danger rounded-xl py-3 shadow-lg shadow-red-100"
+          class="w-full p-button-danger text-sm! lg:text-base! lg:py-3 py-1.5 rounded-xl shadow-lg shadow-red-100"
           tooltipPosition="top"
           (click)="finishTest()"
         ></button>
+
+        <!-- <button
+          pButton
+          label="الخروج من الامتحان"
+          class="w-full p-button-outlined p-button-secondary lg:text-base text-sm lg:py-3 py-1.5 rounded-xl shadow-sm mt-3"
+          tooltipPosition="top"
+          (click)="confirmExit($event)"
+        ></button> -->
       </div>
     </div>
 
@@ -69,30 +92,33 @@
           />
         </div>
 
-        <div class="flex justify-between mt-6 px-2 items-center bg-white p-4 rounded-2xl shadow-sm">
-          <button
-            pButton
-            icon="pi pi-chevron-right"
-            label="السابق"
-            class="p-button-text text-text-muted font-semibold"
-            (click)="jumpToPrev()"
-            [disabled]="getCurrentIndex() <= 0"
-          ></button>
-
-          <button
-            pButton
-            [icon]="isMarked(q.id!) ? 'pi pi-bookmark-fill' : 'pi pi-bookmark'"
-            [label]="isMarked(q.id!) ? 'تم التمييز' : 'تميز للمراجعة'"
-            class="p-button-rounded p-button-warning p-button-text text-sm"
-            (click)="toggleBookmark(q.id!)"
-          ></button>
-
+        <div
+          class="flex justify-between mt-6 px-2 items-center bg-white lg:p-4 p-2 rounded-2xl shadow-sm"
+        >
           <button
             pButton
             icon="pi pi-chevron-left"
+            iconPos="left"
+            label="السابق"
+            class="p-button-text text-text-muted font-semibold cursor-pointer text-xs! md:text-sm! lg:text-base! lg:py-3 py-2"
+            (click)="jumpToPrev()"
+            [disabled]="getCurrentIndex() <= 0"
+          ></button>
+          @if (screenSize() >= 1024) {
+            <button
+              pButton
+              [icon]="isMarked(q.id!) ? 'pi pi-bookmark-fill' : 'pi pi-bookmark'"
+              [label]="isMarked(q.id!) ? 'تم التمييز' : 'تميز للمراجعة'"
+              (click)="toggleBookmark(q.id!)"
+              class="p-button-warning p-button-text cursor-pointer text-xs! md:text-sm! lg:text-base!"
+            ></button>
+          }
+          <button
+            pButton
+            icon="pi pi-chevron-right"
             iconPos="right"
             label="التالي"
-            class="p-button-text text-main font-semibold"
+            class="p-button-text text-main font-semibold cursor-pointer text-xs! md:text-sm! lg:text-base! lg:py-3 py-2"
             (click)="jumpToNext()"
             [disabled]="getCurrentIndex() >= (data().length || 0) - 1"
           ></button>

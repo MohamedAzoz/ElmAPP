@@ -1,4 +1,4 @@
-import { Component, Input, effect } from '@angular/core';
+import { Component, Input, effect, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { GetCurriculumDto, GetDepartmentDto, GetYearDto } from '../../../core/api/clients';
 import { Card } from 'primeng/card';
@@ -7,20 +7,20 @@ import { Card } from 'primeng/card';
   selector: 'app-carde',
   imports: [RouterLink, Card],
   templateUrl: './carde.html',
-  styleUrl: './carde.scss',
+  styleUrl: './carde.css',
 })
 export class Carde {
-  @Input({ required: true }) data!: GetCurriculumDto | GetDepartmentDto | GetYearDto;
-  @Input() Link!: string;
+  data = input.required<GetCurriculumDto | GetDepartmentDto | GetYearDto>();
+  Link = input<string>('');
   name!: string;
   url!: string;
   constructor() {
     effect(() => {
-      this.name = this.data.name ?? this.data.subjectName ?? '';
+      this.name = this.data().name ?? this.data().subjectName ?? '';
       this.url =
-        this.Link !== undefined || ''
-          ? `${this.data.id}/${this.Link}`
-          : (this.data.id?.toString() ?? '');
+        (this.Link() || '').trim() !== ''
+          ? `${this.data().id}/${this.Link()}`
+          : (this.data().id?.toString() ?? '');
     });
   }
 }

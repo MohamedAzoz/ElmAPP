@@ -7,7 +7,7 @@ import { IdentitySignals } from '../../../core/Auth/services/identity-signals';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './home.html',
-  styleUrl: './home.scss',
+  styleUrl: './home.css',
 })
 export class Home {
   public identity = inject(IdentitySignals);

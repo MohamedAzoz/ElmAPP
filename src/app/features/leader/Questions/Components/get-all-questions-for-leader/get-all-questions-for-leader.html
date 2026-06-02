@@ -30,32 +30,13 @@
             <span class="text-blue-800 font-semibold">{{ totalQuestions() }}</span>
             <span class="text-blue-600">سؤال</span>
           </div>
-          <!-- Add by Excel -->
-          <p-button
-            label="رفع ملف Excel"
-            icon="pi pi-file-excel"
-            [disabled]="isLoading()"
-            (onClick)="openExcelUploadDialog()"
-            styleClass="p-button-outlined p-button-success"
-          >
-          </p-button>
-          <!-- add many questions -->
-          <p-button
-            label="إضافة سؤالات متعددة"
-            icon="pi pi-plus"
-            [disabled]="isLoading()"
-            (onClick)="openBulkAddDialog()"
-            styleClass="p-button-outlined p-button-success"
-          >
-          </p-button>
           <!-- Add Button with Menu -->
           <p-splitButton
-            label="إضافة سؤال"
-            icon="pi pi-plus"
+            label="إضافة"
             [model]="addMenuItems"
-            (onClick)="openAddQuestionDialog()"
-            styleClass="p-button-success shadow-md"
-            [disabled]="isLoading()"
+            class="p-button-primary shadow-md"
+            rounded
+            severity="primary"
           >
           </p-splitButton>
         </div>
@@ -118,7 +99,6 @@
         [rowHover]="true"
         dataKey="id"
         [expandedRowKeys]="expandedRows()"
-        responsiveLayout="scroll"
       >
         <!-- Header -->
         <ng-template pTemplate="header">
@@ -156,14 +136,12 @@
         <!-- Body -->
         <ng-template pTemplate="body" let-question let-expanded="expanded" let-rowIndex="rowIndex">
           <tr class="transition-all hover:bg-blue-50/50">
-
             <!-- Index -->
             <td class="text-center">
               <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium">
                 {{ rowIndex + 1 }}
               </span>
             </td>
-
             <!-- Content -->
             <td>
               <div class="max-w-md">
@@ -172,7 +150,6 @@
                 </p>
               </div>
             </td>
-
             <!-- Type -->
             <td>
               <p-tag
@@ -183,7 +160,6 @@
               >
               </p-tag>
             </td>
-
             <!-- Options Count -->
             <td class="text-center">
               <p-button
@@ -205,14 +181,6 @@
                   (onClick)="openEditQuestionDialog(question)"
                   styleClass="p-button-rounded p-button-text p-button-info"
                   pTooltip="تعديل السؤال"
-                  tooltipPosition="top"
-                >
-                </p-button>
-                <p-button
-                  icon="pi pi-list"
-                  (onClick)="openOptionsDialog(question)"
-                  styleClass="p-button-rounded p-button-text p-button-success"
-                  pTooltip="إدارة الإجابات"
                   tooltipPosition="top"
                 >
                 </p-button>
@@ -321,6 +289,7 @@
     [resizable]="false"
     styleClass="rounded-2xl"
     [closable]="!isSubmitting()"
+    appendTo="body"
   >
     <form [formGroup]="questionForm" class="space-y-6">
       <!-- Question Content -->
@@ -355,7 +324,8 @@
           optionLabel="label"
           optionValue="value"
           placeholder="اختر نوع السؤال"
-          styleClass="w-full"
+          class="w-full"
+          appendTo="body"
         >
           <ng-template pTemplate="selectedItem" let-selected>
             @if (selected) {
@@ -478,11 +448,12 @@
     [draggable]="false"
     styleClass="rounded-2xl"
     [closable]="!isSubmitting()"
+    appendTo="body"
   >
     <form [formGroup]="bulkQuestionsForm">
       <div class="space-y-6" formArrayName="questions">
         @for (question of bulkQuestionsArray.controls; track $index; let qi = $index) {
-          <p-card [formGroupName]="qi" styleClass="border border-gray-200 rounded-xl shadow-sm">
+          <p-card [formGroupName]="qi" class="border border-gray-200 rounded-xl shadow-sm">
             <ng-template pTemplate="header">
               <div
                 class="flex items-center justify-between p-4 bg-linear-to-r from-blue-50 to-indigo-50 rounded-t-xl"
@@ -493,7 +464,7 @@
                 </span>
                 <p-button
                   icon="pi pi-trash"
-                  (onClick)="removeBulkQuestion(qi)"
+                  (click)="removeBulkQuestion(qi)"
                   styleClass="p-button-rounded p-button-text p-button-danger p-button-sm"
                   [disabled]="bulkQuestionsArray.length <= 1"
                   pTooltip="حذف السؤال"
@@ -503,7 +474,6 @@
             </ng-template>
 
             <div class="space-y-4">
-              <!-- Content -->
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="md:col-span-2">
                   <label class="block text-sm font-medium text-gray-700 mb-2">نص السؤال</label>
@@ -524,20 +494,19 @@
                     [options]="questionTypes"
                     optionLabel="label"
                     optionValue="value"
-                    styleClass="w-full"
+                    class="w-full"
+                    appendTo="body"
                   >
                   </p-select>
                 </div>
               </div>
-
-              <!-- Options -->
               <div>
                 <div class="flex items-center justify-between mb-3">
                   <label class="text-sm font-medium text-gray-700">الإجابات</label>
                   <p-button
                     icon="pi pi-plus"
                     label="إضافة"
-                    (onClick)="addBulkQuestionOption(qi)"
+                    (click)="addBulkQuestionOption(qi)"
                     styleClass="p-button-sm p-button-outlined p-button-secondary"
                     [disabled]="getBulkQuestionOptions(qi).length >= 6"
                   >
@@ -568,7 +537,7 @@
                       </p-checkbox>
                       <p-button
                         icon="pi pi-times"
-                        (onClick)="removeBulkQuestionOption(qi, oi)"
+                        (click)="removeBulkQuestionOption(qi, oi)"
                         styleClass="p-button-rounded p-button-text p-button-danger p-button-sm"
                         [disabled]="getBulkQuestionOptions(qi).length <= 2"
                       >
@@ -581,20 +550,18 @@
           </p-card>
         }
       </div>
-
-      <!-- Add More Questions Button -->
       <div class="flex justify-center mt-6">
         <p-button
           label="إضافة سؤال آخر"
           icon="pi pi-plus-circle"
-          (onClick)="addBulkQuestion()"
+          (click)="addBulkQuestion()"
           styleClass="p-button-outlined p-button-lg"
         >
         </p-button>
       </div>
     </form>
 
-    <ng-template pTemplate="footer">
+     <ng-template pTemplate="footer">
       <div class="flex items-center justify-between">
         <span class="text-gray-500 text-sm">
           <i class="pi pi-info-circle ml-1"></i>
@@ -604,7 +571,7 @@
           <p-button
             label="إلغاء"
             icon="pi pi-times"
-            (onClick)="showBulkAddDialog.set(false)"
+            (click)="showBulkAddDialog.set(false)"
             styleClass="p-button-text"
             [disabled]="isSubmitting()"
           >
@@ -612,7 +579,7 @@
           <p-button
             label="إضافة الكل"
             [icon]="isSubmitting() ? 'pi pi-spinner pi-spin' : 'pi pi-check-circle'"
-            (onClick)="saveBulkQuestions()"
+            (click)="saveBulkQuestions()"
             styleClass="p-button-success"
             [disabled]="isSubmitting()"
           >
@@ -631,6 +598,7 @@
     [draggable]="false"
     styleClass="rounded-2xl"
     [closable]="!isSubmitting()"
+    appendTo="body"
   >
     <div class="space-y-6">
       <!-- Info Section -->
@@ -691,7 +659,7 @@
       <p-button
         label="إغلاق"
         icon="pi pi-times"
-        (onClick)="showExcelUploadDialog.set(false)"
+        (click)="showExcelUploadDialog.set(false)"
         styleClass="p-button-text"
         [disabled]="isSubmitting()"
       >
@@ -707,10 +675,10 @@
     [style]="{ width: '95vw', maxWidth: '700px' }"
     [draggable]="false"
     styleClass="rounded-2xl"
+    appendTo="body"
   >
     @if (selectedQuestion()) {
       <div class="space-y-6">
-        <!-- Question Preview -->
         <div class="bg-linear-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-100">
           <div class="flex items-start gap-3">
             <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
@@ -727,19 +695,15 @@
             </div>
           </div>
         </div>
-
-        <!-- Add Option Button -->
         <div class="flex justify-end">
           <p-button
             label="إضافة إجابة جديدة"
             icon="pi pi-plus"
-            (onClick)="openAddOptionDialog()"
+            (click)="openAddOptionDialog()"
             styleClass="p-button-success"
           >
           </p-button>
         </div>
-
-        <!-- Options List -->
         <div class="space-y-3">
           @for (option of selectedQuestion()?.options; track option.id; let i = $index) {
             <div
@@ -750,15 +714,12 @@
                   : 'bg-white border-gray-200 hover:border-gray-300'
               "
             >
-              <!-- Option Letter -->
               <span
                 class="w-10 h-10 rounded-full flex items-center justify-center font-bold"
                 [class]="option.isCorrect ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'"
               >
                 {{ ['أ', 'ب', 'ج', 'د', 'هـ', 'و'][i] || i + 1 }}
               </span>
-
-              <!-- Option Content -->
               <div class="flex-1">
                 <p
                   class="font-medium"
@@ -773,19 +734,17 @@
                   </span>
                 }
               </div>
-
-              <!-- Actions -->
               <div class="flex items-center gap-2">
                 <p-button
                   icon="pi pi-pencil"
-                  (onClick)="openEditOptionDialog(option)"
+                  (click)="openEditOptionDialog(option)"
                   styleClass="p-button-rounded p-button-text p-button-info"
                   pTooltip="تعديل"
                 >
                 </p-button>
                 <p-button
                   icon="pi pi-trash"
-                  (onClick)="deleteOption(option)"
+                  (click)="deleteOption(option.id!)"
                   styleClass="p-button-rounded p-button-text p-button-danger"
                   pTooltip="حذف"
                 >
@@ -807,7 +766,7 @@
       <p-button
         label="إغلاق"
         icon="pi pi-times"
-        (onClick)="showOptionsDialog.set(false)"
+        (click)="showOptionsDialog.set(false)"
         styleClass="p-button-text"
       >
       </p-button>
@@ -823,6 +782,7 @@
     [draggable]="false"
     styleClass="rounded-2xl"
     [closable]="!isSubmitting()"
+    appendTo="body"
   >
     <form [formGroup]="optionForm" class="space-y-6 pt-4">
       <div class="space-y-2">
@@ -869,7 +829,7 @@
         <p-button
           label="إلغاء"
           icon="pi pi-times"
-          (onClick)="showAddOptionDialog.set(false)"
+          (click)="showAddOptionDialog.set(false)"
           styleClass="p-button-text p-button-secondary font-bold"
         ></p-button>
 
@@ -877,7 +837,7 @@
           [label]="selectedOption() ? 'تحديث الإجابة' : 'حفظ الإجابة'"
           [icon]="isSubmitting() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
           [disabled]="optionForm.invalid || isSubmitting()"
-          (onClick)="saveOption()"
+          (click)="saveOption()"
           styleClass="p-button-primary rounded-xl px-6"
         ></p-button>
       </div>
