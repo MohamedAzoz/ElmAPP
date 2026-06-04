@@ -277,6 +277,7 @@ export class GetAllQuestionForLeader implements OnInit {
         id: formValue.id,
         content: formValue.content,
         questionType: formValue.questionType,
+        imageUrl: null, // تعديل لاحقاً إذا أردنا دعم تعديل الصورة
       };
 
       this.questionLeaderFacade.updateQuestion(updateCommand).subscribe({

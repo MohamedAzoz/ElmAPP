@@ -1453,11 +1453,11 @@ export interface ICurriulumPublicClient {
     /**
      * @return OK
      */
-    byDoctorId(userId: string): Observable<ResultOfListOfGetCurriculumDto>;
+    myCurriculum(): Observable<ResultOfListOfGetCurriculumDto>;
     /**
      * @return OK
      */
-    byStudentId(userId: string): Observable<ResultOfListOfGetCurriculumDto>;
+    myCurriculumForStudent(): Observable<ResultOfListOfGetCurriculumDto>;
 }
 
 @Injectable({
@@ -1589,11 +1589,8 @@ export class CurriulumPublicClient implements ICurriulumPublicClient {
     /**
      * @return OK
      */
-    byDoctorId(userId: string, httpContext?: HttpContext): Observable<ResultOfListOfGetCurriculumDto> {
-        let url_ = this.baseUrl + "/api/CurriulumPublic/ByDoctorId/{UserId}";
-        if (userId === undefined || userId === null)
-            throw new globalThis.Error("The parameter 'userId' must be defined.");
-        url_ = url_.replace("{UserId}", encodeURIComponent("" + userId));
+    myCurriculum(httpContext?: HttpContext): Observable<ResultOfListOfGetCurriculumDto> {
+        let url_ = this.baseUrl + "/api/CurriulumPublic/MyCurriculum";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -1606,11 +1603,11 @@ export class CurriulumPublicClient implements ICurriulumPublicClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processByDoctorId(response_);
+            return this.processMyCurriculum(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processByDoctorId(response_ as any);
+                    return this.processMyCurriculum(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ResultOfListOfGetCurriculumDto>;
                 }
@@ -1619,7 +1616,7 @@ export class CurriulumPublicClient implements ICurriulumPublicClient {
         }));
     }
 
-    protected processByDoctorId(response: HttpResponseBase): Observable<ResultOfListOfGetCurriculumDto> {
+    protected processMyCurriculum(response: HttpResponseBase): Observable<ResultOfListOfGetCurriculumDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1644,11 +1641,8 @@ export class CurriulumPublicClient implements ICurriulumPublicClient {
     /**
      * @return OK
      */
-    byStudentId(userId: string, httpContext?: HttpContext): Observable<ResultOfListOfGetCurriculumDto> {
-        let url_ = this.baseUrl + "/api/CurriulumPublic/ByStudentId/{UserId}";
-        if (userId === undefined || userId === null)
-            throw new globalThis.Error("The parameter 'userId' must be defined.");
-        url_ = url_.replace("{UserId}", encodeURIComponent("" + userId));
+    myCurriculumForStudent(httpContext?: HttpContext): Observable<ResultOfListOfGetCurriculumDto> {
+        let url_ = this.baseUrl + "/api/CurriulumPublic/MyCurriculumForStudent";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -1661,11 +1655,11 @@ export class CurriulumPublicClient implements ICurriulumPublicClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processByStudentId(response_);
+            return this.processMyCurriculumForStudent(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processByStudentId(response_ as any);
+                    return this.processMyCurriculumForStudent(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ResultOfListOfGetCurriculumDto>;
                 }
@@ -1674,7 +1668,7 @@ export class CurriulumPublicClient implements ICurriulumPublicClient {
         }));
     }
 
-    protected processByStudentId(response: HttpResponseBase): Observable<ResultOfListOfGetCurriculumDto> {
+    protected processMyCurriculumForStudent(response: HttpResponseBase): Observable<ResultOfListOfGetCurriculumDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -3389,6 +3383,10 @@ export interface IQuestionLeaderClient {
     /**
      * @return OK
      */
+    exportTemplateForEsayQuestions(questionsBankId: number): Observable<FileStreamResult>;
+    /**
+     * @return OK
+     */
     addQuestion(body: AddQuestionCommand): Observable<ResultOfQuestionsDto>;
     /**
      * @return OK
@@ -3400,6 +3398,12 @@ export interface IQuestionLeaderClient {
      * @return OK
      */
     addByExcelQuestions(file?: FileParameter | undefined, questionBankId?: number | undefined): Observable<ResultOfboolean>;
+    /**
+     * @param file (optional) 
+     * @param questionBankId (optional) 
+     * @return OK
+     */
+    addByExcelEsayQuestions(file?: FileParameter | undefined, questionBankId?: number | undefined): Observable<ResultOfboolean>;
     /**
      * @return OK
      */
@@ -3453,6 +3457,61 @@ export class QuestionLeaderClient implements IQuestionLeaderClient {
     }
 
     protected processExportTemplateForQuestions(response: HttpResponseBase): Observable<FileStreamResult> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        let _mappings: { source: any, target: any }[] = [];
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver) as FileStreamResult;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    exportTemplateForEsayQuestions(questionsBankId: number, httpContext?: HttpContext): Observable<FileStreamResult> {
+        let url_ = this.baseUrl + "/api/leader/QuestionLeader/ExportTemplateForEsayQuestions/{questionsBankId}";
+        if (questionsBankId === undefined || questionsBankId === null)
+            throw new globalThis.Error("The parameter 'questionsBankId' must be defined.");
+        url_ = url_.replace("{questionsBankId}", encodeURIComponent("" + questionsBankId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            context: httpContext,
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processExportTemplateForEsayQuestions(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processExportTemplateForEsayQuestions(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FileStreamResult>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FileStreamResult>;
+        }));
+    }
+
+    protected processExportTemplateForEsayQuestions(response: HttpResponseBase): Observable<FileStreamResult> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -3633,6 +3692,71 @@ export class QuestionLeaderClient implements IQuestionLeaderClient {
     }
 
     protected processAddByExcelQuestions(response: HttpResponseBase): Observable<ResultOfboolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        let _mappings: { source: any, target: any }[] = [];
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver) as ResultOfboolean;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param file (optional) 
+     * @param questionBankId (optional) 
+     * @return OK
+     */
+    addByExcelEsayQuestions(file?: FileParameter | undefined, questionBankId?: number | undefined, httpContext?: HttpContext): Observable<ResultOfboolean> {
+        let url_ = this.baseUrl + "/api/leader/QuestionLeader/AddByExcelEsayQuestions";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = new FormData();
+        if (file === null || file === undefined)
+            throw new globalThis.Error("The parameter 'file' cannot be null.");
+        else
+            content_.append("File", file.data, file.fileName ? file.fileName : "File");
+        if (questionBankId === null || questionBankId === undefined)
+            throw new globalThis.Error("The parameter 'questionBankId' cannot be null.");
+        else
+            content_.append("QuestionBankId", questionBankId.toString());
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            context: httpContext,
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddByExcelEsayQuestions(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddByExcelEsayQuestions(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfboolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfboolean>;
+        }));
+    }
+
+    protected processAddByExcelEsayQuestions(response: HttpResponseBase): Observable<ResultOfboolean> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -4484,6 +4608,571 @@ export class RolePublicClient implements IRolePublicClient {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             result200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver) as ResultOfIEnumerableOfstring;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+export interface ISectionLeaderClient {
+    /**
+     * @return OK
+     */
+    createSection(body: AddSectionCommand): Observable<ResultOfboolean>;
+    /**
+     * @return OK
+     */
+    addCodeSnippet(body: AddCodeSnippetCommand): Observable<ResultOfboolean>;
+    /**
+     * @return OK
+     */
+    updateSection(body: UpdateSectionCommand): Observable<ResultOfboolean>;
+    /**
+     * @return OK
+     */
+    deleteSection(id: number): Observable<ResultOfboolean>;
+}
+
+@Injectable({
+    providedIn: 'root'
+})
+export class SectionLeaderClient implements ISectionLeaderClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "https://elm.runasp.net/";
+    }
+
+    /**
+     * @return OK
+     */
+    createSection(body: AddSectionCommand, httpContext?: HttpContext): Observable<ResultOfboolean> {
+        let url_ = this.baseUrl + "/api/leader/SectionLeader/CreateSection";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            context: httpContext,
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateSection(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateSection(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfboolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfboolean>;
+        }));
+    }
+
+    protected processCreateSection(response: HttpResponseBase): Observable<ResultOfboolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        let _mappings: { source: any, target: any }[] = [];
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver) as ResultOfboolean;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    addCodeSnippet(body: AddCodeSnippetCommand, httpContext?: HttpContext): Observable<ResultOfboolean> {
+        let url_ = this.baseUrl + "/api/leader/SectionLeader/AddCodeSnippet";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            context: httpContext,
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddCodeSnippet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddCodeSnippet(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfboolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfboolean>;
+        }));
+    }
+
+    protected processAddCodeSnippet(response: HttpResponseBase): Observable<ResultOfboolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        let _mappings: { source: any, target: any }[] = [];
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver) as ResultOfboolean;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    updateSection(body: UpdateSectionCommand, httpContext?: HttpContext): Observable<ResultOfboolean> {
+        let url_ = this.baseUrl + "/api/leader/SectionLeader/UpdateSection";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            context: httpContext,
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateSection(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateSection(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfboolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfboolean>;
+        }));
+    }
+
+    protected processUpdateSection(response: HttpResponseBase): Observable<ResultOfboolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        let _mappings: { source: any, target: any }[] = [];
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver) as ResultOfboolean;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    deleteSection(id: number, httpContext?: HttpContext): Observable<ResultOfboolean> {
+        let url_ = this.baseUrl + "/api/leader/SectionLeader/DeleteSection/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            context: httpContext,
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteSection(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteSection(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfboolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfboolean>;
+        }));
+    }
+
+    protected processDeleteSection(response: HttpResponseBase): Observable<ResultOfboolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        let _mappings: { source: any, target: any }[] = [];
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver) as ResultOfboolean;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+export interface ISectionPublicClient {
+    /**
+     * @return OK
+     */
+    getAllSections(curriculumId: number): Observable<ResultOfListOfGetSectionDto>;
+    /**
+     * @return OK
+     */
+    getSectionsByDepartmentAndYear(departmentId: number, year: number): Observable<ResultOfListOfGetSectionDto>;
+    /**
+     * @return OK
+     */
+    mySections(): Observable<ResultOfListOfGetSectionDto>;
+    /**
+     * @return OK
+     */
+    mySectionForStudent(): Observable<ResultOfListOfGetSectionDto>;
+    /**
+     * @return OK
+     */
+    getSectionDetails(sectionId: number): Observable<ResultOfListOfGetSectionDetailsDto>;
+}
+
+@Injectable({
+    providedIn: 'root'
+})
+export class SectionPublicClient implements ISectionPublicClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "https://elm.runasp.net/";
+    }
+
+    /**
+     * @return OK
+     */
+    getAllSections(curriculumId: number, httpContext?: HttpContext): Observable<ResultOfListOfGetSectionDto> {
+        let url_ = this.baseUrl + "/api/SectionPublic/GetAllSections/{curriculumId}";
+        if (curriculumId === undefined || curriculumId === null)
+            throw new globalThis.Error("The parameter 'curriculumId' must be defined.");
+        url_ = url_.replace("{curriculumId}", encodeURIComponent("" + curriculumId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            context: httpContext,
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllSections(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllSections(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfListOfGetSectionDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfListOfGetSectionDto>;
+        }));
+    }
+
+    protected processGetAllSections(response: HttpResponseBase): Observable<ResultOfListOfGetSectionDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        let _mappings: { source: any, target: any }[] = [];
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver) as ResultOfListOfGetSectionDto;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getSectionsByDepartmentAndYear(departmentId: number, year: number, httpContext?: HttpContext): Observable<ResultOfListOfGetSectionDto> {
+        let url_ = this.baseUrl + "/api/SectionPublic/GetSectionsByDepartmentAndYear/{departmentId}/{year}";
+        if (departmentId === undefined || departmentId === null)
+            throw new globalThis.Error("The parameter 'departmentId' must be defined.");
+        url_ = url_.replace("{departmentId}", encodeURIComponent("" + departmentId));
+        if (year === undefined || year === null)
+            throw new globalThis.Error("The parameter 'year' must be defined.");
+        url_ = url_.replace("{year}", encodeURIComponent("" + year));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            context: httpContext,
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetSectionsByDepartmentAndYear(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetSectionsByDepartmentAndYear(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfListOfGetSectionDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfListOfGetSectionDto>;
+        }));
+    }
+
+    protected processGetSectionsByDepartmentAndYear(response: HttpResponseBase): Observable<ResultOfListOfGetSectionDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        let _mappings: { source: any, target: any }[] = [];
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver) as ResultOfListOfGetSectionDto;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    mySections(httpContext?: HttpContext): Observable<ResultOfListOfGetSectionDto> {
+        let url_ = this.baseUrl + "/api/SectionPublic/MySections";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            context: httpContext,
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processMySections(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processMySections(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfListOfGetSectionDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfListOfGetSectionDto>;
+        }));
+    }
+
+    protected processMySections(response: HttpResponseBase): Observable<ResultOfListOfGetSectionDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        let _mappings: { source: any, target: any }[] = [];
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver) as ResultOfListOfGetSectionDto;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    mySectionForStudent(httpContext?: HttpContext): Observable<ResultOfListOfGetSectionDto> {
+        let url_ = this.baseUrl + "/api/SectionPublic/MySectionForStudent";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            context: httpContext,
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processMySectionForStudent(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processMySectionForStudent(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfListOfGetSectionDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfListOfGetSectionDto>;
+        }));
+    }
+
+    protected processMySectionForStudent(response: HttpResponseBase): Observable<ResultOfListOfGetSectionDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        let _mappings: { source: any, target: any }[] = [];
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver) as ResultOfListOfGetSectionDto;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getSectionDetails(sectionId: number, httpContext?: HttpContext): Observable<ResultOfListOfGetSectionDetailsDto> {
+        let url_ = this.baseUrl + "/api/SectionPublic/GetSectionDetails/{sectionId}";
+        if (sectionId === undefined || sectionId === null)
+            throw new globalThis.Error("The parameter 'sectionId' must be defined.");
+        url_ = url_.replace("{sectionId}", encodeURIComponent("" + sectionId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            context: httpContext,
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetSectionDetails(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetSectionDetails(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfListOfGetSectionDetailsDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfListOfGetSectionDetailsDto>;
+        }));
+    }
+
+    protected processGetSectionDetails(response: HttpResponseBase): Observable<ResultOfListOfGetSectionDetailsDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        let _mappings: { source: any, target: any }[] = [];
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver) as ResultOfListOfGetSectionDetailsDto;
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -5433,6 +6122,397 @@ export class UniversityPublicClient implements IUniversityPublicClient {
     }
 }
 
+export interface IVideoLeaderClient {
+    /**
+     * @return OK
+     */
+    createVideoForSection(body: AddVideoForSectionCommand): Observable<ResultOfboolean>;
+    /**
+     * @return OK
+     */
+    createVideoForCurriculum(body: AddVideoForCurriculumCommand): Observable<ResultOfboolean>;
+    /**
+     * @return OK
+     */
+    updateVideo(body: UpdateVideoCommand): Observable<ResultOfboolean>;
+    /**
+     * @return OK
+     */
+    deleteVideo(id: number): Observable<ResultOfboolean>;
+}
+
+@Injectable({
+    providedIn: 'root'
+})
+export class VideoLeaderClient implements IVideoLeaderClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "https://elm.runasp.net/";
+    }
+
+    /**
+     * @return OK
+     */
+    createVideoForSection(body: AddVideoForSectionCommand, httpContext?: HttpContext): Observable<ResultOfboolean> {
+        let url_ = this.baseUrl + "/api/leader/VideoLeader/CreateVideoForSection";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            context: httpContext,
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateVideoForSection(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateVideoForSection(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfboolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfboolean>;
+        }));
+    }
+
+    protected processCreateVideoForSection(response: HttpResponseBase): Observable<ResultOfboolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        let _mappings: { source: any, target: any }[] = [];
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver) as ResultOfboolean;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    createVideoForCurriculum(body: AddVideoForCurriculumCommand, httpContext?: HttpContext): Observable<ResultOfboolean> {
+        let url_ = this.baseUrl + "/api/leader/VideoLeader/CreateVideoForCurriculum";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            context: httpContext,
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateVideoForCurriculum(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateVideoForCurriculum(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfboolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfboolean>;
+        }));
+    }
+
+    protected processCreateVideoForCurriculum(response: HttpResponseBase): Observable<ResultOfboolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        let _mappings: { source: any, target: any }[] = [];
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver) as ResultOfboolean;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    updateVideo(body: UpdateVideoCommand, httpContext?: HttpContext): Observable<ResultOfboolean> {
+        let url_ = this.baseUrl + "/api/leader/VideoLeader/UpdateVideo";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            context: httpContext,
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateVideo(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateVideo(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfboolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfboolean>;
+        }));
+    }
+
+    protected processUpdateVideo(response: HttpResponseBase): Observable<ResultOfboolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        let _mappings: { source: any, target: any }[] = [];
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver) as ResultOfboolean;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    deleteVideo(id: number, httpContext?: HttpContext): Observable<ResultOfboolean> {
+        let url_ = this.baseUrl + "/api/leader/VideoLeader/DeleteVideo/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            context: httpContext,
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteVideo(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteVideo(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfboolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfboolean>;
+        }));
+    }
+
+    protected processDeleteVideo(response: HttpResponseBase): Observable<ResultOfboolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        let _mappings: { source: any, target: any }[] = [];
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver) as ResultOfboolean;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+export interface IVideoPublicClient {
+    /**
+     * @return OK
+     */
+    getAllVideosForSection(sectionId: number): Observable<ResultOfListOfGetVideoDto>;
+    /**
+     * @return OK
+     */
+    getAllVideosForCurriculum(curriculumId: number): Observable<ResultOfListOfGetVideoDto>;
+}
+
+@Injectable({
+    providedIn: 'root'
+})
+export class VideoPublicClient implements IVideoPublicClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "https://elm.runasp.net/";
+    }
+
+    /**
+     * @return OK
+     */
+    getAllVideosForSection(sectionId: number, httpContext?: HttpContext): Observable<ResultOfListOfGetVideoDto> {
+        let url_ = this.baseUrl + "/api/VideoPublic/GetAllVideosForSection/{sectionId}";
+        if (sectionId === undefined || sectionId === null)
+            throw new globalThis.Error("The parameter 'sectionId' must be defined.");
+        url_ = url_.replace("{sectionId}", encodeURIComponent("" + sectionId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            context: httpContext,
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllVideosForSection(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllVideosForSection(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfListOfGetVideoDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfListOfGetVideoDto>;
+        }));
+    }
+
+    protected processGetAllVideosForSection(response: HttpResponseBase): Observable<ResultOfListOfGetVideoDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        let _mappings: { source: any, target: any }[] = [];
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver) as ResultOfListOfGetVideoDto;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getAllVideosForCurriculum(curriculumId: number, httpContext?: HttpContext): Observable<ResultOfListOfGetVideoDto> {
+        let url_ = this.baseUrl + "/api/VideoPublic/GetAllVideosForCurriculum/{curriculumId}";
+        if (curriculumId === undefined || curriculumId === null)
+            throw new globalThis.Error("The parameter 'curriculumId' must be defined.");
+        url_ = url_.replace("{curriculumId}", encodeURIComponent("" + curriculumId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            context: httpContext,
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllVideosForCurriculum(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllVideosForCurriculum(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfListOfGetVideoDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfListOfGetVideoDto>;
+        }));
+    }
+
+    protected processGetAllVideosForCurriculum(response: HttpResponseBase): Observable<ResultOfListOfGetVideoDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        let _mappings: { source: any, target: any }[] = [];
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver) as ResultOfListOfGetVideoDto;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
 export interface IYearAdminClient {
     /**
      * @return OK
@@ -5764,6 +6844,14 @@ export class YearPublicClient implements IYearPublicClient {
     }
 }
 
+export interface AddCodeSnippetCommand {
+    title: string;
+    code: string;
+    sectionId: number;
+
+    [key: string]: any;
+}
+
 export interface AddCollegeCommand {
     name: string;
     universityId: number;
@@ -5822,8 +6910,16 @@ export interface AddQuestionsBankCommand {
 
 export interface AddQuestionsDto {
     content?: string;
+    imageUrl?: string | null;
     questionType?: string;
     options?: AddOptionsDto[];
+
+    [key: string]: any;
+}
+
+export interface AddSectionCommand {
+    title: string;
+    curriculumId: number;
 
     [key: string]: any;
 }
@@ -5844,6 +6940,22 @@ export interface AddSubjectCommand {
 
 export interface AddUniversityCommand {
     name: string;
+
+    [key: string]: any;
+}
+
+export interface AddVideoForCurriculumCommand {
+    title: string;
+    url: string;
+    curriculumId: number;
+
+    [key: string]: any;
+}
+
+export interface AddVideoForSectionCommand {
+    title: string;
+    url: string;
+    sectionId: number;
 
     [key: string]: any;
 }
@@ -6007,6 +7119,21 @@ export interface GetDepartmentDto2 {
     [key: string]: any;
 }
 
+export interface GetSectionDetailsDto {
+    id?: number;
+    title?: string;
+    codeSnippet?: string | null;
+
+    [key: string]: any;
+}
+
+export interface GetSectionDto {
+    id?: number;
+    title?: string;
+
+    [key: string]: any;
+}
+
 export interface GetSubjectDto {
     id?: number;
     name?: string;
@@ -6019,6 +7146,14 @@ export interface GetSubjectDto2 {
     id?: number;
     name?: string;
     code?: string;
+
+    [key: string]: any;
+}
+
+export interface GetVideoDto {
+    id?: number;
+    title?: string;
+    url?: string;
 
     [key: string]: any;
 }
@@ -6131,7 +7266,9 @@ export interface QuestionsDto {
     id?: number;
     content?: string;
     questionType?: string;
-    options?: OptionsDto2[];
+    imageUrl?: string | null;
+    modelAnswer?: string | null;
+    options?: OptionsDto2[] | null;
 
     [key: string]: any;
 }
@@ -6140,7 +7277,9 @@ export interface QuestionsDto2 {
     id?: number;
     content?: string;
     questionType?: string;
-    options?: OptionsDto2[];
+    imageUrl?: string | null;
+    modelAnswer?: string | null;
+    options?: OptionsDto2[] | null;
 
     [key: string]: any;
 }
@@ -6374,8 +7513,38 @@ export interface ResultOfListOfGetDepartmentDto {
     [key: string]: any;
 }
 
+export interface ResultOfListOfGetSectionDetailsDto {
+    data?: GetSectionDetailsDto[] | null;
+    isSuccess?: boolean;
+    statusCode?: number;
+    errors?: ValidationError[];
+    message?: string | null;
+
+    [key: string]: any;
+}
+
+export interface ResultOfListOfGetSectionDto {
+    data?: GetSectionDto[] | null;
+    isSuccess?: boolean;
+    statusCode?: number;
+    errors?: ValidationError[];
+    message?: string | null;
+
+    [key: string]: any;
+}
+
 export interface ResultOfListOfGetSubjectDto {
     data?: GetSubjectDto[] | null;
+    isSuccess?: boolean;
+    statusCode?: number;
+    errors?: ValidationError[];
+    message?: string | null;
+
+    [key: string]: any;
+}
+
+export interface ResultOfListOfGetVideoDto {
+    data?: GetVideoDto[] | null;
     isSuccess?: boolean;
     statusCode?: number;
     errors?: ValidationError[];
@@ -6633,6 +7802,7 @@ export interface UpdateOptionCommand {
 export interface UpdateQuestionCommand {
     id: number;
     content: string;
+    imageUrl: string | null;
     questionType: string;
 
     [key: string]: any;
@@ -6642,6 +7812,13 @@ export interface UpdateQuestionsBankCommand {
     id: number;
     name: string;
     curriculumId: number;
+
+    [key: string]: any;
+}
+
+export interface UpdateSectionCommand {
+    id: number;
+    title: string;
 
     [key: string]: any;
 }
@@ -6664,6 +7841,14 @@ export interface UpdateSubjectCommand {
 export interface UpdateUniversityCommand {
     id: number;
     name: string;
+
+    [key: string]: any;
+}
+
+export interface UpdateVideoCommand {
+    id: number;
+    title: string;
+    url: string;
 
     [key: string]: any;
 }

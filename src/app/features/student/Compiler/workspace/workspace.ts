@@ -35,6 +35,13 @@ export class Workspace {
   selectedLanguage: string = 'cpp';
   code: string = this.boilerplates['cpp'];
 
+  constructor() {
+    const state = typeof window !== 'undefined' ? window.history.state : null;
+    if (state && state.code) {
+      this.code = state.code;
+    }
+  }
+
   terminalOutput: string = 'اضغط على زر "تشغيل الكود" لرؤية النتيجة هنا...';
   isCompilerError: boolean = false;
   isLoading: boolean = false;

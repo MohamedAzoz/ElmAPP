@@ -1,0 +1,34 @@
+<section class="essay-card">
+  <article class="essay-panel">
+    <header class="essay-header">
+      <div class="essay-meta">
+        <h2
+          class="text-base md:text-lg lg:text-xl xl:text-2xl pb-1 font-semibold text-gray-800 leading-[1.4]"
+        >
+          @if (index !== undefined) {
+            <span class="essay-index">{{ index + 1 }}.</span> {{ question.content }}
+          } @else {
+            {{ question.content }}
+          }
+        </h2>
+      </div>
+    </header>
+
+    @if (safeImageUrl) {
+      <div class="essay-image">
+        <img [src]="safeImageUrl" alt="صورة السؤال" loading="lazy" />
+      </div>
+    }
+
+    <div class="essay-actions">
+      <button type="button" class="toggle-answer" (click)="toggleAnswer()">
+        {{ showAnswer ? 'إخفاء الإجابة' : 'عرض الإجابة' }}
+      </button>
+    </div>
+
+    <div class="essay-answer" *ngIf="showAnswer">
+      <h3>الإجابة النموذجية</h3>
+      <p>{{ answerText }}</p>
+    </div>
+  </article>
+</section>

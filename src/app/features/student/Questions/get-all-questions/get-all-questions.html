@@ -1,7 +1,7 @@
 <p-confirmDialog></p-confirmDialog>
 
 <section
-  class="min-h-screen bg-gray-50 py-3 lg:py-6 lg:px-4 px-2 flex flex-col items-center"
+  class="min-h-screen pt-2 pb-4 lg:pb-6 lg:px-4 px-1 flex flex-col items-center"
   appKeyboardNavigation
   [optionsLength]="currentQuestion()?.options?.length || 0"
   (selectOption)="selectOptionByIndex($event)"
@@ -10,9 +10,9 @@
   (submitQuiz)="onSubmitKeyboard()"
 >
   <div
-    class="sticky top-0 z-20 w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 items-center gap-2 lg:gap-6 mb-4 lg:mb-8 lg:p-6 p-3 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100"
+    class="hidden lg:grid sticky top-0 z-20 w-full max-w-4xl grid-cols-3 items-center gap-6 mb-4 p-6 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100"
   >
-    <div class="flex items-center gap-3 justify-center md:justify-start">
+    <div class="flex items-center gap-3 justify-start">
       <div
         class="w-8 lg:w-12 h-8 lg:h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600"
       >
@@ -28,7 +28,7 @@
       </div>
     </div>
 
-    <div class="justify-center hidden lg:flex">
+    <div class="justify-center flex">
       <div class="bg-gray-50 p-1 rounded-xl border border-gray-200">
         <p-selectbutton
           [options]="[
@@ -43,7 +43,7 @@
       </div>
     </div>
 
-    <div class="hidden lg:flex flex-col items-center md:items-end justify-center">
+    <div class="flex flex-col items-end justify-center">
       <span class="text-sm font-bold text-gray-800"
         >سؤال {{ currentIndex() + 1 }}
         <span class="text-gray-400">/ {{ questions().length }}</span></span
@@ -58,14 +58,47 @@
     </div>
   </div>
 
+  <div
+    class="sticky top-0 z-20 w-full max-w-4xl lg:hidden bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-4 mb-4"
+  >
+    <div class="flex flex-col gap-3">
+      <div class="flex items-center justify-between gap-3">
+        <div>
+          <p class="text-sm font-bold text-gray-800">
+            سؤال {{ currentIndex() + 1 }} من {{ questions().length }}
+          </p>
+        </div>
+        <div
+          class="inline-flex items-center gap-2 rounded-2xl bg-indigo-50 px-3 py-2 text-indigo-700 font-semibold"
+        >
+          <i class="pi pi-clock"></i>
+          {{ quizState.timerString() }}
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="flex-1">
+          <p-progressBar
+            [value]="progress()"
+            [showValue]="false"
+            class="h-2 rounded-full overflow-hidden"
+          ></p-progressBar>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="w-full max-w-4xl relative transition-all duration-500 z-10" [dir]="isTestMode()">
     @if (currentQuestion(); as question) {
-      <app-question-carde
-        [index]="currentIndex()"
-        [question]="question"
-        [savedAnswerId]="quizState.getAnswer(question.id!)"
-        (answerSelect)="onAnswerSelected($event)"
-      />
+      @if (question.questionType !== 'Esay') {
+        <app-question-carde
+          [index]="currentIndex()"
+          [question]="question"
+          [savedAnswerId]="quizState.getAnswer(question.id!)"
+          (answerSelect)="onAnswerSelected($event)"
+        />
+      } @else {
+        <app-question-esay-carde [index]="currentIndex()" [question]="question" />
+      }
     } @else {
       <div
         class="flex flex-col justify-center items-center h-80 bg-white rounded-3xl shadow-sm w-full"
@@ -78,42 +111,45 @@
     }
   </div>
 
-  <div class="w-full max-w-4xl flex justify-between mt-6 lg:mt-8" [dir]="isTestMode()">
+  <div class="w-full max-w-4xl grid grid-cols-3 gap-3 mt-6 lg:mt-8" [dir]="isTestMode()">
     <button
       pButton
-      label="السابق"
+      type="button"
       icon="pi pi-chevron-left"
       iconPos="left"
-      class="px-3 md:px-5 lg:px-10 lg:py-4 py-2 text-xs! md:text-sm! lg:text-base! p-button-text p-button-lg font-bold text-gray-600 hover:text-indigo-600 transition-colors"
+      class="w-full px-3 md:px-4 lg:px-6 lg:py-4 py-2 text-xs! md:text-sm! lg:text-base! p-button-text p-button-lg font-bold text-gray-600 hover:text-indigo-600 transition-colors"
       [disabled]="isFirstQuestion()"
       (click)="prev()"
-    ></button>
-    <!-- اخفى label  فى الموبايل -->
+    >السابق</button>
     @if (!isLastQuestion()) {
       <button
-        class="cursor-pointer flex items-center gap-2 p-button-outlined p-button-secondary px-3 md:px-5 lg:px-8 lg:py-4 py-2 rounded-2xl font-bold"
+        type="button"
+        class="w-full cursor-pointer flex items-center justify-center gap-2 p-button-outlined p-button-secondary px-3 md:px-4 lg:px-6 lg:py-4 py-2 rounded-2xl font-bold"
         (click)="confirmEnd($event)"
       >
         <i class="pi pi-sign-out"></i>
-        <span class="hidden md:inline">الخروج من الاختبار</span>
+        <span class="hidden sm:inline">الخروج</span>
       </button>
-
       <button
         pButton
-        label="التالي"
+        type="button"
         icon="pi pi-chevron-right"
         iconPos="right"
-        class="px-3 md:px-5 lg:px-10 lg:py-4 py-2 text-xs! md:text-sm! lg:text-base! bg-indigo-600 border-none rounded-2xl shadow-[0_10px_20px_rgba(79,70,229,0.3)] hover:bg-indigo-700 hover:-translate-y-1 transition-all"
+        label="التالي"
+        class="w-full px-3 md:px-4 lg:px-6 lg:py-4 py-2 text-xs! md:text-sm! lg:text-base! bg-indigo-600 border-none rounded-2xl shadow-[0_10px_20px_rgba(79,70,229,0.3)] hover:bg-indigo-700 hover:-translate-y-1 transition-all"
         (click)="next()"
-      ></button>
+      >
+    </button>
     } @else {
       <button
         pButton
-        label="إنهاء الاختبار"
+        type="button"
         severity="danger"
-        class="px-3 md:px-5 lg:px-10 lg:py-4 py-2 text-xs! md:text-sm! lg:text-base! rounded-2xl shadow-[0_10px_20px_rgba(239,68,68,0.3)] hover:-translate-y-1 transition-all"
+        class="w-full px-3 md:px-4 lg:px-6 lg:py-4 py-2 text-xs! md:text-sm! lg:text-base! rounded-2xl shadow-[0_10px_20px_rgba(239,68,68,0.3)] hover:-translate-y-1 transition-all"
         (click)="confirmEnd($event)"
-      ></button>
+      >
+        إنهاء
+      </button>
     }
   </div>
 </section>

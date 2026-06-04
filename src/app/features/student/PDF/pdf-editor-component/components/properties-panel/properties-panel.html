@@ -1,0 +1,139 @@
+<aside class="properties-panel" [class.collapsed]="!isOpen()" role="complementary" aria-label="الخصائص">
+  <!-- Panel Header -->
+  <div class="panel-header">
+    <button class="panel-toggle" (click)="onToggle()" [title]="isOpen() ? 'إخفاء' : 'إظهار'" aria-label="تبديل لوحة الخصائص">
+      <i class="pi" [class.pi-sliders-h]="!isOpen()" [class.pi-times]="isOpen()"></i>
+    </button>
+    @if (isOpen()) {
+      <span class="panel-title">الخصائص</span>
+    }
+  </div>
+
+  @if (isOpen()) {
+    <div class="panel-content">
+      <!-- Text Formatting Section -->
+      @if (hasSelection()) {
+        <section class="prop-section">
+          <h4 class="section-label">تنسيق النص</h4>
+
+          <!-- Font Family -->
+          <div class="prop-row">
+            <select
+              class="prop-select"
+              [ngModel]="currentProps().fontFamily"
+              (ngModelChange)="onFontFamilyChange($event)"
+              aria-label="نوع الخط"
+            >
+              @for (font of fontFamilies; track font) {
+                <option [value]="font">{{ font }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Text content if selection is text -->
+          @if (selectedAnnotation()?.type === 'text') {
+            <div class="prop-row">
+              <textarea
+                class="prop-select"
+                style="height: auto; resize: vertical; min-height: 60px; line-height: 1.4;"
+                [ngModel]="selectedAnnotation()?.content"
+                (ngModelChange)="onTextChange($event)"
+                placeholder="محتوى النص..."
+                rows="3"
+                aria-label="محتوى النص"
+              ></textarea>
+            </div>
+          }
+
+          <!-- Font Size + Bold -->
+          <div class="prop-row inline">
+            <button
+              class="prop-btn"
+              [class.active]="currentProps().fontWeight === '700'"
+              (click)="toggleBold()"
+              title="عريض"
+              aria-label="عريض"
+            >
+              Bold
+            </button>
+            <select
+              class="prop-select size-select"
+              [ngModel]="currentProps().fontSize"
+              (ngModelChange)="onFontSizeChange($event)"
+              aria-label="حجم الخط"
+            >
+              @for (size of fontSizes; track size) {
+                <option [value]="size">{{ size }}</option>
+              }
+            </select>
+            <span class="size-unit">pt</span>
+          </div>
+
+          <!-- Text Alignment -->
+          <div class="prop-row alignment-row">
+            <button class="align-btn" [class.active]="currentProps().textAlign === 'right'" (click)="onAlignChange('right')" title="محاذاة لليمين" aria-label="محاذاة لليمين">
+              <i class="pi pi-align-right"></i>
+            </button>
+            <button class="align-btn" [class.active]="currentProps().textAlign === 'center'" (click)="onAlignChange('center')" title="توسيط" aria-label="توسيط">
+              <i class="pi pi-align-center"></i>
+            </button>
+            <button class="align-btn" [class.active]="currentProps().textAlign === 'left'" (click)="onAlignChange('left')" title="محاذاة ليسار" aria-label="محاذاة لليسار">
+              <i class="pi pi-align-left"></i>
+            </button>
+            <button class="align-btn" title="ضبط" aria-label="ضبط">
+              <i class="pi pi-align-justify"></i>
+            </button>
+          </div>
+        </section>
+
+        <!-- Color Section -->
+        <section class="prop-section">
+          <h4 class="section-label">اللون</h4>
+          <div class="prop-row color-row">
+            <div 
+              class="color-swatch" 
+              [style.background]="currentProps().color"
+              (click)="colorInput.click()"
+              title="تغيير اللون"
+            ></div>
+            <input
+              #colorInput
+              type="color"
+              class="color-input"
+              [ngModel]="currentProps().color"
+              (ngModelChange)="onColorChange($event)"
+              aria-label="لون النص"
+            />
+            <span class="color-hex">{{ currentProps().color }}</span>
+          </div>
+        </section>
+      }
+
+      <!-- Layers Section -->
+      <section class="prop-section">
+        <h4 class="section-label">ترتيب الطبقات</h4>
+        <div class="prop-row layers-row">
+          <button class="layer-btn" (click)="moveBackward()" title="إلى الخلف" aria-label="نقل للخلف">
+            <i class="pi pi-arrow-down"></i>
+            <span>إلى الخلف</span>
+          </button>
+          <button class="layer-btn" (click)="moveForward()" title="إلى الأمام" aria-label="نقل للأمام">
+            <i class="pi pi-arrow-up"></i>
+            <span>إلى الأمام</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Page Info Section -->
+      <section class="prop-section page-info">
+        <h4 class="section-label">معلومات الصفحة</h4>
+        <div class="info-grid">
+          <span class="info-label">الحجم:</span>
+          <span class="info-value">A4 (210 × 297 mm)</span>
+          <span class="info-label">الطبقات:</span>
+          <span class="info-value">12 كائن</span>
+        </div>
+      </section>
+    </div>
+  }
+</aside>

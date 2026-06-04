@@ -13,6 +13,8 @@ import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { KeyboardNavigation } from '../../../../shared/Directives/keyboard-navigation';
+import { QuestionsDto2 } from '../../../../core/api/clients';
+import { QuestionEsayCarde } from '../../../../shared/Components/question-esay-carde/question-esay-carde';
 
 @Component({
   selector: 'app-get-all-questions',
@@ -26,6 +28,7 @@ import { KeyboardNavigation } from '../../../../shared/Directives/keyboard-navig
     SelectButtonModule,
     FormsModule,
     KeyboardNavigation,
+    QuestionEsayCarde
   ],
   providers: [ConfirmationService],
   templateUrl: './get-all-questions.html',
@@ -50,7 +53,7 @@ export class GetAllQuestions implements OnInit, OnDestroy {
   // 2. حساب الـ Index بناءً على الـ ID الموجود في الرابط
   currentIndex = computed(() => {
     const id = this.questionIdFromUrl();
-    const index = this.questions().findIndex((q: any) => q.id === id);
+    const index = this.questions().findIndex((q: QuestionsDto2) => q.id === id);
     // إذا لم يجد السؤال (مثلاً عند أول تحميل)، نرجع 0
     return index !== -1 ? index : 0;
   });

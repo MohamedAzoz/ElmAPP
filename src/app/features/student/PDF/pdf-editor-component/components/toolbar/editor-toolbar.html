@@ -1,0 +1,14 @@
+<div class="floating-toolbar" role="toolbar" aria-label="أدوات التحرير">
+  @for (tool of tools; track tool.tool) {
+    <button
+      class="toolbar-btn"
+      [class.active]="activeTool() === tool.tool"
+      [title]="tool.tooltip"
+      [attr.aria-label]="tool.tooltip"
+      [attr.aria-pressed]="activeTool() === tool.tool"
+      (click)="onToolClick(tool.tool)"
+    >
+      <i [class]="tool.icon"></i>
+    </button>
+  }
+</div>

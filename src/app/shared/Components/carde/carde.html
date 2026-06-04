@@ -1,49 +1,216 @@
-<div class="h-full drop-shadow-xl drop-shadow-sky-500/20 hover:drop-shadow-sky-500/40">
-  <a
-    [routerLink]="[url]"
-    class="group block h-full focus:outline-none focus:ring-2 focus:ring-main rounded-3xl transition-all"
-    [aria-label]="'الانتقال إلى ' + name"
-  >
-    <p-card
-      class="h-full border-0 overflow-hidden rounded-3xl transition-all duration-500 transform group-hover:-translate-y-3 relative"
+@if (cardType() === 'default') {
+  <div class="h-full drop-shadow-xl drop-shadow-sky-500/20 hover:drop-shadow-sky-500/40">
+    <a
+      [routerLink]="[url]"
+      class="group block h-full focus:outline-none focus:ring-2 focus:ring-main rounded-3xl transition-all"
+      [aria-label]="'الانتقال إلى ' + name"
     >
-      <div
-        class="absolute top-0 left-0 right-0 h-32 bg-linear-to-b from-primary-500/60 via-primary-500/60 to-primary-500/60 opacity-60"
+      <p-card
+        class="h-full border-0 overflow-hidden rounded-3xl transition-all duration-500 transform group-hover:-translate-y-3 relative"
       >
         <div
-          class="absolute -top-10 -left-10 w-32 h-32 bg-main/60 rounded-full blur-3xl group-hover:bg-main/30 transition-colors"
-        ></div>
-        <div
-          class="absolute top-5 right-5 w-12 h-12 bg-main/60 rounded-full blur-xl animate-pulse"
-        ></div>
-      </div>
-
-      <ng-template #content>
-        <div class="relative z-10 flex flex-col items-center justify-center pt-10 pb-6 px-4">
+          class="absolute top-0 left-0 right-0 h-32 bg-linear-to-b from-primary-500/60 via-primary-500/60 to-primary-500/60 opacity-60"
+        >
           <div
-            class="mb-8 w-20 h-20 rounded-2xl bg-white shadow-[0_8px_20px_rgba(0,0,0,0.04)] border border-main/70 flex items-center justify-center text-main transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500"
-          >
-            <i class="pi pi-box opacity-80 group-hover:opacity-100"></i>
-          </div>
-
-          <h3
-            class="text-2xl md:text-3xl font-extrabold text-text-dark group-hover:text-main text-center transition-colors duration-300 tracking-tight"
-          >
-            {{ name }}
-          </h3>
-          <div class="mt-10 flex items-center gap-1">
-            <span class="h-1.5 w-1.5 rounded-full bg-main/20"></span>
-            <div
-              class="h-1 w-12 bg-linear-to-r from-main/20 via-main to-main/20 group-hover:w-20 transition-all duration-500 rounded-full shadow-sm"
-            ></div>
-            <span class="h-1.5 w-1.5 rounded-full bg-main/20"></span>
-          </div>
+            class="absolute -top-10 -left-10 w-32 h-32 bg-main/60 rounded-full blur-3xl group-hover:bg-main/30 transition-colors"
+          ></div>
+          <div
+            class="absolute top-5 right-5 w-12 h-12 bg-main/60 rounded-full blur-xl animate-pulse"
+          ></div>
         </div>
-      </ng-template>
 
+        <ng-template #content>
+          <div class="relative z-10 flex flex-col items-center justify-center pt-10 pb-6 px-4">
+            <div
+              class="mb-8 w-20 h-20 rounded-2xl bg-white shadow-[0_8px_20px_rgba(0,0,0,0.04)] border border-main/70 flex items-center justify-center text-main transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500"
+            >
+              <i class="pi pi-box opacity-80 group-hover:opacity-100"></i>
+            </div>
+
+            <h3
+              class="text-2xl md:text-3xl font-extrabold text-text-dark group-hover:text-main text-center transition-colors duration-300 tracking-tight"
+            >
+              {{ name }}
+            </h3>
+            <div class="mt-10 flex items-center gap-1">
+              <span class="h-1.5 w-1.5 rounded-full bg-main/20"></span>
+              <div
+                class="h-1 w-12 bg-linear-to-r from-main/20 via-main to-main/20 group-hover:w-20 transition-all duration-500 rounded-full shadow-sm"
+              ></div>
+              <span class="h-1.5 w-1.5 rounded-full bg-main/20"></span>
+            </div>
+          </div>
+        </ng-template>
+
+        <div
+          class="absolute bottom-0 left-0 right-0 h-1 bg-linear-to-r from-transparent via-main to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"
+        ></div>
+      </p-card>
+    </a>
+  </div>
+} @else if (cardType() === 'department') {
+  <!-- New Department Card Design -->
+  <div
+    class="h-full bg-white dark:bg-surface rounded-3xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_30px_rgba(37,99,235,0.08)] transition-all duration-500 flex flex-col justify-between group transform hover:-translate-y-2"
+  >
+    <!-- Top half with gradient -->
+    <div
+      class="relative h-28 bg-linear-to-b from-main/10 via-main/5 to-transparent flex items-center justify-center"
+    >
+      <div class="absolute -top-10 -left-10 w-24 h-24 bg-main/5 rounded-full blur-2xl"></div>
+      <!-- Centered Icon Box -->
       <div
-        class="absolute bottom-0 left-0 right-0 h-1 bg-linear-to-r from-transparent via-main to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"
-      ></div>
-    </p-card>
-  </a>
-</div>
+        class="absolute top-14 w-16 h-16 rounded-2xl bg-white dark:bg-surface shadow-[0_4px_12px_rgba(0,0,0,0.05)] border border-gray-100 dark:border-gray-800 flex items-center justify-center text-main transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500"
+      >
+        <i class="pi pi-box text-2xl opacity-80 group-hover:opacity-100"></i>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="pt-8 pb-6 px-6 text-center grow">
+      <h3
+        class="text-xl font-extrabold text-text-dark group-hover:text-main transition-colors duration-300"
+      >
+        {{ name }}
+      </h3>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="px-6 pb-6 pt-2 flex gap-3">
+      <a
+        [routerLink]="[data().id, 'curriulums']"
+        class="flex-1 py-2.5 px-4 text-center rounded-xl bg-main hover:bg-main-hover text-white text-sm font-semibold transition-all shadow-md shadow-blue-500/10 hover:shadow-lg hover:shadow-blue-500/20 transform hover:-translate-y-0.5"
+      >
+        عرض المواد
+      </a>
+      <a
+        [routerLink]="[data().id, 'sections']"
+        class="flex-1 py-2.5 px-4 text-center rounded-xl bg-white dark:bg-surface border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 text-text-main text-sm font-semibold transition-all transform hover:-translate-y-0.5"
+      >
+        السكاشن
+      </a>
+    </div>
+  </div>
+} @else if (cardType() === 'curriculum') {
+  <!-- New Curriculum Card Design -->
+  <div
+    class="h-full bg-white dark:bg-surface rounded-3xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_30px_rgba(37,99,235,0.08)] transition-all duration-500 flex flex-col justify-between group transform hover:-translate-y-2"
+  >
+    <!-- Top half with gradient -->
+    <div
+      class="relative h-28 bg-linear-to-b from-main/10 via-main/5 to-transparent flex items-center justify-center"
+    >
+      <div class="absolute -top-10 -left-10 w-24 h-24 bg-main/5 rounded-full blur-2xl"></div>
+      <!-- Centered Icon Box -->
+      <div
+        class="absolute top-14 w-16 h-16 rounded-2xl bg-white dark:bg-surface shadow-[0_4px_12px_rgba(0,0,0,0.05)] border border-gray-100 dark:border-gray-800 flex items-center justify-center text-main transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500"
+      >
+        <i class="pi pi-box text-2xl opacity-80 group-hover:opacity-100"></i>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="pt-8 pb-4 px-6 text-center grow">
+      <h3
+        class="text-lg md:text-xl font-extrabold text-text-dark group-hover:text-main transition-colors duration-300 leading-snug"
+      >
+        {{ name }}
+      </h3>
+    </div>
+
+    <!-- 2x2 Action Buttons Grid -->
+    <div class="px-4 pb-6 pt-2 grid grid-cols-2 gap-2 md:gap-3">
+      <a
+        [routerLink]="[data().id, 'F']"
+        class="py-2.5 px-2 text-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all hover:scale-[1.03] shadow-md shadow-blue-600/10 flex items-center justify-center gap-1.5"
+        title="ملخصات المادة"
+      >
+        <i class="pi pi-file-pdf"></i>
+        <span class="hidden sm:inline">ملخصات المادة</span>
+      </a>
+      <a
+        [routerLink]="[data().id, 'QB']"
+        class="py-2.5 px-2 text-center rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all hover:scale-[1.03] shadow-md shadow-red-600/10 flex items-center justify-center gap-1.5"
+        title="بنوك الأسئلة"
+      >
+        <i class="pi pi-database"></i>
+        <span class="hidden sm:inline">بنوك الأسئلة</span>
+      </a>
+      <a
+        [routerLink]="[data().id, 'T']"
+        class="py-2.5 px-2 text-center rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition-all hover:scale-[1.03] shadow-md shadow-amber-500/10 flex items-center justify-center gap-1.5"
+        title="عمل اختبار"
+      >
+        <i class="pi pi-stopwatch"></i>
+        <span class="hidden sm:inline">عمل اختبار</span>
+      </a>
+      <a
+        [routerLink]="[data().id, 'V']"
+        class="py-2.5 px-2 text-center rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all hover:scale-[1.03] shadow-md shadow-emerald-600/10 flex items-center justify-center gap-1.5"
+        title="فيديوهات الشرح"
+      >
+        <i class="pi pi-video"></i>
+        <span class="hidden sm:inline">فيديوهات الشرح</span>
+      </a>
+    </div>
+  </div>
+} @else if (cardType() === 'section') {
+  <!-- New Section Card Design -->
+  <div
+    class="h-full bg-white dark:bg-surface rounded-3xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_30px_rgba(37,99,235,0.08)] transition-all duration-500 flex flex-col justify-between group transform hover:-translate-y-2"
+  >
+    <!-- Top half with gradient -->
+    <div
+      class="relative h-28 bg-linear-to-b from-main/10 via-main/5 to-transparent flex items-center justify-center"
+    >
+      <div class="absolute -top-10 -left-10 w-24 h-24 bg-main/5 rounded-full blur-2xl"></div>
+      <!-- Centered Icon Box -->
+      <div
+        class="absolute top-14 w-16 h-16 rounded-2xl bg-white dark:bg-surface shadow-[0_4px_12px_rgba(0,0,0,0.05)] border border-gray-100 dark:border-gray-800 flex items-center justify-center text-main transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500"
+      >
+        <i [class]="icon() + ' text-2xl opacity-80 group-hover:opacity-100'"></i>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="pt-8 pb-4 px-6 text-center grow">
+      <h3
+        class="text-lg md:text-xl font-extrabold text-text-dark group-hover:text-main transition-colors duration-300 leading-snug"
+      >
+        {{ name }}
+      </h3>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="px-4 pb-6 pt-2 flex flex-col gap-3">
+      <!-- 2 Columns for first two buttons -->
+      <div class="grid grid-cols-2 gap-2 md:gap-3">
+        <a
+          [routerLink]="[curriculumId() || data().id, 'F']"
+          class="py-2.5 px-2 text-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all hover:scale-[1.03] shadow-md shadow-blue-600/10 flex items-center justify-center gap-1.5"
+          title="ملخص السكشن"
+        >
+          <i class="pi pi-file-pdf"></i>
+          <span class="hidden sm:inline">ملخص السكشن</span>
+        </a>
+        <a
+          [routerLink]="[curriculumId() || data().id || '', 'V']"
+          class="py-2.5 px-2 text-center rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all hover:scale-[1.03] shadow-md shadow-indigo-600/10 flex items-center justify-center gap-1.5"
+          title="فيديوهات السكشن"
+        >
+          <i class="pi pi-video"></i>
+          <span class="hidden sm:inline">فيديوهات السكشن</span>
+        </a>
+      </div>
+      <!-- Centered bottom button -->
+      <a
+        [routerLink]="[data().id, 'code-playground']"
+        class="py-2.5 px-6 text-center rounded-xl bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold transition-all hover:scale-[1.03] shadow-md shadow-purple-700/10 flex items-center justify-center gap-1.5 w-max mx-auto"
+        title="الكومبيلر والأكواد"
+      >
+        <i class="pi pi-code"></i>
+        <span class="hidden sm:inline">الكومبيلر والأكواد</span>
+      </a>
+    </div>
+  </div>
+}

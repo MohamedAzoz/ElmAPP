@@ -1,84 +1,99 @@
 import {
-  Component,
-  Input,
-  Output,
-  EventEmitter,
-  OnChanges,
-  SimpleChanges,
-  input,
-  output,
   ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// نضيف الواجهات الجديدة لضمان التوافق (اختياري لكن مفضل)
-import { QuestionsDto2 } from '../../../core/api/clients';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { OptionsDto2, QuestionsDto2 } from '../../../core/api/clients';
 
 @Component({
   selector: 'app-question-carde',
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './question-carde.html',
-  styleUrl: './question-carde.css',
+  styleUrls: ['./question-carde.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QuestionCarde implements OnChanges {
-  // نقبل النوعين (سؤال بنك أو سؤال اختبار)
-  // change to input type , output type guard from core and من نفس الملف  الى فية ال signal
-  // question = input.required<QuestionsDto2>();
-  // savedAnswerId = input<number | undefined>();
-  // isTestMode = input<boolean>(false);
-  // answerSelect = output<any>();
-  @Input() index!: number;
+  @Input() index?: number;
   @Input({ required: true }) question!: QuestionsDto2;
-  @Input() savedAnswerId: number | undefined;
-  @Input() isTestMode: boolean = false;
-  @Output() answerSelect = new EventEmitter<any>();
+  @Input() savedAnswerId?: number;
+  @Input() isTestMode = false;
+  @Output() answerSelect = new EventEmitter<number>();
 
   selectedOptionId: number | null = null;
+  safeImageUrl: SafeResourceUrl | null = null;
+  optionLabels = ['A', 'B', 'C', 'D'];
+  private sanitizer = inject(DomSanitizer);
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['savedAnswerId']) {
-      this.selectedOptionId = this.savedAnswerId || null;
+      this.selectedOptionId = this.savedAnswerId ?? null;
     }
-    if (changes['question'] && !this.savedAnswerId) {
-      this.selectedOptionId = null;
+
+    if (changes['question']) {
+      this.safeImageUrl = this.createSafeUrl(this.question.imageUrl);
+      if (!this.savedAnswerId) {
+        this.selectedOptionId = null;
+      }
     }
   }
 
-  select(option: any) {
-    // في حالة الاختبار (Test Mode)، نسمح بتغيير الإجابة، لذا لا نوقف الدالة إذا كان مختاراً
-    this.selectedOptionId = option.id!;
-    this.answerSelect.emit(option.id!);
+  private createSafeUrl(url?: string | null): SafeResourceUrl | null {
+    if (!url) {
+      return null;
+    }
+
+    const trimmed = url.trim();
+
+    // all link only get from google drive
+    const isAllowed =
+      trimmed.startsWith('http://') ||
+      trimmed.startsWith('https://') ||
+      trimmed.startsWith('data:image/') ||
+      trimmed.startsWith('blob:');
+
+    return isAllowed ? this.sanitizer.bypassSecurityTrustResourceUrl(trimmed) : null;
   }
 
-  getOptionClass(option: any): string {
-    // 1. الحالة الافتراضية: لم يتم اختيار شيء
-    if (!this.selectedOptionId)
-      return 'bg-white border-gray-200 text-gray-700 hover:border-indigo-400';
+  select(option: OptionsDto2): void {
+    if (!option?.id) {
+      return;
+    }
+
+    this.selectedOptionId = option.id;
+    this.answerSelect.emit(option.id);
+  }
+
+  trackByOption(_index: number, option: OptionsDto2): number | undefined {
+    return option.id;
+  }
+
+  getOptionClass(option: OptionsDto2): string {
+    if (this.selectedOptionId === null) {
+      return 'option-card option-default';
+    }
 
     const isSelected = option.id === this.selectedOptionId;
 
-    // --- منطق الاختبار (Test Mode) ---
-    // إذا لم تكن خاصية isCorrect موجودة، فهذا يعني أننا في وضع "اختبار" وليس "بنك أسئلة"
-    // وبالتالي نريد تلوين الاختيار بالأزرق فقط دون إظهار صح/خطأ
     if (this.isTestMode) {
-      if (isSelected) {
-        return 'bg-blue-50 border-blue-500 text-blue-700 font-semibold shadow-sm'; // لون أزرق للاختيار
-      }
-      return 'bg-white border-gray-200 text-gray-700 opacity-100'; // باقي الخيارات تبقى عادية
+      return isSelected ? 'option-card option-selected' : 'option-card option-passive';
     }
 
-    // --- منطق بنك الأسئلة (Training Mode - القديم) ---
-    // هنا isCorrect موجودة (true/false)
-    if (isSelected && !this.isTestMode) {
-      return option.isCorrect
-        ? 'bg-green-100 border-green-500 text-green-800 font-bold'
-        : 'bg-red-100 border-red-500 text-red-800';
+    if (isSelected) {
+      return option.isCorrect ? 'option-card option-correct' : 'option-card option-wrong';
     }
 
-    if (option.isCorrect && this.selectedOptionId !== null && !this.isTestMode) {
-      return 'bg-green-50 border-green-300 text-green-700';
+    if (option.isCorrect && this.selectedOptionId !== null) {
+      return 'option-card option-correct-fade';
     }
 
-    return 'bg-gray-50 border-gray-200 text-gray-400 opacity-70';
+    return 'option-card option-passive';
   }
 }

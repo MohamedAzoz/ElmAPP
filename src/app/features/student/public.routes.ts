@@ -28,6 +28,43 @@ export const publicRoutes: Routes = [
                 loadComponent: () => import('./Year/home-year/home-year').then((m) => m.HomeYear),
               },
               {
+                path: ':departmentId/sections',
+                children: [
+                  {
+                    path: '',
+                    title: 'السكاشن',
+                    loadComponent: () =>
+                      import('./Sections/get-all-sections/get-all-sections').then(
+                        (m) => m.GetAllSections,
+                      ),
+                  },
+                  {
+                    path: ':sectionId/code-playground',
+                    title: 'تتبع الكود البرمجي والتجارب العملية',
+                    loadComponent: () =>
+                      import('./Sections/code-playground/code-playground').then(
+                        (m) => m.CodePlayground,
+                      ),
+                  },
+                  {
+                    path: ':curriculumId/F',
+                    title: 'الملخصات',
+                    loadComponent: () =>
+                      import('./Files/get-all-files/get-all-files').then(
+                        (m) => m.GetAllFiles,
+                      ),
+                  },
+                  {
+                    path: ':curriculumId/V',
+                    title: 'فيديوهات الشرح',
+                    loadComponent: () =>
+                      import('./Videos/get-all-videos/get-all-videos').then(
+                        (m) => m.GetAllVideos,
+                      ),
+                  },
+                ],
+              },
+              {
                 path: ':departmentId/curriulums',
                 children: [
                   {
@@ -43,17 +80,22 @@ export const publicRoutes: Routes = [
                     children: [
                       {
                         path: '',
-                        title: 'المصادر',
-                        loadComponent: () =>
-                          import('./Curriulums/home-curriulum/home-curriulum').then(
-                            (m) => m.HomeCurriulum,
-                          ),
+                        redirectTo: 'F',
+                        pathMatch: 'full',
                       },
                       {
                         path: 'F',
                         title: 'الملخصات',
                         loadComponent: () =>
                           import('./Files/get-all-files/get-all-files').then((m) => m.GetAllFiles),
+                      },
+                      {
+                        path: 'V',
+                        title: 'فيديوهات الشرح',
+                        loadComponent: () =>
+                          import('./Videos/get-all-videos/get-all-videos').then(
+                            (m) => m.GetAllVideos,
+                          ),
                       },
                       {
                         path: 'C',
@@ -117,5 +159,11 @@ export const publicRoutes: Routes = [
         ],
       },
     ],
+  },
+  // PdfEditorComponent
+  {
+    title: 'محرر الملفات',
+    path: 'pdf-editor',
+    loadComponent: () => import('./PDF/pdf-editor-component/pdf-editor-component').then((m) => m.PdfEditorComponent),
   },
 ];

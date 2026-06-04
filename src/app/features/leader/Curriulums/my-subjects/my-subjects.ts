@@ -17,6 +17,6 @@ export class MySubjects implements OnInit {
   curriulums = this.curriulumFacade.curriulums;
 
   ngOnInit() {
-    this.curriulumFacade.getCurriulumsByStudentId('1600fc10-9900-4785-82d5-bf67a9642b80');
+    this.curriulumFacade.getCurriulumsByStudentId();
   }
 }

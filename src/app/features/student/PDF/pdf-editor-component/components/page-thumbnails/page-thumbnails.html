@@ -1,0 +1,41 @@
+<aside
+  class="thumbnails-sidebar"
+  [class.collapsed]="isCollapsed()"
+  role="navigation"
+  aria-label="صفحات المستند"
+>
+  <!-- Toggle Button -->
+  <button
+    class="toggle-btn"
+    (click)="onToggle()"
+    [title]="isCollapsed() ? 'إظهار الصفحات' : 'إخفاء الصفحات'"
+    aria-label="تبديل عرض الصفحات"
+  >
+    <i class="pi" [class.pi-angle-left]="!isCollapsed()" [class.pi-angle-right]="isCollapsed()"></i>
+  </button>
+
+  @if (!isCollapsed()) {
+    <div class="thumbnails-list" role="list">
+      @for (page of pages; track page) {
+        <button
+          class="thumbnail-card"
+          [class.active]="currentPage() === page"
+          (click)="onPageClick(page)"
+          role="listitem"
+          [attr.aria-label]="'صفحة ' + page"
+          [attr.aria-current]="currentPage() === page ? 'page' : null"
+        >
+          <div class="thumbnail-preview">
+            <span class="page-placeholder-number">{{ page }}</span>
+          </div>
+          <span class="thumbnail-label">{{ page }}</span>
+        </button>
+      }
+
+      <!-- Add Page Button -->
+      <button class="add-page-btn" (click)="onAddPageClick()" aria-label="إضافة صفحة" title="إضافة صفحة فارغة">
+        <i class="pi pi-plus"></i>
+      </button>
+    </div>
+  }
+</aside>

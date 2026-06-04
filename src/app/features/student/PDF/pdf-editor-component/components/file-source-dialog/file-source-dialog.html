@@ -1,0 +1,142 @@
+@if (isOpen()) {
+  <!-- Overlay -->
+  <div class="dialog-overlay" (click)="close()" role="presentation"></div>
+
+  <!-- Dialog -->
+  <div class="dialog-container" role="dialog" [attr.aria-label]="isExportMode() ? 'تصدير الملف' : 'فتح ملف'">
+    <!-- Header -->
+    <div class="dialog-header">
+      @if (mode() === 'drive-browse') {
+        <button class="back-btn" (click)="goBack()" aria-label="رجوع">
+          <i class="pi pi-arrow-right"></i>
+        </button>
+      }
+      <h3 class="dialog-title">
+        @if (isExportMode()) {
+          تصدير المستند
+        } @else {
+          فتح ملف PDF
+        }
+      </h3>
+      <button class="close-btn" (click)="close()" aria-label="إغلاق">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <!-- Choose Source Mode -->
+    @if (mode() === 'choose') {
+      <div class="source-options">
+        <!-- Local File Option -->
+        <button class="source-card" (click)="onLocalSelected()">
+          <div class="source-icon local-icon">
+            <i class="pi pi-folder-open"></i>
+          </div>
+          <div class="source-info">
+            <span class="source-name">
+              @if (isExportMode()) {
+                حفظ في الجهاز
+              } @else {
+                الجهاز المحلي
+              }
+            </span>
+            <span class="source-desc">
+              @if (isExportMode()) {
+                تحميل الملف مباشرة لجهازك
+              } @else {
+                اختر ملف PDF من جهازك
+              }
+            </span>
+          </div>
+          <i class="pi pi-chevron-left source-arrow"></i>
+        </button>
+
+        <!-- Google Drive Option -->
+        <button class="source-card" (click)="isDriveSignedIn ? browseDriveFiles() : connectDrive()">
+          <div class="source-icon drive-icon">
+            <i class="pi pi-google"></i>
+          </div>
+          <div class="source-info">
+            <span class="source-name">Google Drive</span>
+            <span class="source-desc">
+              @if (isExportMode()) {
+                رفع الملف إلى Google Drive
+              } @else {
+                استيراد من Google Drive
+              }
+            </span>
+          </div>
+          @if (isLoading()) {
+            <i class="pi pi-spinner pi-spin source-arrow"></i>
+          } @else {
+            <i class="pi pi-chevron-left source-arrow"></i>
+          }
+        </button>
+      </div>
+    }
+
+    <!-- Drive Browse Mode -->
+    @if (mode() === 'drive-browse') {
+      <div class="drive-browser">
+        <!-- Search -->
+        <div class="search-bar">
+          <i class="pi pi-search search-icon"></i>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="ابحث في ملفات PDF..."
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
+            aria-label="بحث في ملفات Drive"
+          />
+        </div>
+
+        <!-- Export: New file option -->
+        @if (isExportMode()) {
+          <div class="export-new-section">
+            <div class="export-name-row">
+              <input
+                type="text"
+                class="export-name-input"
+                [ngModel]="exportFileName()"
+                (ngModelChange)="exportFileName.set($event)"
+                aria-label="اسم الملف"
+              />
+            </div>
+            <button class="export-new-btn" (click)="onExportNewToDrive()">
+              <i class="pi pi-cloud-upload"></i>
+              رفع كملف جديد
+            </button>
+          </div>
+          <div class="divider-text">أو استبدل ملف موجود</div>
+        }
+
+        <!-- File List -->
+        @if (isLoading()) {
+          <div class="loading-state">
+            <i class="pi pi-spinner pi-spin"></i>
+            <span>جاري تحميل الملفات...</span>
+          </div>
+        } @else if (filteredFiles.length === 0) {
+          <div class="empty-state">
+            <i class="pi pi-file-pdf"></i>
+            <span>لا توجد ملفات PDF</span>
+          </div>
+        } @else {
+          <div class="files-list" role="list">
+            @for (file of filteredFiles; track file.id) {
+              <button class="file-item" (click)="onDriveFileSelected(file)" role="listitem">
+                <div class="file-icon">
+                  <i class="pi pi-file-pdf"></i>
+                </div>
+                <div class="file-details">
+                  <span class="file-name">{{ file.name }}</span>
+                  <span class="file-meta">{{ formatDate(file.modifiedTime) }} · {{ formatSize(file.size) }}</span>
+                </div>
+              </button>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+}

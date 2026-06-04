@@ -1,5 +1,5 @@
-import { Injectable, signal } from '@angular/core';
-import { AddQuestionsDto, QuestionPublicClient, QuestionsDto2 } from '../../../core/api/clients';
+import { inject, Injectable, signal } from '@angular/core';
+import { QuestionPublicClient, QuestionsDto2 } from '../../../core/api/clients';
 
 @Injectable({
   providedIn: 'root',
@@ -7,7 +7,7 @@ import { AddQuestionsDto, QuestionPublicClient, QuestionsDto2 } from '../../../c
 export class QuestionFacade {
   questions = signal<QuestionsDto2[]>([]);
   isLoading = signal<boolean>(false);
-  constructor(private questionPublicService: QuestionPublicClient) {}
+  private questionPublicService = inject(QuestionPublicClient);
 
   getQuestionsByBankId(bankId: number) {
     this.isLoading.set(true);

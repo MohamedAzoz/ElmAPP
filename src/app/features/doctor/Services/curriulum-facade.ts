@@ -9,11 +9,11 @@ export class CurriulumFacade {
   curriulums = signal<GetCurriculumDto[]>([]);
   isLoading = signal<boolean>(false);
 
-  getCurriulumByUserId(userId: string) {
+  getCurriulumByUserId() {
     this.isLoading.set(true);
     this.curriulums.set([]);
 
-    return this.curriulumService.byDoctorId(userId).subscribe({
+    return this.curriulumService.myCurriculum().subscribe({
       next: (res) => {
         this.curriulums.set(res.data || []);
         this.isLoading.set(false);

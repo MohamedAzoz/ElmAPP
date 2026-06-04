@@ -9,8 +9,8 @@ export class CurriulumFacade {
   curriulum = signal<GetCurriculumDto | null>(null);
   constructor(private universityPublic: CurriulumPublicClient) {}
 
-  getCurriulumsByStudentId(id: string) {
-    return this.universityPublic.byStudentId(id).subscribe({
+  getCurriulumsByStudentId() {
+    return this.universityPublic.myCurriculumForStudent().subscribe({
       next: (res) => {
         this.curriulums.set(res.data || []);
       },

@@ -1,0 +1,174 @@
+<section class="max-w-full mx-auto px-1 pb-4 sm:pb-8" dir="rtl">
+  <!-- Header Bar -->
+  <div class="px-3 py-2 sticky top-0 z-50 bg-white border-b border-gray-100 flex justify-between items-start sm:items-center gap-4 mb-3 sm:mb-6 pb-3">
+    <div class="flex flex-col">
+      <span class="text-sm lg:text-lg font-semibold text-primary-600 tracking-wider uppercase mb-1">منصة علم</span>
+      <h1 class="text-xs sm:text-base md:text-lg lg:text-xl font-semibold text-text-dark">
+        {{ isSection() ? 'السكاشن العملية والفيديوهات' : 'المحاضرات وفيديوهات الشرح' }}
+      </h1>
+    </div>
+    
+    <button (click)="goBack()" 
+            class="flex items-center gap-2 py-2.5 px-5 rounded-xl border border-primary-200 bg-white hover:bg-gray-50 text-primary-600 text-sm font-semibold transition-all hover:scale-[1.02] shadow-xs cursor-pointer">
+            <span class="hidden sm:block">رجوع للرئيسية</span>
+      <i class="pi pi-arrow-left"></i>
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <!-- Loader Skeleton View -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div class="lg:col-span-1 flex flex-col gap-4">
+        <p-skeleton width="100%" height="40px" borderRadius="12px"></p-skeleton>
+        @for (i of [1, 2, 3, 4]; track i) {
+          <p-skeleton width="100%" height="80px" borderRadius="16px"></p-skeleton>
+        }
+      </div>
+      <div class="lg:col-span-3 flex flex-col gap-4">
+        <p-skeleton width="100%" height="400px" borderRadius="24px"></p-skeleton>
+        <p-skeleton width="60%" height="30px" borderRadius="8px"></p-skeleton>
+        <p-skeleton width="90%" height="60px" borderRadius="8px"></p-skeleton>
+      </div>
+    </div>
+  } @else {
+    @if (videos().length > 0) {
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 m-5" dir="ltr">
+        <!-- Sidebar Playlist -->
+        <div class="lg:col-span-1 flex flex-col gap-4 order-2 lg:order-1 px-2 sm:px-0">
+          <div class="bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col gap-3">
+            <div class="flex items-center justify-between border-b border-gray-200/60 pb-2.5">
+              <h3 class="text-sm font-bold text-gray-700 flex items-center gap-2">
+                <i class="pi pi-list"></i>
+                <span>قائمة الشروحات المتاحة</span>
+              </h3>
+              <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                {{ videos().length }}
+              </span>
+            </div>
+            
+            <div class="flex flex-col gap-3 max-h-[600px] overflow-y-auto pr-1 video-scroll">
+              @for (video of videos(); track video.id) {
+                <div class="flex gap-3 p-2.5 rounded-xl border transition-all cursor-pointer items-center group relative overflow-hidden"
+                     [class]="selectedVideo()?.id === video.id ? 'border-indigo-500 bg-indigo-50/20 shadow-xs' : 'border-gray-100 bg-white hover:bg-gray-50/80'"
+                     (click)="selectVideo(video)">
+                  
+                  <!-- Thumbnail card structure matching mockup -->
+                  <div class="relative w-24 h-16 rounded-lg overflow-hidden flex flex-col border border-gray-100 shrink-0">
+                    <div class="h-1/2 bg-blue-100/70"></div>
+                    <div class="h-1/2 bg-white"></div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                      <div class="w-6.5 h-6.5 rounded-md bg-white/95 shadow-xs border border-gray-100 flex items-center justify-center text-gray-500 transition-transform group-hover:scale-110">
+                        <i class="pi pi-video text-xs"></i>
+                      </div>
+                    </div>
+                    <!-- Duration badge -->
+                    <span class="absolute bottom-1 left-1 px-1 py-0.2 text-[8px] font-bold bg-black/70 text-white rounded tracking-wide">
+                      15:30
+                    </span>
+                  </div>
+                  
+                  <!-- Text info -->
+                  <div class="flex-1 min-w-0 text-right">
+                    <h4 class="text-xs font-bold text-gray-800 leading-snug line-clamp-2 transition-colors group-hover:text-indigo-600"
+                        [class]="selectedVideo()?.id === video.id ? 'text-indigo-600 font-extrabold' : ''">
+                      {{ video.title }}
+                    </h4>
+                    <span class="text-[9px] text-gray-400 mt-1 block">محاضرة تعليمية</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Video Player Main View -->
+        <div class="lg:col-span-3 order-1 lg:order-2">
+          <div class="bg-white rounded-2xl sm:rounded-3xl border border-gray-100 p-2 sm:p-5 shadow-xs flex flex-col gap-4 sm:gap-5">
+            <!-- Video Container -->
+            <div id="player-container" class="relative w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-gray-950 shadow-md group">
+              @if (safeUrl()) {
+                <iframe
+                  id="video-player-iframe"
+                  [src]="safeUrl()!"
+                  class="w-full h-full border-0"
+                  allowfullscreen
+                  allow="autoplay; encrypted-media; gyroscope; picture-in-picture"
+                ></iframe>
+              } @else {
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 text-gray-400">
+                  <div class="w-16 h-16 rounded-full bg-gray-900 flex items-center justify-center mb-4 text-gray-600 border border-gray-800 animate-pulse">
+                    <i class="pi pi-video text-2xl"></i>
+                  </div>
+                  <p class="text-sm font-medium">مشاهدة الفيديو: اختر فيديو للبدء</p>
+                </div>
+              }
+            </div>
+
+            <!-- Custom Controls -->
+            @if (selectedVideo()) {
+              <div class="flex flex-wrap items-center justify-between gap-4 p-3 bg-gray-50 border border-gray-100/80 rounded-2xl">
+                <div class="flex items-center gap-3">
+                  @if (isYouTube()) {
+                    <button (click)="isPlaying() ? pauseVideo() : playVideo()" 
+                            class="w-10 h-10 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center transition-all hover:scale-105 active:scale-95 shadow-md shadow-indigo-600/10 cursor-pointer"
+                            [title]="isPlaying() ? 'إيقاف مؤقت' : 'تشغيل'">
+                      <i [class]="isPlaying() ? 'pi pi-pause' : 'pi pi-play'"></i>
+                    </button>
+                  }
+                  
+                  <div class="flex items-center gap-1 bg-white border border-gray-150 px-2 py-1 rounded-xl shadow-xs">
+                    <span class="text-[10px] font-bold text-gray-400 px-1">السرعة:</span>
+                    @for (speed of [0.5, 1, 1.25, 1.5, 2]; track speed) {
+                      <button (click)="setSpeed(speed)"
+                              class="px-1.5 py-0.5 rounded-lg text-[10px] font-extrabold transition-all cursor-pointer"
+                              [class]="currentSpeed() === speed ? 'bg-indigo-600 text-white' : 'text-gray-500 hover:bg-gray-100'"
+                              [disabled]="!isYouTube()">
+                        {{ speed }}x
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <button (click)="toggleFullscreen()" 
+                          class="flex items-center gap-1.5 py-2 px-3.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs font-bold transition-all cursor-pointer"
+                          title="ملء الشاشة">
+                    <i [class]="isFullscreen() ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"></i>
+                    <span>{{ isFullscreen() ? 'شاشة عادية' : 'ملء الشاشة' }}</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Explanation Alert for Drive -->
+              @if (!isYouTube()) {
+                <div class="p-3 bg-blue-50 border border-blue-100 rounded-xl text-blue-800 text-xs font-medium flex items-center gap-2">
+                  <i class="pi pi-info-circle"></i>
+                  <span>بالنسبة لمشغل Google Drive، يرجى استخدام عناصر التحكم داخل شاشة الفيديو للتحكم في التشغيل والسرعة.</span>
+                </div>
+              }
+
+              <!-- Video Info -->
+              <div class="flex flex-col gap-2.5 text-right">
+                <h2 class="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900 text-center leading-snug">
+                  {{ selectedVideo()?.title }}
+                </h2>
+                <!-- <p class="text-gray-500 text-xs sm:text-sm leading-relaxed max-w-4xl">
+                  استكشف الأقسام المقدمة وشرح أساسيات المنهج الدراسي وتطبيقاتها العملية. يهدف هذا الشرح لتبسيط المفاهيم المعروضة وربطها بالتجربة العملية.
+                </p> -->
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    } @else {
+      <!-- Empty State -->
+      <div class="flex flex-col items-center justify-center py-20 text-center bg-gray-50 border border-dashed border-gray-200 rounded-3xl p-6">
+        <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-4 text-gray-400 shadow-xs border border-gray-100">
+          <i class="pi pi-video text-2xl"></i>
+        </div>
+        <h3 class="text-base font-bold text-gray-800 mb-1">لا توجد فيديوهات متاحة</h3>
+        <p class="text-xs text-gray-500 max-w-sm">لم يتم رفع فيديوهات شرح لهذه المادة أو هذا السكشن بعد. يرجى مراجعة الصفحة لاحقاً.</p>
+      </div>
+    }
+  }
+</section>

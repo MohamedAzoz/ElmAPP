@@ -1,0 +1,285 @@
+<div class="editor-shell" dir="rtl">
+
+  <!-- ─── Header Bar ─── -->
+  <header class="editor-header">
+    <!-- Right Side: Brand -->
+    <div class="header-brand">
+      <span class="brand-name">Elm</span>
+      <span class="brand-label">Editor</span>
+    </div>
+
+    <!-- Center: Document Title -->
+    <div class="header-center">
+      <span class="doc-title">{{ fileName() }}</span>
+      @if (hasUnsavedChanges()) {
+        <span class="unsaved-dot" title="تغييرات غير محفوظة"></span>
+      }
+    </div>
+
+    <!-- Left Side: Actions -->
+    <div class="header-actions">
+      <!-- Save Button -->
+      <button
+        class="header-btn save-btn"
+        (click)="save()"
+        [disabled]="!isDocumentLoaded()"
+        title="حفظ"
+        aria-label="حفظ"
+      >
+        <i class="pi pi-save"></i>
+        <span class="btn-text">Save</span>
+      </button>
+
+      <!-- Export Button -->
+      <button
+        class="header-btn export-btn"
+        (click)="exportFile()"
+        [disabled]="!isDocumentLoaded()"
+        title="تصدير"
+        aria-label="تصدير"
+      >
+        <i class="pi pi-download"></i>
+        <span class="btn-text">Export</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ─── Secondary Toolbar ─── -->
+  <nav class="secondary-toolbar" role="toolbar" aria-label="أدوات التنقل">
+    <div class="toolbar-group right-group">
+      <!-- Annotate -->
+      <button 
+        class="nav-btn" 
+        [class.active]="currentMode() === 'annotate'" 
+        (click)="setMode('annotate')"
+        title="التعليقات التوضيحية"
+      >
+        <i class="pi pi-pencil"></i>
+        <span class="nav-label">Annotate</span>
+      </button>
+      <!-- View -->
+      <button 
+        class="nav-btn" 
+        [class.active]="currentMode() === 'view'" 
+        (click)="setMode('view')"
+        title="عرض"
+      >
+        <i class="pi pi-eye"></i>
+        <span class="nav-label">View</span>
+      </button>
+      <!-- Edit -->
+      <button 
+        class="nav-btn" 
+        [class.active]="currentMode() === 'edit'" 
+        (click)="setMode('edit')"
+        title="تحرير"
+      >
+        <i class="pi pi-file-edit"></i>
+        <span class="nav-label">Edit</span>
+      </button>
+      <!-- File / Open -->
+      <button class="nav-btn" (click)="openFile()" title="فتح ملف">
+        <i class="pi pi-folder-open"></i>
+        <span class="nav-label">File</span>
+      </button>
+    </div>
+
+    <div class="toolbar-group center-group">
+      <!-- Undo/Redo -->
+      <button 
+        class="icon-btn" 
+        (click)="undo()" 
+        [disabled]="undoStack.length === 0" 
+        title="تراجع" 
+        aria-label="تراجع"
+      >
+        <i class="pi pi-replay"></i>
+      </button>
+      <button 
+        class="icon-btn" 
+        (click)="redo()" 
+        [disabled]="redoStack.length === 0" 
+        title="إعادة" 
+        aria-label="إعادة"
+      >
+        <i class="pi pi-refresh"></i>
+      </button>
+
+      <div class="toolbar-divider"></div>
+
+      <!-- Zoom Controls -->
+      <button class="icon-btn" (click)="zoomOut()" title="تصغير" aria-label="تصغير">
+        <i class="pi pi-minus"></i>
+      </button>
+      <span class="zoom-value">{{ zoom() }}%</span>
+      <button class="icon-btn" (click)="zoomIn()" title="تكبير" aria-label="تكبير">
+        <i class="pi pi-plus"></i>
+      </button>
+    </div>
+
+    <div class="toolbar-group left-group">
+      <!-- Auto-Save indicator -->
+      @if (statusMessage()) {
+        <span class="status-badge">
+          <i class="pi pi-check-circle"></i>
+          {{ statusMessage() }}
+        </span>
+      } @else {
+        <span class="autosave-label">
+          <i class="pi pi-history"></i>
+          الحفظ التلقائي
+        </span>
+      }
+
+      <!-- Mobile toggle buttons -->
+      <button class="icon-btn mobile-only" (click)="toggleMobileSidebar()" title="الصفحات" aria-label="عرض الصفحات">
+        <i class="pi pi-th-large"></i>
+      </button>
+      <button class="icon-btn mobile-only" (click)="toggleMobileProps()" title="الخصائص" aria-label="عرض الخصائص">
+        <i class="pi pi-sliders-h"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ─── Main Editor Body ─── -->
+  <div class="editor-body">
+
+    <!-- Properties Panel (Left in RTL) -->
+    <app-properties-panel
+      class="desktop-panel"
+      [selectedAnnotation]="selectedAnnotation()"
+      [currentPage]="currentPage()"
+      [totalPages]="totalPages()"
+      [isOpen]="isPropertiesPanelOpen()"
+      (propertiesChanged)="onPropertiesChanged($event)"
+      (orderChanged)="onOrderChanged($event)"
+      (togglePanel)="togglePropertiesPanel()"
+    />
+
+    <!-- Main Canvas Area -->
+    <main class="canvas-area" role="main">
+      @if (!isDocumentLoaded()) {
+        <!-- Empty State -->
+        <div class="empty-state" (click)="openFile()">
+          <div class="empty-icon">
+            <i class="pi pi-file-pdf"></i>
+          </div>
+          <h2 class="empty-title">محرر Elm للمستندات</h2>
+          <p class="empty-desc">اسحب ملف PDF هنا أو اضغط لفتح ملف</p>
+          <div class="empty-actions">
+            <button class="empty-btn primary" (click)="openFile(); $event.stopPropagation()">
+              <i class="pi pi-folder-open"></i>
+              فتح ملف
+            </button>
+          </div>
+          <div class="empty-sources">
+            <span class="source-chip">
+              <i class="pi pi-desktop"></i>
+              الجهاز المحلي
+            </span>
+            <span class="source-chip">
+              <i class="pi pi-google"></i>
+              Google Drive
+            </span>
+          </div>
+        </div>
+      } @else {
+        <!-- PDF Viewer -->
+        <div class="pdf-canvas-area" (click)="onCanvasClick($event)">
+          <!-- Floating Toolbar -->
+          @if (currentMode() !== 'view') {
+            <app-editor-toolbar
+              [activeTool]="activeTool()"
+              (toolSelected)="onToolSelected($event)"
+            />
+          }
+
+          <!-- ngx-extended-pdf-viewer -->
+          <ngx-extended-pdf-viewer
+            [src]="pdfSrc()!"
+            [page]="currentPage()"
+            [zoom]="zoom() + '%'"
+            [showToolbar]="false"
+            [showSidebarButton]="false"
+            [showFindButton]="false"
+            [showPagingButtons]="false"
+            [showZoomButtons]="false"
+            [showPresentationModeButton]="false"
+            [showOpenFileButton]="false"
+            [showPrintButton]="false"
+            [showDownloadButton]="false"
+            [showSecondaryToolbarButton]="false"
+            [showRotateButton]="false"
+            [showHandToolButton]="false" 
+            [showSpreadButton]="false"
+            [showPropertiesButton]="false"
+            [textLayer]="true"
+            [showBorders]="false"
+            (pagesLoaded)="onPagesLoaded($event)"
+            (pageChange)="onPageChange($event)"
+          />
+        </div>
+
+        <!-- Page Navigation Footer -->
+        <div class="page-nav">
+          <button class="page-nav-btn" (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() <= 1" aria-label="الصفحة السابقة">
+            <i class="pi pi-chevron-right"></i>
+          </button>
+          <span class="page-indicator">{{ currentPage() }} / {{ totalPages() }}</span>
+          <button class="page-nav-btn" (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() >= totalPages()" aria-label="الصفحة التالية">
+            <i class="pi pi-chevron-left"></i>
+          </button>
+        </div>
+      }
+    </main>
+
+    <!-- Thumbnails Sidebar (Right in RTL) -->
+    <app-page-thumbnails
+      class="desktop-panel"
+      [totalPages]="totalPages()"
+      [currentPage]="currentPage()"
+      [isCollapsed]="!isSidebarOpen()"
+      (pageSelected)="goToPage($event)"
+      (toggleSidebar)="toggleSidebar()"
+      (addPage)="addNewPage()"
+    />
+  </div>
+
+  <!-- ─── Mobile Sidebar Overlay ─── -->
+  @if (isMobileSidebarOpen()) {
+    <div class="mobile-overlay" (click)="toggleMobileSidebar()"></div>
+    <div class="mobile-sidebar-panel">
+      <app-page-thumbnails
+        [totalPages]="totalPages()"
+        [currentPage]="currentPage()"
+        [isCollapsed]="false"
+        (pageSelected)="goToPage($event); toggleMobileSidebar()"
+        (toggleSidebar)="toggleMobileSidebar()"
+        (addPage)="addNewPage()"
+      />
+    </div>
+  }
+
+  <!-- ─── Mobile Properties Overlay ─── -->
+  @if (isMobilePropsOpen()) {
+    <div class="mobile-overlay" (click)="toggleMobileProps()"></div>
+    <div class="mobile-props-panel">
+      <app-properties-panel
+        [selectedAnnotation]="selectedAnnotation()"
+        [currentPage]="currentPage()"
+        [totalPages]="totalPages()"
+        [isOpen]="true"
+        (propertiesChanged)="onPropertiesChanged($event)"
+        (orderChanged)="onOrderChanged($event)"
+        (togglePanel)="toggleMobileProps()"
+      />
+    </div>
+  }
+
+  <!-- ─── File Source Dialog ─── -->
+  <app-file-source-dialog
+    #fileDialog
+    (fileSelected)="onFileSelected($event)"
+    (exportToDrive)="onExportToDrive($event)"
+  />
+</div>

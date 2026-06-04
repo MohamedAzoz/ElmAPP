@@ -1,11 +1,11 @@
-<section class="max-w-7xl mx-auto px-6 py-12">
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
   @if (year()) {
     @let uniData = year()!;
-    <div class="mb-10 text-center">
-      <h1 class="text-2xl md:text-3xl lg:text-4xl font-semibold text-text-dark mb-2">
-        {{ uniData.name }}
+    <div class="mb-8 sm:mb-12 text-center">
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-text-dark mb-3">
+      المستوى {{ uniData.name }}
       </h1>
-      <p class="text-text-muted">استكشف الاقسام المتاحة فى هذا المستوى {{ uniData.name }}</p>
+      <p class="text-text-muted text-sm sm:text-base md:text-lg max-w-2xl mx-auto">استكشف الأقسام المتاحة مباشرة للانتقال للمواد أو السكاشن</p>
     </div>
 
     @if (isLoadingColleges()) {
@@ -16,12 +16,12 @@
       </div>
     } @else {
       @if (departments().length > 0) {
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           @for (department of departments(); track $index) {
             @defer (on viewport; prefetch on idle) {
-              <app-carde [data]="department" Link="curriulums" />
+              <app-carde [data]="department" cardType="department" Link="curriulums" />
             } @placeholder {
-              <p-skeleton width="25rem" height="250px"></p-skeleton>
+              <p-skeleton width="100%" height="250px" styleClass="rounded-3xl"></p-skeleton>
             }
           }
         </div>

@@ -57,6 +57,6 @@ function isApiRequest(url: string): boolean {
 }
 
 function isPublicOrLogoutRequest(url: string): boolean {
-  const excludedEndpoints = ['/Auth/login', '/Auth/logout'];
+  const excludedEndpoints = ['/Auth/login', '/Auth/Logout'];
   return excludedEndpoints.some((endpoint) => url.includes(endpoint));
 }

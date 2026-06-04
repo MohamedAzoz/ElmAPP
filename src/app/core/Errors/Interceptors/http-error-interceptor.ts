@@ -16,10 +16,7 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
         catchError((error: HttpErrorResponse) => {
             switch (error.status) {
                 case 401:
-                    authService.logout();
-                    router.navigate(['/main/login'], {
-                        queryParams: { returnUrl: router.url },
-                    });
+                    authService.forceLogout();
                     break;
 
                 case 403:
