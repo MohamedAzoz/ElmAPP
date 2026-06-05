@@ -1,0 +1,71 @@
+:host {
+  display: block;
+}
+
+button {
+  text-align: right;
+  transition: all 0.3s ease;
+}
+
+button:active {
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  :host ::ng-deep {
+    .grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    button {
+      padding: 1rem;
+    }
+
+    .text-lg {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .text-sm {
+      font-size: 0.875rem;
+    }
+
+    .rounded-3xl {
+      border-radius: 1rem;
+    }
+
+    .px-3 {
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
+
+    .py-1 {
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+    }
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 641px) and (max-width: 1024px) {
+  :host ::ng-deep {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+    }
+  }
+}
+
+/* Large screens */
+@media (min-width: 1025px) {
+  button:hover {
+    transform: translateY(-2px);
+  }
+}

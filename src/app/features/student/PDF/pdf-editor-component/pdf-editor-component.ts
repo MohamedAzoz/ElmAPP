@@ -1,38 +1,30 @@
-import { Component, inject, signal, viewChild, OnInit, AfterViewInit, OnDestroy, ChangeDetectionStrategy, effect } from '@angular/core';
+import {
+  Component,
+  inject,
+  signal,
+  OnInit,
+  AfterViewInit,
+  OnDestroy,
+  ChangeDetectionStrategy,
+  effect,
+} from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { PDFDocument, rgb } from 'pdf-lib';
+import { CatbeeIndexedDBService } from '@ng-catbee/indexed-db';
 
 import { EditorToolbarComponent } from './components/toolbar/editor-toolbar';
 import { PageThumbnailsComponent } from './components/page-thumbnails/page-thumbnails';
-import { PropertiesPanelComponent } from './components/properties-panel/properties-panel';
-import { FileSourceDialogComponent } from './components/file-source-dialog/file-source-dialog';
-import { GoogleDriveService } from '../services/google-drive.service';
-import type {
-  EditorTool,
-  Annotation,
-  ElementProperties,
-  FileSourceResult,
-} from './models/editor.models';
+import type { EditorTool, Annotation } from './models/editor.models';
 
 @Component({
   selector: 'app-pdf-editor-component',
-  imports: [
-    NgxExtendedPdfViewerModule,
-    EditorToolbarComponent,
-    PageThumbnailsComponent,
-    PropertiesPanelComponent,
-    FileSourceDialogComponent,
-  ],
+  imports: [NgxExtendedPdfViewerModule, EditorToolbarComponent, PageThumbnailsComponent],
   templateUrl: './pdf-editor-component.html',
   styleUrl: './pdf-editor-component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
-  private readonly driveService = inject(GoogleDriveService);
-
-  /** Reference to the file source dialog */
-  fileDialog = viewChild<FileSourceDialogComponent>('fileDialog');
-
   // ─── Editor State Signals ──────────────────────────────────────
 
   /** PDF source (ArrayBuffer or URL) */
@@ -74,11 +66,13 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   /** Whether a PDF is loaded */
   isDocumentLoaded = signal(false);
 
-  /** Google Drive file ID (if imported from Drive) */
-  currentDriveFileId = signal<string | null>(null);
-
   /** Whether the document has unsaved changes */
   hasUnsavedChanges = signal(false);
+
+  private readonly db = inject(CatbeeIndexedDBService);
+  private readonly draftStore = 'pdfDrafts';
+  private readonly draftKey = 'editor-draft';
+  private draftTimer: number | null = null;
 
   /** Status message shown briefly in the header */
   statusMessage = signal<string | null>(null);
@@ -104,6 +98,12 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       this.selectedAnnotation();
       this.currentMode();
       this.isDocumentLoaded();
+      this.pdfBytes();
+      this.hasUnsavedChanges();
+
+      if (this.isDocumentLoaded() && this.hasUnsavedChanges()) {
+        this.scheduleAutoSave();
+      }
 
       // Schedule rendering outside current microtask to ensure DOM is updated
       setTimeout(() => this.renderAnnotations(), 20);
@@ -113,7 +113,9 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   // ─── Lifecycle ──────────────────────────────────────────────────
 
   ngOnInit(): void {
-    this.driveService.init().catch(() => {});
+    this.loadDraft().catch(() => {
+      console.warn('No draft loaded');
+    });
   }
 
   ngAfterViewInit(): void {
@@ -125,14 +127,20 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         for (const m of mutations) {
           if (m.type === 'childList') {
             const addedPages = Array.from(m.addedNodes).some(
-              (node) => node instanceof HTMLElement && (node.classList.contains('page') || node.querySelector('.page'))
+              (node) =>
+                node instanceof HTMLElement &&
+                (node.classList.contains('page') || node.querySelector('.page')),
             );
             if (addedPages) {
               shouldRender = true;
               break;
             }
           }
-          if (m.type === 'attributes' && m.target instanceof HTMLElement && m.target.classList.contains('page')) {
+          if (
+            m.type === 'attributes' &&
+            m.target instanceof HTMLElement &&
+            m.target.classList.contains('page')
+          ) {
             shouldRender = true;
             break;
           }
@@ -155,92 +163,130 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.observer) {
       this.observer.disconnect();
     }
+    if (this.draftTimer) {
+      clearTimeout(this.draftTimer);
+    }
+  }
+
+  // ─── Draft Persistence ───────────────────────────────────────────
+
+  private async loadDraft(): Promise<void> {
+    try {
+      const draft = await firstValueFrom(
+        this.db.getByID<{
+          id: string;
+          fileName: string;
+          currentDriveFileId?: string | null;
+          annotations: Annotation[];
+          pdfBase64: string;
+          savedAt: number;
+        }>(this.draftStore, this.draftKey),
+      );
+
+      if (!draft || !draft.pdfBase64) {
+        return;
+      }
+
+      const bytes = this.base64ToBytes(draft.pdfBase64);
+      this.pdfBytes.set(bytes);
+      this.pdfSrc.set(bytes);
+      this.fileName.set(draft.fileName || 'Elm_Document.pdf');
+      this.annotations.set(draft.annotations || []);
+      this.isDocumentLoaded.set(true);
+      this.hasUnsavedChanges.set(true);
+      this.showStatus('تم استعادة نسخة المسودة التلقائية');
+    } catch (err) {
+      console.warn('[PdfEditor] No draft loaded or failed to restore:', err);
+    }
+  }
+
+  private scheduleAutoSave(): void {
+    if (this.draftTimer) {
+      clearTimeout(this.draftTimer);
+    }
+    this.draftTimer = window.setTimeout(() => {
+      this.saveDraft().catch(() => {
+        console.warn('Auto-save failed');
+      });
+    }, 2000);
+  }
+
+  private async saveDraft(): Promise<void> {
+    const bytes = this.pdfBytes();
+    if (!bytes || !this.isDocumentLoaded()) return;
+
+    const payload = {
+      id: this.draftKey,
+      fileName: this.fileName(),
+      annotations: this.annotations(),
+      pdfBase64: this.bytesToBase64(bytes),
+      savedAt: Date.now(),
+    };
+
+    await firstValueFrom(this.db.update(this.draftStore, payload));
+    this.showStatus('تم حفظ المسودة تلقائياً');
+    if (this.draftTimer) {
+      clearTimeout(this.draftTimer);
+      this.draftTimer = null;
+    }
+  }
+
+  private async deleteDraft(): Promise<void> {
+    if (this.draftTimer) {
+      clearTimeout(this.draftTimer);
+      this.draftTimer = null;
+    }
+
+    try {
+      await firstValueFrom(this.db.deleteByKey(this.draftStore, this.draftKey));
+    } catch {
+      // ignore delete failure
+    }
+  }
+
+  private bytesToBase64(bytes: Uint8Array): string {
+    let binary = '';
+    const chunkSize = 0x8000;
+    for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+      const slice = bytes.subarray(offset, offset + chunkSize);
+      binary += String.fromCharCode(...slice);
+    }
+    return window.btoa(binary);
+  }
+
+  private base64ToBytes(base64: string): Uint8Array {
+    const binary = window.atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
   }
 
   // ─── File Operations ────────────────────────────────────────────
 
-  /** Open the file source dialog for importing */
+  /** Create a blank document */
   openFile(): void {
-    this.fileDialog()?.openForImport();
+    this.createBlankDocument();
   }
 
-  /** Open the file source dialog for exporting */
   exportFile(): void {
-    this.fileDialog()?.openForExport(this.fileName());
-  }
-
-  /** Handle file selection from dialog */
-  async onFileSelected(result: FileSourceResult): Promise<void> {
-    try {
-      if (result.source === 'local' && result.file) {
-        await this.loadLocalFile(result.file);
-      } else if (result.source === 'drive' && result.driveFile) {
-        await this.loadDriveFile(result.driveFile.id, result.driveFile.name);
-      } else if (result.source === 'local' && !result.file) {
-        // Export to local
-        await this.exportToLocal();
-      }
-    } catch (err) {
-      console.error('[PdfEditor] File operation failed:', err);
-      this.showStatus('حدث خطأ أثناء العملية');
-    }
-  }
-
-  /** Handle export to Drive */
-  async onExportToDrive(event: { fileName: string; fileId?: string }): Promise<void> {
-    try {
-      const bytes = await this.applyAnnotations();
-      if (event.fileId) {
-        await this.driveService.updateFile(event.fileId, bytes);
-        this.showStatus('تم تحديث الملف في Drive');
-      } else {
-        const newId = await this.driveService.uploadFile(event.fileName, bytes);
-        this.currentDriveFileId.set(newId);
-        this.showStatus('تم رفع الملف إلى Drive');
-      }
-      this.hasUnsavedChanges.set(false);
-    } catch {
-      this.showStatus('فشل التصدير إلى Drive');
-    }
-  }
-
-  /** Load a local file via FileReader */
-  private async loadLocalFile(file: File): Promise<void> {
-    const buffer = await file.arrayBuffer();
-    const bytes = new Uint8Array(buffer);
-    this.pdfBytes.set(bytes);
-    this.pdfSrc.set(bytes);
-    this.fileName.set(file.name);
-    this.currentDriveFileId.set(null);
-    this.isDocumentLoaded.set(true);
-    this.annotations.set([]);
-    this.hasUnsavedChanges.set(false);
-    this.showStatus('تم فتح الملف بنجاح');
-  }
-
-  /** Load a file from Google Drive */
-  private async loadDriveFile(fileId: string, name: string): Promise<void> {
-    this.showStatus('جاري التحميل من Drive...');
-    const buffer = await this.driveService.downloadFile(fileId);
-    const bytes = new Uint8Array(buffer);
-    this.pdfBytes.set(bytes);
-    this.pdfSrc.set(bytes);
-    this.fileName.set(name);
-    this.currentDriveFileId.set(fileId);
-    this.isDocumentLoaded.set(true);
-    this.annotations.set([]);
-    this.hasUnsavedChanges.set(false);
-    this.showStatus('تم فتح الملف من Drive');
+    this.exportToLocal().catch(() => {
+      console.warn('Export failed');
+    });
   }
 
   /** Export to local device */
   async exportToLocal(): Promise<void> {
     try {
       const modifiedBytes = await this.applyAnnotations();
-      const blob = new Blob([modifiedBytes as any], { type: 'application/pdf' });
+      // Update viewer before initiating download
+      this.pdfBytes.set(modifiedBytes);
+      this.pdfSrc.set(modifiedBytes);
+      const blob = new Blob([modifiedBytes as BlobPart], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url; 
+      a.href = url;
       a.download = this.fileName();
       a.click();
       URL.revokeObjectURL(url);
@@ -251,19 +297,17 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  /** Save — either to Drive (if connected) or local */
+  /** Save locally by downloading and clearing the IndexedDB draft */
   async save(): Promise<void> {
-    if (this.currentDriveFileId()) {
-      try {
-        const bytes = await this.applyAnnotations();
-        await this.driveService.updateFile(this.currentDriveFileId()!, bytes);
-        this.hasUnsavedChanges.set(false);
-        this.showStatus('تم الحفظ في Drive');
-      } catch {
-        this.showStatus('فشل الحفظ');
-      }
-    } else {
+    if (!this.isDocumentLoaded()) return;
+
+    try {
       await this.exportToLocal();
+      await this.deleteDraft();
+      this.hasUnsavedChanges.set(false);
+      this.showStatus('تم حفظ الملف وتنزيله بنجاح');
+    } catch {
+      this.showStatus('فشل الحفظ');
     }
   }
 
@@ -306,9 +350,7 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     const updated: Annotation = { ...selected, ...props };
     this.selectedAnnotation.set(updated);
 
-    this.annotations.update((list) =>
-      list.map((a) => (a.id === selected.id ? updated : a))
-    );
+    this.annotations.update((list) => list.map((a) => (a.id === selected.id ? updated : a)));
     this.hasUnsavedChanges.set(true);
   }
 
@@ -339,6 +381,33 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     // Default sizing in percentages
     const width = tool === 'text' ? 25 : 15;
     const height = tool === 'text' ? 4 : 8;
+    // If image tool: prompt for an image file instead of creating empty box
+    if (tool === 'image') {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = () => {
+        const file = input.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          const dataUrl = reader.result as string;
+          const imgWidth = 30;
+          const imgHeight = 20;
+          this.createImageAnnotation(
+            pageNum,
+            Math.max(0, Math.min(100 - imgWidth, x)),
+            Math.max(0, Math.min(100 - imgHeight, y)),
+            imgWidth,
+            imgHeight,
+            dataUrl,
+          );
+        };
+        reader.readAsDataURL(file);
+      };
+      input.click();
+      return;
+    }
 
     this.saveHistory(this.annotations());
 
@@ -365,6 +434,81 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Switch back to select tool
     this.activeTool.set('select');
+  }
+
+  /** Drag over handler for image drop */
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+  }
+
+  /** Handle drop events for images */
+  async onDrop(event: DragEvent): Promise<void> {
+    event.preventDefault();
+    const dt = event.dataTransfer;
+    if (!dt || !dt.files || dt.files.length === 0) return;
+    const file = dt.files[0];
+    if (!file.type.startsWith('image/')) return;
+
+    // Find the page element under the drop point if possible
+    const target =
+      (event.target as HTMLElement) ||
+      (document.elementFromPoint(event.clientX, event.clientY) as HTMLElement);
+    const pageEl = target?.closest('.page') as HTMLElement | null;
+    const pageNum = pageEl
+      ? parseInt(pageEl.getAttribute('data-page-number') || '1', 10)
+      : this.currentPage();
+
+    const rect = pageEl
+      ? pageEl.getBoundingClientRect()
+      : ({ left: 0, top: 0, width: window.innerWidth, height: window.innerHeight } as DOMRect);
+    const dropX = event.clientX - rect.left;
+    const dropY = event.clientY - rect.top;
+
+    const x = (dropX / rect.width) * 100;
+    const y = (dropY / rect.height) * 100;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      // Create a reasonable default size for dropped images
+      const imgWidth = 30;
+      const imgHeight = 20;
+      this.createImageAnnotation(
+        pageNum,
+        Math.max(0, Math.min(100 - imgWidth, x)),
+        Math.max(0, Math.min(100 - imgHeight, y)),
+        imgWidth,
+        imgHeight,
+        dataUrl,
+      );
+    };
+    reader.readAsDataURL(file);
+  }
+
+  private createImageAnnotation(
+    page: number,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    dataUrl: string,
+  ): void {
+    this.saveHistory(this.annotations());
+    const ann: Annotation = {
+      id: crypto.randomUUID(),
+      type: 'image',
+      page,
+      x,
+      y,
+      width,
+      height,
+      color: '#000000',
+      content: dataUrl,
+      opacity: 1,
+    };
+    this.annotations.update((list) => [...list, ann]);
+    this.selectedAnnotation.set(ann);
+    this.hasUnsavedChanges.set(true);
   }
 
   /** Select an existing annotation */
@@ -485,6 +629,24 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  async createBlankDocument(): Promise<void> {
+    try {
+      const pdfDoc = await PDFDocument.create();
+      pdfDoc.addPage([595.27, 841.89]);
+      const bytes = await pdfDoc.save();
+      this.pdfBytes.set(bytes);
+      this.pdfSrc.set(bytes);
+      this.fileName.set('Elm_Document.pdf');
+      this.annotations.set([]);
+      this.isDocumentLoaded.set(true);
+      this.hasUnsavedChanges.set(true);
+      this.showStatus('تم إنشاء مستند جديد');
+    } catch (err) {
+      console.error('[PdfEditor] Create blank document failed:', err);
+      this.showStatus('فشل إنشاء المستند الجديد');
+    }
+  }
+
   // ─── Zoom Controls ─────────────────────────────────────────────
 
   zoomIn(): void {
@@ -573,6 +735,41 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         textSpan.style.textAlign = ann.textAlign || 'right';
         textSpan.style.direction = 'rtl';
         textSpan.textContent = ann.content || '';
+        // Allow inline editing like Word when not in view mode
+        const editable = this.currentMode() !== 'view';
+        textSpan.contentEditable = String(editable);
+
+        // When the user types, update the annotation content immediately
+        textSpan.addEventListener('input', () => {
+          const newText = textSpan.textContent || '';
+          this.annotations.update((list) =>
+            list.map((a) => (a.id === ann.id ? { ...a, content: newText } : a)),
+          );
+          // Update selectedAnnotation reference to the latest object
+          const updated = this.annotations().find((a) => a.id === ann.id) || null;
+          this.selectedAnnotation.set(updated);
+          this.hasUnsavedChanges.set(true);
+          this.scheduleAutoSave();
+        });
+
+        // Focus when selected so typing is seamless
+        if (selectedId === ann.id && editable) {
+          setTimeout(() => {
+            try {
+              textSpan.focus();
+              // place caret at the end
+              const range = document.createRange();
+              range.selectNodeContents(textSpan);
+              range.collapse(false);
+              const sel = window.getSelection();
+              sel?.removeAllRanges();
+              sel?.addRange(range);
+            } catch {
+              console.warn('Failed to focus annotation text');
+            }
+          }, 50);
+        }
+
         annEl.appendChild(textSpan);
       } else if (ann.type === 'highlight') {
         const highlightDiv = document.createElement('div');
@@ -597,6 +794,14 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         drawDiv.style.background = ann.color || '#141b2b';
         drawDiv.style.borderRadius = '50%';
         annEl.appendChild(drawDiv);
+      } else if (ann.type === 'image') {
+        const img = document.createElement('img');
+        img.className = 'annotation-image';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'contain';
+        img.src = ann.content || '';
+        annEl.appendChild(img);
       }
 
       if (selectedId === ann.id && this.currentMode() !== 'view') {
@@ -661,7 +866,11 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
     annEl.addEventListener('mousedown', (e) => {
       if (this.currentMode() === 'view' || this.activeTool() !== 'select') return;
-      if ((e.target as HTMLElement).closest('.annotation-del-btn') || (e.target as HTMLElement).closest('.annotation-resize-handle')) return;
+      if (
+        (e.target as HTMLElement).closest('.annotation-del-btn') ||
+        (e.target as HTMLElement).closest('.annotation-resize-handle')
+      )
+        return;
 
       e.stopPropagation();
       e.preventDefault();
@@ -701,7 +910,7 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         this.saveHistory(this.annotations());
 
         this.annotations.update((list) =>
-          list.map((a) => (a.id === ann.id ? { ...a, x: ann.x, y: ann.y } : a))
+          list.map((a) => (a.id === ann.id ? { ...a, x: ann.x, y: ann.y } : a)),
         );
         this.hasUnsavedChanges.set(true);
       };
@@ -711,7 +920,12 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private setupResizeHandler(handle: HTMLElement, ann: Annotation, annEl: HTMLElement, pageEl: HTMLElement): void {
+  private setupResizeHandler(
+    handle: HTMLElement,
+    ann: Annotation,
+    annEl: HTMLElement,
+    pageEl: HTMLElement,
+  ): void {
     let isResizing = false;
     let startX = 0;
     let startY = 0;
@@ -761,8 +975,8 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this.annotations.update((list) =>
           list.map((a) =>
-            a.id === ann.id ? { ...a, width: ann.width, height: ann.height, x: ann.x } : a
-          )
+            a.id === ann.id ? { ...a, width: ann.width, height: ann.height, x: ann.x } : a,
+          ),
         );
         this.hasUnsavedChanges.set(true);
       };
@@ -775,53 +989,69 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   // ─── Canvas to PNG text renderer for PDF-Lib ────────────────────
 
   private async textToPngBytes(
-    text: string, 
-    widthPx: number, 
-    heightPx: number, 
-    fontSize: number, 
-    fontFamily: string, 
-    fontWeight: string, 
-    color: string, 
-    textAlign: string
-  ): Promise<Uint8Array> {
-    const scale = 3;
-    const canvas = document.createElement('canvas');
-    canvas.width = widthPx * scale;
-    canvas.height = heightPx * scale;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('Could not get canvas context');
+  text: string,
+  width: number,
+  height: number,
+  fontSize: number,
+  fontFamily: string,
+  fontWeight: string,
+  color: string,
+  textAlign: string
+): Promise<Uint8Array> {
+  // 1. إنشاء عنصر Canvas مؤقت
+  const canvas = document.createElement('canvas');
 
-    ctx.scale(scale, scale);
+  // لضمان وضوح النص عالي الدقة (High-DPI) وعدم بكسلته داخل الـ PDF
+  const scale = 2;
+  canvas.width = width * scale;
+  canvas.height = height * scale;
 
-    ctx.font = `${fontWeight === '700' ? 'bold' : 'normal'} ${fontSize}px "${fontFamily}"`;
-    ctx.fillStyle = color;
-    ctx.textBaseline = 'middle';
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Could not get 2D context from canvas');
 
-    let x = 0;
-    if (textAlign === 'right') {
-      ctx.textAlign = 'right';
-      x = widthPx;
-    } else if (textAlign === 'center') {
-      ctx.textAlign = 'center';
-      x = widthPx / 2;
-    } else {
-      ctx.textAlign = 'left';
-      x = 0;
-    }
+  // تنظيف المساحة وجعلها شفافة
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const y = heightPx / 2;
-    ctx.fillText(text, x, y);
+  // تطبيق الـ Scale لتكبير الرسم تلقائياً دون إعادة حساب الإحداثيات
+  ctx.scale(scale, scale);
 
-    const dataUrl = canvas.toDataURL('image/png');
-    const base64Data = dataUrl.split(',')[1];
-    const binaryStr = window.atob(base64Data);
-    const len = binaryStr.length;
-    const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-      bytes[i] = binaryStr.charCodeAt(i);
-    }
-    return bytes;
+  // 2. ضبط الخط بالصيغة القياسية الصارمة للـ Canvas (تأكد من وجود px)
+  ctx.font = `${fontWeight} ${fontSize}px "${fontFamily}", sans-serif`;
+  ctx.fillStyle = color || '#000000';
+
+  // 3. الحل السحري: ضبط الـ Baseline والـ Direction لدعم العربي
+  ctx.textBaseline = 'top'; // تجعل النص يبدأ من الحافة العلوية للصندوق لضمان ظهوره
+  ctx.direction = 'rtl';    // تفعيل توجيه النصوص العربية
+
+  // ضبط المحاذاة الأفقية
+  ctx.textAlign = textAlign as CanvasTextAlign;
+
+  // 4. تحديد إحداثي X بناءً على نوع المحاذاة المحددة للـ Annotation
+  let x = 0;
+  if (textAlign === 'right') {
+    x = width; // إذا كان محاذاة لليمين، نقطة الارتكاز هي أقصى عرض الصندوق
+  } else if (textAlign === 'center') {
+    x = width / 2;
+  } else {
+    x = 0;
   }
+
+  // 5. رسم النص عند y = 0 بأمان لأن الـ Baseline أصبح top
+  ctx.fillText(text, x, 0);
+
+  // 6. تحويل الـ Canvas إلى مصفوفة البايتات (الكود الخاص بك)
+  const dataUrl = canvas.toDataURL('image/png');
+  const base64Data = dataUrl.split(',')[1];
+  const binaryStr = window.atob(base64Data);
+  const len = binaryStr.length;
+  const bytes = new Uint8Array(len);
+
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryStr.charCodeAt(i);
+  }
+
+  return bytes;
+}
 
   // ─── PDF-Lib Save Integration ───────────────────────────────────
 
@@ -840,7 +1070,8 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       const { width: pageWidth, height: pageHeight } = page.getSize();
 
       const x = (annotation.x / 100) * pageWidth;
-      const y = pageHeight - ((annotation.y / 100) * pageHeight) - ((annotation.height / 100) * pageHeight);
+      const y =
+        pageHeight - (annotation.y / 100) * pageHeight - (annotation.height / 100) * pageHeight;
       const width = (annotation.width / 100) * pageWidth;
       const height = (annotation.height / 100) * pageHeight;
 
@@ -856,8 +1087,8 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
                 annotation.fontSize || 16,
                 annotation.fontFamily || 'IBM Plex Sans Arabic',
                 annotation.fontWeight || '400',
-                annotation.color,
-                annotation.textAlign || 'right'
+                annotation.color || '#000000',
+                annotation.textAlign || 'right',
               );
               const pngImage = await pdfDoc.embedPng(pngBytes);
               page.drawImage(pngImage, {
@@ -878,7 +1109,7 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
             y,
             width,
             height,
-            color: this.hexToRgb(annotation.color),
+            color: this.hexToRgb(annotation.color || '#ffd500'), // حماية بقيمة افتراضية
             opacity: 0.35,
           });
           break;
@@ -889,7 +1120,7 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
             y,
             width,
             height,
-            borderColor: this.hexToRgb(annotation.color),
+            borderColor: this.hexToRgb(annotation.color || '#141b2b'),
             borderWidth: 2,
             opacity: annotation.opacity ?? 1,
           });
@@ -900,9 +1131,28 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
             x: x + width / 2,
             y: y + height / 2,
             size: Math.min(width, height) / 2,
-            color: this.hexToRgb(annotation.color),
+            color: this.hexToRgb(annotation.color || '#000000'),
             opacity: annotation.opacity ?? 1,
           });
+          break;
+
+        case 'image':
+          if (annotation.content && annotation.content.startsWith('data:')) {
+            try {
+              const base64 = annotation.content.split(',')[1];
+              const bytes = this.base64ToBytes(base64);
+              // Try PNG first, fallback to JPG
+              let img;
+              if (annotation.content.includes('image/png')) {
+                img = await pdfDoc.embedPng(bytes);
+              } else {
+                img = await pdfDoc.embedJpg(bytes);
+              }
+              page.drawImage(img, { x, y, width, height });
+            } catch (err) {
+              console.error('Error embedding image annotation:', err);
+            }
+          }
           break;
 
         default:
@@ -928,5 +1178,25 @@ export class PdfEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get currentPageAnnotations(): Annotation[] {
     return this.annotations().filter((a) => a.page === this.currentPage());
+  }
+
+  // دالة مساعدة لرسم النصوص متعددة الأسطر داخل الـ Canvas
+  private wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+    const words = text.split(' ');
+    const lines: string[] = [];
+    let currentLine = words[0] || '';
+
+    for (let i = 1; i < words.length; i++) {
+      const word = words[i];
+      const width = ctx.measureText(currentLine + ' ' + word).width;
+      if (width < maxWidth) {
+        currentLine += ' ' + word;
+      } else {
+        lines.push(currentLine);
+        currentLine = word;
+      }
+    }
+    lines.push(currentLine);
+    return lines;
   }
 }

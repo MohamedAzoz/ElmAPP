@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { KeyboardNavigation } from '../../../../../shared/Directives/keyboard-navigation';
+import { WrongAnswersService } from '../../../Wrong_Answers_Hub/wrong-answers.service';
 
 @Component({
   selector: 'app-test-session',
@@ -32,6 +33,7 @@ export class TestSession implements OnInit {
   private route = inject(ActivatedRoute);
   private localStorage = inject(LocalStorage);
   private router = inject(Router);
+  private wrongAnswersService = inject(WrongAnswersService);
 
   data = this.testFacade.currentTestData;
   currentQuesId = signal<number>(0);
@@ -144,7 +146,35 @@ export class TestSession implements OnInit {
     });
   }
 
-  finishTest() {
+  onQuestionAnswered(optionId: number) {
+    const question = this.currentQuestion();
+    if (!question || question.id === undefined) {
+      return;
+    }
+
+    this.quizState.saveAnswer(question.id, optionId);
+
+    const correctOption = question.options?.find((o) => o.isCorrect === true);
+    if (correctOption && correctOption.id !== optionId) {
+      const selectedOption = question.options?.find((o) => o.id === optionId);
+      const bankId = Number(sessionStorage.getItem('current_question_bank_id') || 0);
+      const bankName = sessionStorage.getItem('current_question_bank_name') || undefined;
+
+      void this.wrongAnswersService.saveWrongAnswer({
+        bankId,
+        bankName,
+        questionId: question.id,
+        questionContent: question.content ?? 'سؤال بدون نص',
+        questionType: question.questionType,
+        selectedOptionId: optionId,
+        selectedOptionText: selectedOption?.content ?? null,
+        correctOptionId: correctOption.id,
+        correctOptionText: correctOption.content ?? null,
+      });
+    }
+  }
+
+  async finishTest() {
     const questions = this.data();
     if (!questions || questions.length === 0) return;
 
@@ -174,6 +204,32 @@ export class TestSession implements OnInit {
       gradePercentage: (correctCount / questions.length) * 100,
       details: details,
     };
+
+    const bankId = Number(sessionStorage.getItem('current_question_bank_id') || 0);
+    const bankName = sessionStorage.getItem('current_question_bank_name') || undefined;
+    const wrongEntries = details.filter((item) => !item.isCorrect);
+
+    await Promise.all(
+      wrongEntries.map((wrong) => {
+        const question = questions.find((q) => q.id === wrong.questionId);
+        const correctOption = question?.options?.find((o) => o.isCorrect === true);
+        const selectedOption = question?.options?.find(
+          (o) => o.content === wrong.selectedOptionContent,
+        );
+
+        return this.wrongAnswersService.saveWrongAnswer({
+          bankId,
+          bankName,
+          questionId: wrong.questionId,
+          questionContent: wrong.content ?? 'سؤال بدون نص',
+          questionType: question?.questionType,
+          selectedOptionId: selectedOption?.id ?? undefined,
+          selectedOptionText: wrong.selectedOptionContent,
+          correctOptionId: correctOption?.id,
+          correctOptionText: correctOption?.content ?? null,
+        });
+      }),
+    );
 
     this.quizState.saveTestResult(finalResult);
     this.quizState.stopTimer();

@@ -1,0 +1,32 @@
+/* Custom PrimeNG Overrides for Security Link Validator */
+
+:host ::ng-deep .add-link-dialog {
+  border: none !important;
+  background: transparent !important;
+}
+
+:host ::ng-deep .add-link-dialog .p-dialog-content {
+  padding: 0 !important;
+  border-radius: 1rem !important;
+  background: transparent !important;
+}
+
+:host ::ng-deep .p-select {
+  padding-left: 0.5rem;
+}
+
+:host ::ng-deep .p-tag {
+  background-color: transparent;
+}
+
+/* التنسيق الإضافي للـ Toast لضمان ظهوره دائماً أعلى من الـ Modal وبشكل منسق ومتجاوب */
+:host ::ng-deep .p-toast {
+  z-index: 99999 !important; 
+}
+
+/* Glassmorphism effects where appropriate */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}

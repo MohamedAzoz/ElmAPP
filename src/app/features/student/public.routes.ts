@@ -50,17 +50,13 @@ export const publicRoutes: Routes = [
                     path: ':curriculumId/F',
                     title: 'الملخصات',
                     loadComponent: () =>
-                      import('./Files/get-all-files/get-all-files').then(
-                        (m) => m.GetAllFiles,
-                      ),
+                      import('./Files/get-all-files/get-all-files').then((m) => m.GetAllFiles),
                   },
                   {
                     path: ':curriculumId/V',
                     title: 'فيديوهات الشرح',
                     loadComponent: () =>
-                      import('./Videos/get-all-videos/get-all-videos').then(
-                        (m) => m.GetAllVideos,
-                      ),
+                      import('./Videos/get-all-videos/get-all-videos').then((m) => m.GetAllVideos),
                   },
                 ],
               },
@@ -122,7 +118,6 @@ export const publicRoutes: Routes = [
                                 (m) => m.GetAllQuestions,
                               ),
                           },
-                          
                         ],
                       },
                       {
@@ -160,10 +155,63 @@ export const publicRoutes: Routes = [
       },
     ],
   },
+  // Security Link Validator
+  {
+    title: 'حفظ الروابط الآمنة',
+    path: 'security-links',
+    loadComponent: () =>
+      import('./SecurityLinkValidator/security-link-validator/security-link-validator').then(
+        (m) => m.SecurityLinkValidator,
+      ),
+  },
   // PdfEditorComponent
   {
     title: 'محرر الملفات',
     path: 'pdf-editor',
-    loadComponent: () => import('./PDF/pdf-editor-component/pdf-editor-component').then((m) => m.PdfEditorComponent),
+    loadComponent: () =>
+      import('./PDF/pdf-editor-component/pdf-editor-component').then((m) => m.PdfEditorComponent),
+  },
+  {
+    path: 'wrong-answers',
+    title: 'الإجابات الخاطئة',
+    loadComponent: () =>
+      import('./Wrong_Answers_Hub/wrong-answers/wrong-answers').then((m) => m.WrongAnswers),
+  },
+  {
+    path: 'saved-banks',
+    title: 'البنوك المحفوظة',
+    loadComponent: () =>
+      import('./QuestionBanks/offline-saved-question-banks/offline-saved-question-banks').then(
+        (m) => m.OfflineSavedQuestionBanks,
+      ),
+  },
+  {
+    path: 'saved-banks/questions',
+    children: [
+      {
+        path: ':bankId',
+        children: [
+          {
+            path: ':questionId',
+            title: 'الأسئلة المحفوظة',
+            loadComponent: () =>
+              import('./Questions/get-all-questions/get-all-questions').then(
+                (m) => m.GetAllQuestions,
+              ),
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: 'saved-banks/result',
+    title: 'النتيجة',
+    loadComponent: () => import('./Result_Exam/result/result').then((m) => m.Result),
+  },
+  {
+    path: 'wrong-answers/:bankId',
+    title: 'تفاصيل البنك',
+    loadComponent: () =>
+      import('./Wrong_Answers_Hub/wrong-answers/wrong-answers').then((m) => m.WrongAnswers),
   },
 ];

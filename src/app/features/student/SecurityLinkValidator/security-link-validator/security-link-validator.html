@@ -1,0 +1,267 @@
+<p-toast></p-toast>
+
+<div class="p-6 md:p-8 min-h-screen bg-bg-page">
+  
+  <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
+    <div class="flex items-center gap-3">
+      <div class="text-blue-600 bg-blue-50 p-3 rounded-full shadow-sm border border-blue-100 flex items-center justify-center">
+        <i class="pi pi-shield text-3xl drop-shadow-sm"></i>
+      </div>
+      <h1 class="text-3xl font-bold text-slate-800 tracking-tight">Security Hub - Checked Links</h1>
+    </div>
+
+    <div class="flex items-center gap-3 mt-4 md:mt-0">
+      <div class="flex items-center gap-2 bg-white rounded-lg p-1.5 shadow-sm border border-slate-200">
+        <button
+          pButton
+          [icon]="facade.driveStatus() === 'connected' ? 'pi pi-google' : 'pi pi-google'"
+          [label]="facade.driveStatus() === 'connected' ? 'Drive Connected' : 'Connect Drive'"
+          [severity]="facade.driveStatus() === 'connected' ? 'success' : 'secondary'"
+          [outlined]="facade.driveStatus() !== 'connected'"
+          class="p-button-sm rounded-md!"
+          size="small"
+          (click)="toggleDriveSync()"
+          pTooltip="Syncing securely to your Google Drive"
+          tooltipPosition="bottom"
+        ></button>
+        
+        @if (facade.driveStatus() === 'connected') {
+          <button
+            pButton
+            icon="pi pi-cloud-download"
+            severity="secondary"
+            outlined
+            class="p-button-sm rounded-md! px-3!"
+            (click)="restoreFromDrive()"
+            pTooltip="Restore from Drive"
+            tooltipPosition="bottom"
+          ></button>
+        }
+      </div>
+
+      <button 
+        pButton 
+        label="Add New Link" 
+        icon="pi pi-plus" 
+        class="bg-blue-600 hover:bg-blue-700 border-blue-600 rounded-lg! px-5! font-medium shadow-md transition-all hover:shadow-lg hover:-translate-y-0.5"
+        (click)="openAddModal()"
+      ></button>
+    </div>
+  </div>
+
+  @if (facade.isLoading()) {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      @for (i of [1,2,3,4]; track i) {
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 h-[220px]">
+          <p-skeleton width="3rem" height="3rem" borderRadius="12px" class="mb-4"></p-skeleton>
+          <p-skeleton width="80%" height="1.5rem" class="mb-2"></p-skeleton>
+          <p-skeleton width="60%" height="1rem" class="mb-6"></p-skeleton>
+          <div class="flex justify-between items-center">
+            <p-skeleton width="4rem" height="1.5rem" borderRadius="16px"></p-skeleton>
+            <div class="flex gap-2">
+              <p-skeleton shape="circle" size="2rem"></p-skeleton>
+              <p-skeleton shape="circle" size="2rem"></p-skeleton>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (facade.links().length === 0) {
+    <div class="flex flex-col items-center justify-center py-20 text-center">
+      <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-6 shadow-inner">
+        <i class="pi pi-link text-4xl text-slate-300"></i>
+      </div>
+      <h3 class="text-xl font-semibold text-slate-700 mb-2">No Links Checked Yet</h3>
+      <p class="text-slate-500 max-w-md">Add a new link to verify its security status. All verified links will be securely synced and stored.</p>
+      <button 
+        pButton 
+        label="Scan First Link" 
+        icon="pi pi-shield" 
+        class="mt-6 bg-blue-600 rounded-lg px-6"
+        (click)="openAddModal()"
+      ></button>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      
+      @for (link of facade.links(); track link.id) {
+        <div 
+          class="relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border flex flex-col group"
+          [ngClass]="{
+            'border-red-200 bg-red-50/10': link.status === 'error',
+            'border-amber-200 bg-amber-50/30': link.status === 'suspicious',
+            'border-slate-100': link.status === 'safe' || link.status === 'pending'
+          }"
+        >
+          <div class="flex justify-between items-start mb-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm"
+                 [ngClass]="{
+                   'bg-blue-50 text-blue-500': link.sourceType === 'external',
+                   'bg-red-50 text-red-500': link.sourceType === 'pdf' || link.sourceType === 'youtube',
+                   'bg-emerald-50 text-emerald-500': link.sourceType === 'gdrive'
+                 }"
+            >
+              <i [class]="getSourceIcon(link.sourceType) + ' text-2xl'"></i>
+            </div>
+            
+            <button class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
+              <i class="pi pi-ellipsis-v"></i>
+            </button>
+          </div>
+
+          <div class="grow">
+            <h3 class="font-semibold text-slate-800 text-lg mb-1 truncate" [title]="link.title">{{link.title}}</h3>
+            <p class="text-sm text-slate-500 truncate mb-5" [title]="link.url">{{link.url}}</p>
+            
+            <p-tag 
+              [value]="STATUS_CONFIG[link.status].label" 
+              [severity]="STATUS_CONFIG[link.status].severity"
+              [icon]="STATUS_CONFIG[link.status].icon"
+              [rounded]="true"
+              class="px-3 py-1 font-medium text-sm border shadow-sm"
+              [ngClass]="{
+                'bg-emerald-50 text-emerald-700 border-emerald-200': link.status === 'safe',
+                'bg-amber-100 text-amber-800 border-amber-300': link.status === 'suspicious',
+                'bg-red-50 text-red-700 border-red-200': link.status === 'error',
+                'bg-blue-50 text-blue-700 border-blue-200': link.status === 'pending'
+              }"
+            ></p-tag>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-400">
+              Check on {{formatDate(link.checkedAt)}}
+            </span>
+            
+            <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <button 
+                class="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                pTooltip="Visit Link"
+                tooltipPosition="top"
+                (click)="openLink(link.url)"
+              >
+                <i class="pi pi-eye"></i>
+              </button>
+              <button 
+                class="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors"
+                pTooltip="Edit"
+                tooltipPosition="top"
+                (click)="openEditModal(link)"
+              >
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button 
+                class="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:bg-red-50 hover:text-red-500 transition-colors"
+                pTooltip="Delete"
+                tooltipPosition="top"
+                (click)="deleteLink(link.id)"
+              >
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
+          </div>
+          
+        </div>
+      }
+      
+    </div>
+  }
+
+</div>
+
+<p-dialog 
+  [(visible)]="showAddModal" 
+  [modal]="true" 
+  [draggable]="false" 
+  [resizable]="false"
+  class="add-link-dialog w-full max-w-md mx-4 rounded-2xl overflow-hidden shadow-2xl"
+  [showHeader]="false"
+  (onHide)="resetForm()"
+>
+  <div class="relative bg-white p-6 md:p-8">
+    
+    <button 
+      class="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+      (click)="closeModal()"
+    >
+      <i class="pi pi-times"></i>
+    </button>
+    
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold text-slate-800 mb-2">
+        {{ editingLinkId() ? 'Edit Link' : 'Add New Link for Security Check' }}
+      </h2>
+      <p class="text-slate-500 text-sm">Securely scan, validate, and save your external resources.</p>
+    </div>
+
+    <div class="flex flex-col gap-6">
+      
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-medium text-slate-700">Link Title (Nickname)</label>
+        <input 
+          pInputText 
+          [(ngModel)]="newLinkTitle"
+          placeholder="e.g., Physics Lecture PDF" 
+          class="w-full rounded-lg p-3 border-slate-200 hover:border-blue-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all" 
+        />
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-medium text-slate-700">The Actual URL (The long link)</label>
+        <input 
+          pInputText 
+          [(ngModel)]="newLinkUrl"
+          placeholder="https://..." 
+          class="w-full rounded-lg p-3 border-slate-200 hover:border-blue-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all" 
+        />
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-medium text-slate-700">Source Type</label>
+        <p-select 
+          [options]="SOURCE_TYPE_OPTIONS" 
+          [(ngModel)]="newLinkSourceType" 
+          optionLabel="label" 
+          optionValue="value"
+          class="w-full rounded-lg border-slate-200 hover:border-blue-300"
+          panelStyleClass="rounded-lg border-slate-100 shadow-xl"
+        >
+          <ng-template pTemplate="selectedItem" let-selectedOption>
+            <div class="flex items-center gap-3 p-1">
+              <i [class]="selectedOption.icon + ' text-slate-500'"></i>
+              <span class="text-slate-700 font-medium">{{selectedOption.label}}</span>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="item" let-option>
+            <div class="flex items-center gap-3 p-2">
+              <i [class]="option.icon + ' text-slate-500'"></i>
+              <span class="text-slate-700 font-medium">{{option.label}}</span>
+            </div>
+          </ng-template>
+        </p-select>
+      </div>
+
+      <div class="mt-4">
+        <button 
+          pButton 
+          class="w-full relative overflow-hidden rounded-xl py-3.5 border-0 shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/40 hover:-translate-y-0.5 transition-all duration-300 group"
+          [disabled]="facade.isValidating() || !newLinkTitle().trim() || !newLinkUrl().trim()"
+          (click)="saveLink()"
+        >
+          <div class="absolute inset-0 bg-linear-to-r from-emerald-500 to-emerald-400 group-hover:from-emerald-400 group-hover:to-emerald-500 transition-colors"></div>
+          
+          <div class="relative flex items-center justify-center gap-3 w-full font-bold text-white text-lg tracking-wide">
+            @if (facade.isValidating()) {
+              <i class="pi pi-spin pi-spinner text-xl"></i>
+              <span>Validating Security...</span>
+            } @else {
+              <i class="pi pi-shield text-xl group-hover:scale-110 transition-transform"></i>
+              <span>{{ editingLinkId() ? 'Update & Re-scan' : 'Scan & Validate Link' }}</span>
+            }
+          </div>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</p-dialog>

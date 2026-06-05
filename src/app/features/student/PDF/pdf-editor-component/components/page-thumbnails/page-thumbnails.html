@@ -7,6 +7,7 @@
   <!-- Toggle Button -->
   <button
     class="toggle-btn"
+    type="button"
     (click)="onToggle()"
     [title]="isCollapsed() ? 'إظهار الصفحات' : 'إخفاء الصفحات'"
     aria-label="تبديل عرض الصفحات"
@@ -19,6 +20,7 @@
       @for (page of pages; track page) {
         <button
           class="thumbnail-card"
+          type="button"
           [class.active]="currentPage() === page"
           (click)="onPageClick(page)"
           role="listitem"
@@ -33,7 +35,7 @@
       }
 
       <!-- Add Page Button -->
-      <button class="add-page-btn" (click)="onAddPageClick()" aria-label="إضافة صفحة" title="إضافة صفحة فارغة">
+      <button class="add-page-btn" type="button" (click)="onAddPageClick()" aria-label="إضافة صفحة" title="إضافة صفحة فارغة">
         <i class="pi pi-plus"></i>
       </button>
     </div>

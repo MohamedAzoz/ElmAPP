@@ -1,0 +1,74 @@
+:host {
+  display: block;
+}
+
+button[disabled] {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  :host ::ng-deep {
+    .min-h-screen {
+      min-height: auto;
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+
+    .max-w-6xl {
+      max-width: 100%;
+    }
+
+    .text-3xl {
+      font-size: 1.5rem;
+      line-height: 2rem;
+    }
+
+    .space-y-6 > * + * {
+      margin-top: 1rem;
+    }
+
+    .rounded-3xl {
+      border-radius: 1rem;
+    }
+
+    .p-5 {
+      padding: 1rem;
+    }
+
+    /* Grid responsive */
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    /* Text adjustments */
+    .text-lg {
+      font-size: 1rem;
+    }
+
+    .text-sm {
+      font-size: 0.875rem;
+    }
+
+    /* Button full width on mobile */
+    button.w-full {
+      width: 100%;
+    }
+
+    /* Answer boxes stacking */
+    .sm\:grid-cols-2 {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 641px) and (max-width: 1024px) {
+  :host ::ng-deep {
+    .max-w-6xl {
+      max-width: 100%;
+      padding: 0 1rem;
+    }
+  }
+}

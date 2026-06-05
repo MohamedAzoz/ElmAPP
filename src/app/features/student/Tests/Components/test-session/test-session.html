@@ -1,12 +1,12 @@
 <div
   class="min-h-screen bg-bg-page p-4 md:p-8"
   dir="ltr"
-  appKeyboardNavigation 
+  appKeyboardNavigation
   [optionsLength]="currentQuestion().options.length || 0"
   (selectOption)="selectOptionByIndex($event)"
   (nextQuestion)="jumpToNext()"
   (prevQuestion)="jumpToPrev()"
-  (submitQuiz)="finishTest()" 
+  (submitQuiz)="finishTest()"
 >
   <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 lg:gap-6 gap-3">
     <div class="lg:col-span-3 order-1 lg:order-2">
@@ -88,7 +88,7 @@
             [question]="q"
             [savedAnswerId]="quizState.getAnswer(q.id!)"
             [isTestMode]="true"
-            (answerSelect)="quizState.saveAnswer(q.id!, $event)"
+            (answerSelect)="onQuestionAnswered($event)"
           />
         </div>
 

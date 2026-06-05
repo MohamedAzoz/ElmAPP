@@ -15,6 +15,9 @@ import { TooltipModule } from 'primeng/tooltip';
 import { KeyboardNavigation } from '../../../../shared/Directives/keyboard-navigation';
 import { QuestionsDto2 } from '../../../../core/api/clients';
 import { QuestionEsayCarde } from '../../../../shared/Components/question-esay-carde/question-esay-carde';
+import { WrongAnswersService } from '../../Wrong_Answers_Hub/wrong-answers.service';
+import { QuestionBankFacade } from '../../QuestionBanks/question-bank-facade';
+import { QuestionBankCacheService } from '../../../../core/Services/question-bank-cache.service';
 
 @Component({
   selector: 'app-get-all-questions',
@@ -28,7 +31,7 @@ import { QuestionEsayCarde } from '../../../../shared/Components/question-esay-c
     SelectButtonModule,
     FormsModule,
     KeyboardNavigation,
-    QuestionEsayCarde
+    QuestionEsayCarde,
   ],
   providers: [ConfirmationService],
   templateUrl: './get-all-questions.html',
@@ -40,10 +43,14 @@ export class GetAllQuestions implements OnInit, OnDestroy {
   private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
   private questionFacade = inject(QuestionFacade);
+  private questionBankFacade = inject(QuestionBankFacade);
+  private questionBankCacheService = inject(QuestionBankCacheService);
+  private wrongAnswersService = inject(WrongAnswersService);
   quizState = inject(QuizStateService);
 
   questions = this.questionFacade.questions;
   isLoading = this.questionFacade.isLoading;
+  offlineMode = signal(false);
 
   // 1. تحديد المعايير القادمة من الرابط مباشرة كـ Signals
   private params = toSignal(this.route.paramMap);
@@ -74,14 +81,34 @@ export class GetAllQuestions implements OnInit, OnDestroy {
   });
 
   constructor() {
-    // الـ effect وظيفته فقط جلب البيانات إذا تغير الـ bankId
     effect(() => {
       const bId = this.bankId();
       if (bId) {
-        // نجلب الأسئلة فقط إذا لم تكن موجودة أو تغير البنك
-        this.questionFacade.getQuestionsByBankId(bId);
+        void this.loadBankQuestions(bId);
       }
     });
+  }
+
+  private async loadBankQuestions(bId: number) {
+    if (navigator.onLine) {
+      this.offlineMode.set(false);
+      this.questionFacade.getQuestionsByBankId(bId);
+      return;
+    }
+
+    const cachedBank = await this.questionBankCacheService.getBank<{
+      id: number;
+      name?: string;
+      subjectName?: string;
+      questions?: QuestionsDto2[];
+    }>(bId.toString());
+    this.offlineMode.set(true);
+
+    if (cachedBank?.questions?.length) {
+      this.questionFacade.questions.set(cachedBank.questions);
+    } else {
+      this.questionFacade.questions.set([]);
+    }
   }
 
   ngOnInit() {
@@ -96,9 +123,23 @@ export class GetAllQuestions implements OnInit, OnDestroy {
       this.quizState.clearBankQuiz();
       this.questionFacade.questions.set([]);
     }
+
+    const bankId = this.bankId();
+    if (bankId) {
+      sessionStorage.setItem('current_question_bank_id', bankId.toString());
+      if (navigator.onLine) {
+        void this.questionBankFacade.getQuestionBankById(bankId);
+      }
+
+      if (!isReload) {
+        void this.wrongAnswersService.startNewSession();
+      } else {
+        void this.wrongAnswersService.ensureSession();
+      }
+    }
+
     // Set isBankTest to true so the correct answers map is retrieved/saved
     this.quizState.isBankTest.set(true);
-
     this.quizState.startTimer();
   }
 
@@ -134,9 +175,28 @@ export class GetAllQuestions implements OnInit, OnDestroy {
   }
 
   onAnswerSelected(optionId: number) {
-    const qId = this.currentQuestion()?.id;
-    if (qId) {
-      this.quizState.saveBankAnswer(qId, optionId);
+    const question = this.currentQuestion();
+    const qId = question?.id;
+    if (!qId || !question) {
+      return;
+    }
+
+    this.quizState.saveBankAnswer(qId, optionId);
+
+    const correctOption = question.options?.find((o) => o.isCorrect === true);
+    if (correctOption && correctOption.id !== optionId) {
+      const selectedOption = question.options?.find((o) => o.id === optionId);
+      void this.wrongAnswersService.saveWrongAnswer({
+        bankId: this.bankId(),
+        bankName: this.questionBankFacade.questionBank()?.name,
+        questionId: qId,
+        questionContent: question.content ?? 'سؤال بدون نص',
+        questionType: question.questionType,
+        selectedOptionId: optionId,
+        selectedOptionText: selectedOption?.content ?? null,
+        correctOptionId: correctOption.id,
+        correctOptionText: correctOption.content ?? null,
+      });
     }
   }
 

@@ -88,6 +88,11 @@
   </div>
 
   <div class="w-full max-w-4xl relative transition-all duration-500 z-10" [dir]="isTestMode()">
+    @if (offlineMode()) {
+      <div class="mb-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-800">
+        يتم تحميل الأسئلة من النسخة المحفوظة محليًا لأنه لا يوجد اتصال بالشبكة.
+      </div>
+    }
     @if (currentQuestion(); as question) {
       @if (question.questionType !== 'Esay') {
         <app-question-carde
@@ -120,7 +125,9 @@
       class="w-full px-3 md:px-4 lg:px-6 lg:py-4 py-2 text-xs! md:text-sm! lg:text-base! p-button-text p-button-lg font-bold text-gray-600 hover:text-indigo-600 transition-colors"
       [disabled]="isFirstQuestion()"
       (click)="prev()"
-    >السابق</button>
+    >
+      السابق
+    </button>
     @if (!isLastQuestion()) {
       <button
         type="button"
@@ -138,8 +145,7 @@
         label="التالي"
         class="w-full px-3 md:px-4 lg:px-6 lg:py-4 py-2 text-xs! md:text-sm! lg:text-base! bg-indigo-600 border-none rounded-2xl shadow-[0_10px_20px_rgba(79,70,229,0.3)] hover:bg-indigo-700 hover:-translate-y-1 transition-all"
         (click)="next()"
-      >
-    </button>
+      ></button>
     } @else {
       <button
         pButton

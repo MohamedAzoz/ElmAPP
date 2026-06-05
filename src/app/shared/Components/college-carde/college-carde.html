@@ -1,35 +1,37 @@
-<div class="h-full drop-shadow-lg"> <a
+<div class="h-full w-full">
+  <a
     [routerLink]="[college.id, 'years']"
     class="block h-full group focus:outline-none focus:ring-2 focus:ring-main rounded-3xl"
-    aria-label="الانتقال إلى سنوات كلية {{ college.name }}"
+    [aria-label]="'الانتقال إلى سنوات كلية ' + college.name"
   >
-    <p-card
-      class="h-full rounded-3xl overflow-hidden shadow-main drop-shadow-lg hover:shadow-main-hover transition-all duration-500 border-0"
+    <div
+      class="h-full bg-white dark:bg-surface rounded-2xl sm:rounded-3xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_30px_rgba(37,99,235,0.08)] transition-all duration-500 flex flex-col justify-between transform group-hover:-translate-y-2 relative"
     >
-      <ng-template #header>
-        <div class="relative h-56 overflow-hidden bg-linear-to-b from-primary-500/60 to-surface flex items-center justify-center p-8">
-          <div class="absolute inset-0 opacity-5 bg-main bg-size-[16px_16px]"></div>
-          
-          <img
-            [alt]="college.name"
-            class="w-auto h-full max-h-40 object-contain drop-shadow-sm transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-2"
-            [src]="college.url"
-          />
-        </div>
-      </ng-template>
+      <div class="relative h-40 sm:h-52 bg-linear-to-b from-main/10 via-main/5 to-transparent flex items-center justify-center p-4 sm:p-6 overflow-hidden">
+        <div class="absolute -top-10 -left-10 w-32 h-32 bg-main/5 rounded-full blur-3xl transition-colors group-hover:bg-main/10"></div>
+        <div class="absolute -bottom-10 -right-10 w-24 h-24 bg-main/5 rounded-full blur-2xl"></div>
+        
+        <img
+          [alt]="college.name"
+          class="w-auto h-full max-h-28 sm:max-h-36 object-contain drop-shadow-[0_4px_10px_rgba(0,0,0,0.05)] transition-all duration-500 group-hover:scale-105 group-hover:-rotate-1"
+          [src]="college.url"
+        />
+      </div>
 
-      <ng-template #title>
-        <div class="flex flex-col items-center text-center py-3 px-4 relative z-10">
-          <h3 class="text-xl lg:text-2xl font-bold text-text-dark group-hover:text-main transition-colors duration-300">
-            كلية {{ college.name }}
-          </h3>
-          
-          <div class="mt-4 flex items-center gap-2 text-sm font-semibold text-main opacity-0 transform translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 delay-75">
-            <span>استكشف الكلية</span>
-            <i class="pi pi-arrow-left text-xs animate-pulse"></i>
-          </div>
+      <div class="pt-3 pb-5 px-4 sm:px-5 text-center grow flex flex-col justify-between items-center gap-3 sm:gap-4">
+        <h3 class="text-lg sm:text-xl lg:text-2xl font-extrabold text-text-dark group-hover:text-main transition-colors duration-300 leading-snug">
+          كلية {{ college.name }}
+        </h3>
+        
+        <div class="flex items-center gap-2 text-xs sm:text-sm font-bold text-main transition-all duration-300 opacity-80 group-hover:opacity-100">
+          <span>استكشف الكلية</span>
+          <i class="pi pi-arrow-left text-[10px] sm:text-xs transform group-hover:-translate-x-1.5 transition-transform duration-300"></i>
         </div>
-      </ng-template>
-    </p-card>
+      </div>
+
+      <div
+        class="absolute bottom-0 left-0 right-0 h-1 bg-linear-to-r from-transparent via-main to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"
+      ></div>
+    </div>
   </a>
 </div>

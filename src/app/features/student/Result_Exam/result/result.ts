@@ -29,12 +29,21 @@ export class Result implements OnInit {
   toggleReview() {
     this.showReview.update((v) => !v);
   }
+  isOnline=computed(()=>navigator.onLine);
 
   goBack() {
     this.quizState.clearAll();
     // العودة لمسار الموارد
+    this.router.navigate(['../../'], { relativeTo: this.route });
+  }
+
+  goToBank() {
+    this.quizState.clearAll();
+    // العودة لمسار الموارد
     this.router.navigate(['../'], { relativeTo: this.route });
   }
+
+
 
   goHome() {
     this.quizState.clearAll();

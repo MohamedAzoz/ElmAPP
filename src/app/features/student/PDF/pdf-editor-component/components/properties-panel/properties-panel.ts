@@ -9,20 +9,20 @@ import type { Annotation, ElementProperties, TextAlign } from '../../models/edit
   styleUrl: './properties-panel.css',
   host: {
     '[class.collapsed]': '!isOpen()',
-  }
+  },
 })
 export class PropertiesPanelComponent {
   /** The currently selected annotation */
-  selectedAnnotation = input<Annotation | null>(null);
+  selectedAnnotation = input<any>(null);
 
   /** Current page number */
-  currentPage = input<number>(1);
+  currentPage = input<any>(1);
 
   /** Total pages */
-  totalPages = input<number>(0);
+  totalPages = input<any>(0);
 
   /** Whether panel is open */
-  isOpen = input<boolean>(true);
+  isOpen = input<any>(true);
 
   /** Emits updated properties */
   propertiesChanged = output<Partial<Annotation>>();

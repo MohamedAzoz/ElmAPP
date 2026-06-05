@@ -14,6 +14,7 @@ import { RateLimitService } from '../../../../../core/Services/rate-limit-servic
 import { LockUi } from '../../../../../shared/Components/lock-ui/lock-ui';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { WrongAnswersService } from '../../../Wrong_Answers_Hub/wrong-answers.service';
 @Component({
   selector: 'app-start-test',
   standalone: true,
@@ -35,6 +36,7 @@ export class StartTest {
   private router = inject(Router);
   private localStorage = inject(LocalStorage);
   private messageService = inject(MessageService);
+  private wrongAnswersService = inject(WrongAnswersService);
   bankFacade = inject(QuestionBankFacade);
   testFacade = inject(TestFacade);
   selectedBank = signal<any>(null);
@@ -62,11 +64,19 @@ export class StartTest {
     });
   }
 
-  onStart() {
+  async onStart() {
     if (!this.selectedBank()) return;
 
+    const bankId = this.selectedBank().id;
+    const bankName = this.selectedBank().name || `Bank ${bankId}`;
+
+    sessionStorage.setItem('current_question_bank_id', bankId.toString());
+    sessionStorage.setItem('current_question_bank_name', bankName);
+
+    void this.wrongAnswersService.startNewSession();
+
     const command: StartTestCommand = {
-      questionsBankId: this.selectedBank().id,
+      questionsBankId: bankId,
       numberOfQuestions: this.numQuestions(),
     };
 

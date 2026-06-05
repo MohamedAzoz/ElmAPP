@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import {
   QuestionsBankDto,
   QuestionsBankDto2,
@@ -15,10 +15,9 @@ export class QuestionBankFacade {
   questionBank = signal<QuestionsBankDto | null>(null);
   countQuestionsInBank = signal<number>(0);
   isQuestionBanktLoading = signal<boolean>(false);
-  constructor(
-    private questionBankPublicService: QuestionsBankPublicClient,
-    private http: HttpClient,
-  ) {}
+
+  private questionBankPublicService = inject(QuestionsBankPublicClient);
+  private http = inject(HttpClient);
 
   getQuestionBanks(curriculumId: number) {
     return this.questionBankPublicService.questionsBanks(curriculumId).subscribe({

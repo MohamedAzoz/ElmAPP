@@ -27,9 +27,13 @@ export class Nav {
   public themeService = inject(Theme);
 
   sidebarVisible = signal(false);
+  isOnline = signal(window.navigator.onLine);
 
   isLoggedIn = signal(false);
   constructor() {
+    window.addEventListener('online', () => this.isOnline.set(true));
+    window.addEventListener('offline', () => this.isOnline.set(false));
+
     effect(() => {
       this.isLoggedIn.set(this.identity.isAuthenticated);
     });

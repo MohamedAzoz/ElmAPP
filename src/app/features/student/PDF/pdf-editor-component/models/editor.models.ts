@@ -1,9 +1,6 @@
 /** Tools available in the PDF editor */
 export type EditorTool = 'select' | 'text' | 'draw' | 'highlight' | 'image' | 'shape';
 
-/** Export destination for the PDF */
-export type ExportTarget = 'local' | 'drive';
-
 /** Shape types for the shape tool */
 export type ShapeType = 'rectangle' | 'circle' | 'line';
 
@@ -28,16 +25,6 @@ export interface Annotation {
   shapeType?: ShapeType;
   opacity?: number;
   isSelected?: boolean;
-}
-
-/** Represents a file entry from Google Drive */
-export interface DriveFile {
-  id: string;
-  name: string;
-  modifiedTime: string;
-  iconLink?: string;
-  size?: string;
-  mimeType?: string;
 }
 
 /** Toolbar button definition */
@@ -69,11 +56,4 @@ export interface ElementProperties {
   color: string;
   textAlign: TextAlign;
   opacity: number;
-}
-
-/** File source dialog result */
-export interface FileSourceResult {
-  source: 'local' | 'drive';
-  file?: File;
-  driveFile?: DriveFile;
 }

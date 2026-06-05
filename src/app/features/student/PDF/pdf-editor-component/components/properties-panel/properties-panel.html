@@ -90,12 +90,14 @@
         <section class="prop-section">
           <h4 class="section-label">اللون</h4>
           <div class="prop-row color-row">
-            <div 
-              class="color-swatch" 
+            <button
+              type="button"
+              class="color-swatch"
               [style.background]="currentProps().color"
               (click)="colorInput.click()"
               title="تغيير اللون"
-            ></div>
+            >
+            </button>
             <input
               #colorInput
               type="color"
@@ -113,27 +115,18 @@
       <section class="prop-section">
         <h4 class="section-label">ترتيب الطبقات</h4>
         <div class="prop-row layers-row">
-          <button class="layer-btn" (click)="moveBackward()" title="إلى الخلف" aria-label="نقل للخلف">
+          <button class="layer-btn" type="button" (click)="moveBackward()" title="إلى الخلف" aria-label="نقل للخلف">
             <i class="pi pi-arrow-down"></i>
             <span>إلى الخلف</span>
           </button>
-          <button class="layer-btn" (click)="moveForward()" title="إلى الأمام" aria-label="نقل للأمام">
+          <button class="layer-btn" type="button" (click)="moveForward()" title="إلى الأمام" aria-label="نقل للأمام">
             <i class="pi pi-arrow-up"></i>
             <span>إلى الأمام</span>
           </button>
         </div>
       </section>
 
-      <!-- Page Info Section -->
-      <section class="prop-section page-info">
-        <h4 class="section-label">معلومات الصفحة</h4>
-        <div class="info-grid">
-          <span class="info-label">الحجم:</span>
-          <span class="info-value">A4 (210 × 297 mm)</span>
-          <span class="info-label">الطبقات:</span>
-          <span class="info-value">12 كائن</span>
-        </div>
-      </section>
+
     </div>
   }
 </aside>

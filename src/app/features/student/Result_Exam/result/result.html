@@ -3,8 +3,10 @@
     <div
       class="h-32 bg-linear-to-r from-primary-600 to-purple-600 flex items-center justify-center"
     >
-      <div class="bg-white/30 w-16 h-16 flex items-center justify-center p-4 rounded-full backdrop-blur-md">
-        <i class="pi pi-trophy text-white" style="font-size: 1.5rem;font-weight: bold;"></i>
+      <div
+        class="bg-white/30 w-16 h-16 flex items-center justify-center p-4 rounded-full backdrop-blur-md"
+      >
+        <i class="pi pi-trophy text-white" style="font-size: 1.5rem; font-weight: bold"></i>
       </div>
     </div>
 
@@ -60,24 +62,34 @@
             class="p-button-outlined p-button-indigo rounded-xl w-full"
           ></button>
         }
-        <button
-          pButton
-          (click)="goBack()"
-          label="العودة للموارد"
-          icon="pi pi-replay"
-          class="p-button-primary p-button-lg rounded-xl w-full"
-        ></button>
 
-        <button
-          pButton
-          (click)="goHome()"
-          label="الرئيسية"
-          class="p-button-secondary p-button-text"
-        ></button>
+        @if (!isOnline()) {
+          <button
+            pButton
+            (click)="goToBank()"
+            label="العودة للاسألة"
+            icon="pi pi-replay"
+            class="p-button-primary p-button-lg rounded-xl w-full"
+          ></button>
+        } @else {
+          <button
+            pButton
+            (click)="goBack()"
+            label="العودة للموارد"
+            icon="pi pi-replay"
+            class="p-button-primary p-button-lg rounded-xl w-full"
+          ></button>
+          <button
+            pButton
+            (click)="goHome()"
+            label="الرئيسية"
+            class="p-button-secondary p-button-text"
+          ></button>
+        }
       </div>
     </div>
   </div>
- 
+
   @if (showReview()) {
     <div class="w-full max-w-2xl mt-8 space-y-4 animate-fadein">
       <h2 class="text-xl font-bold text-text-main px-2">تفاصيل الأسئلة:</h2>

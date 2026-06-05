@@ -1,5 +1,4 @@
 <div class="editor-shell" dir="rtl">
-
   <!-- ─── Header Bar ─── -->
   <header class="editor-header">
     <!-- Right Side: Brand -->
@@ -41,26 +40,23 @@
         <i class="pi pi-download"></i>
         <span class="btn-text">Export</span>
       </button>
+
+      <!-- Add Page -->
+      <button class="header-btn" (click)="addNewPage()" title="إضافة صفحة" aria-label="إضافة صفحة">
+        <i class="pi pi-plus"></i>
+        <span class="btn-text">صفحة</span>
+      </button>
     </div>
   </header>
 
   <!-- ─── Secondary Toolbar ─── -->
   <nav class="secondary-toolbar" role="toolbar" aria-label="أدوات التنقل">
     <div class="toolbar-group right-group">
-      <!-- Annotate -->
-      <button 
-        class="nav-btn" 
-        [class.active]="currentMode() === 'annotate'" 
-        (click)="setMode('annotate')"
-        title="التعليقات التوضيحية"
-      >
-        <i class="pi pi-pencil"></i>
-        <span class="nav-label">Annotate</span>
-      </button>
+      <!-- Annotate removed per request -->
       <!-- View -->
-      <button 
-        class="nav-btn" 
-        [class.active]="currentMode() === 'view'" 
+      <button
+        class="nav-btn"
+        [class.active]="currentMode() === 'view'"
         (click)="setMode('view')"
         title="عرض"
       >
@@ -68,38 +64,38 @@
         <span class="nav-label">View</span>
       </button>
       <!-- Edit -->
-      <button 
-        class="nav-btn" 
-        [class.active]="currentMode() === 'edit'" 
+      <button
+        class="nav-btn"
+        [class.active]="currentMode() === 'edit'"
         (click)="setMode('edit')"
         title="تحرير"
       >
         <i class="pi pi-file-edit"></i>
         <span class="nav-label">Edit</span>
       </button>
-      <!-- File / Open -->
-      <button class="nav-btn" (click)="openFile()" title="فتح ملف">
-        <i class="pi pi-folder-open"></i>
-        <span class="nav-label">File</span>
+      <!-- New Document -->
+      <button class="nav-btn" (click)="createBlankDocument()" title="مستند جديد">
+        <i class="pi pi-file"></i>
+        <span class="nav-label">New</span>
       </button>
     </div>
 
     <div class="toolbar-group center-group">
       <!-- Undo/Redo -->
-      <button 
-        class="icon-btn" 
-        (click)="undo()" 
-        [disabled]="undoStack.length === 0" 
-        title="تراجع" 
+      <button
+        class="icon-btn"
+        (click)="undo()"
+        [disabled]="undoStack.length === 0"
+        title="تراجع"
         aria-label="تراجع"
       >
         <i class="pi pi-replay"></i>
       </button>
-      <button 
-        class="icon-btn" 
-        (click)="redo()" 
-        [disabled]="redoStack.length === 0" 
-        title="إعادة" 
+      <button
+        class="icon-btn"
+        (click)="redo()"
+        [disabled]="redoStack.length === 0"
+        title="إعادة"
         aria-label="إعادة"
       >
         <i class="pi pi-refresh"></i>
@@ -132,66 +128,51 @@
       }
 
       <!-- Mobile toggle buttons -->
-      <button class="icon-btn mobile-only" (click)="toggleMobileSidebar()" title="الصفحات" aria-label="عرض الصفحات">
-        <i class="pi pi-th-large"></i>
-      </button>
-      <button class="icon-btn mobile-only" (click)="toggleMobileProps()" title="الخصائص" aria-label="عرض الخصائص">
-        <i class="pi pi-sliders-h"></i>
-      </button>
+      <!-- Pages menu removed (integrated into header) -->
     </div>
   </nav>
 
   <!-- ─── Main Editor Body ─── -->
   <div class="editor-body">
-
-    <!-- Properties Panel (Left in RTL) -->
-    <app-properties-panel
+    <!-- Page Thumbnails Sidebar -->
+    <app-page-thumbnails
       class="desktop-panel"
-      [selectedAnnotation]="selectedAnnotation()"
-      [currentPage]="currentPage()"
       [totalPages]="totalPages()"
-      [isOpen]="isPropertiesPanelOpen()"
-      (propertiesChanged)="onPropertiesChanged($event)"
-      (orderChanged)="onOrderChanged($event)"
-      (togglePanel)="togglePropertiesPanel()"
+      [currentPage]="currentPage()"
+      [isCollapsed]="!isSidebarOpen()"
+      (pageSelected)="goToPage($event)"
+      (toggleSidebar)="toggleSidebar()"
+      (addPage)="addNewPage()"
     />
 
     <!-- Main Canvas Area -->
     <main class="canvas-area" role="main">
       @if (!isDocumentLoaded()) {
         <!-- Empty State -->
-        <div class="empty-state" (click)="openFile()">
+        <div class="empty-state">
           <div class="empty-icon">
             <i class="pi pi-file-pdf"></i>
           </div>
           <h2 class="empty-title">محرر Elm للمستندات</h2>
-          <p class="empty-desc">اسحب ملف PDF هنا أو اضغط لفتح ملف</p>
+          <p class="empty-desc">أنشئ مستندًا جديدًا وابدأ التعديل مباشرة داخل المحرر</p>
           <div class="empty-actions">
-            <button class="empty-btn primary" (click)="openFile(); $event.stopPropagation()">
-              <i class="pi pi-folder-open"></i>
-              فتح ملف
+            <button class="empty-btn secondary" (click)="createBlankDocument()">
+              <i class="pi pi-file"></i>
+              إنشاء مستند جديد
             </button>
-          </div>
-          <div class="empty-sources">
-            <span class="source-chip">
-              <i class="pi pi-desktop"></i>
-              الجهاز المحلي
-            </span>
-            <span class="source-chip">
-              <i class="pi pi-google"></i>
-              Google Drive
-            </span>
           </div>
         </div>
       } @else {
         <!-- PDF Viewer -->
-        <div class="pdf-canvas-area" (click)="onCanvasClick($event)">
+        <div 
+          class="pdf-canvas-area"
+          (click)="onCanvasClick($event)"
+          (dragover)="onDragOver($event)"
+          (drop)="onDrop($event)"
+        >
           <!-- Floating Toolbar -->
           @if (currentMode() !== 'view') {
-            <app-editor-toolbar
-              [activeTool]="activeTool()"
-              (toolSelected)="onToolSelected($event)"
-            />
+            <app-editor-toolbar [activeTool]="activeTool" (toolSelected)="onToolSelected($event)" />
           }
 
           <!-- ngx-extended-pdf-viewer -->
@@ -210,7 +191,7 @@
             [showDownloadButton]="false"
             [showSecondaryToolbarButton]="false"
             [showRotateButton]="false"
-            [showHandToolButton]="false" 
+            [showHandToolButton]="false"
             [showSpreadButton]="false"
             [showPropertiesButton]="false"
             [textLayer]="true"
@@ -222,64 +203,29 @@
 
         <!-- Page Navigation Footer -->
         <div class="page-nav">
-          <button class="page-nav-btn" (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() <= 1" aria-label="الصفحة السابقة">
+          <button
+            class="page-nav-btn"
+            (click)="goToPage(currentPage() - 1)"
+            [disabled]="currentPage() <= 1"
+            aria-label="الصفحة السابقة"
+          >
             <i class="pi pi-chevron-right"></i>
           </button>
           <span class="page-indicator">{{ currentPage() }} / {{ totalPages() }}</span>
-          <button class="page-nav-btn" (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() >= totalPages()" aria-label="الصفحة التالية">
+          <button
+            class="page-nav-btn"
+            (click)="goToPage(currentPage() + 1)"
+            [disabled]="currentPage() >= totalPages()"
+            aria-label="الصفحة التالية"
+          >
             <i class="pi pi-chevron-left"></i>
           </button>
         </div>
       }
     </main>
 
-    <!-- Thumbnails Sidebar (Right in RTL) -->
-    <app-page-thumbnails
-      class="desktop-panel"
-      [totalPages]="totalPages()"
-      [currentPage]="currentPage()"
-      [isCollapsed]="!isSidebarOpen()"
-      (pageSelected)="goToPage($event)"
-      (toggleSidebar)="toggleSidebar()"
-      (addPage)="addNewPage()"
-    />
+    <!-- Left thumbnails sidebar preserved; page controls are in header -->
   </div>
 
-  <!-- ─── Mobile Sidebar Overlay ─── -->
-  @if (isMobileSidebarOpen()) {
-    <div class="mobile-overlay" (click)="toggleMobileSidebar()"></div>
-    <div class="mobile-sidebar-panel">
-      <app-page-thumbnails
-        [totalPages]="totalPages()"
-        [currentPage]="currentPage()"
-        [isCollapsed]="false"
-        (pageSelected)="goToPage($event); toggleMobileSidebar()"
-        (toggleSidebar)="toggleMobileSidebar()"
-        (addPage)="addNewPage()"
-      />
-    </div>
-  }
-
-  <!-- ─── Mobile Properties Overlay ─── -->
-  @if (isMobilePropsOpen()) {
-    <div class="mobile-overlay" (click)="toggleMobileProps()"></div>
-    <div class="mobile-props-panel">
-      <app-properties-panel
-        [selectedAnnotation]="selectedAnnotation()"
-        [currentPage]="currentPage()"
-        [totalPages]="totalPages()"
-        [isOpen]="true"
-        (propertiesChanged)="onPropertiesChanged($event)"
-        (orderChanged)="onOrderChanged($event)"
-        (togglePanel)="toggleMobileProps()"
-      />
-    </div>
-  }
-
-  <!-- ─── File Source Dialog ─── -->
-  <app-file-source-dialog
-    #fileDialog
-    (fileSelected)="onFileSelected($event)"
-    (exportToDrive)="onExportToDrive($event)"
-  />
+  <!-- Mobile pages overlay removed -->
 </div>

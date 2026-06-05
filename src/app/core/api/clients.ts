@@ -5184,6 +5184,83 @@ export class SectionPublicClient implements ISectionPublicClient {
     }
 }
 
+export interface ISecurityClient {
+    /**
+     * @return OK
+     */
+    validateLink(body: ValidateLinkCommand): Observable<ResultOfLinkValidationResult>;
+}
+
+@Injectable({
+    providedIn: 'root'
+})
+export class SecurityClient implements ISecurityClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "https://elm.runasp.net/";
+    }
+
+    /**
+     * @return OK
+     */
+    validateLink(body: ValidateLinkCommand, httpContext?: HttpContext): Observable<ResultOfLinkValidationResult> {
+        let url_ = this.baseUrl + "/api/Security/validateLink";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            context: httpContext,
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processValidateLink(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processValidateLink(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfLinkValidationResult>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfLinkValidationResult>;
+        }));
+    }
+
+    protected processValidateLink(response: HttpResponseBase): Observable<ResultOfLinkValidationResult> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        let _mappings: { source: any, target: any }[] = [];
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver) as ResultOfLinkValidationResult;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
 export interface ISettingsClient {
     /**
      * @return OK
@@ -5765,6 +5842,106 @@ export class SubjectPublicClient implements ISubjectPublicClient {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             result200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver) as ResultOfGetSubjectDto;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+export interface ISupportsClient {
+    /**
+     * @param name (optional) 
+     * @param email (optional) 
+     * @param message (optional) 
+     * @param images (optional) 
+     * @return OK
+     */
+    submitError(name?: string | undefined, email?: string | undefined, message?: string | undefined, images?: string[] | undefined): Observable<ResultOfboolean>;
+}
+
+@Injectable({
+    providedIn: 'root'
+})
+export class SupportsClient implements ISupportsClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "https://elm.runasp.net/";
+    }
+
+    /**
+     * @param name (optional) 
+     * @param email (optional) 
+     * @param message (optional) 
+     * @param images (optional) 
+     * @return OK
+     */
+    submitError(name?: string | undefined, email?: string | undefined, message?: string | undefined, images?: string[] | undefined, httpContext?: HttpContext): Observable<ResultOfboolean> {
+        let url_ = this.baseUrl + "/api/Supports/submit-error";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = new FormData();
+        if (name === null || name === undefined)
+            throw new globalThis.Error("The parameter 'name' cannot be null.");
+        else
+            content_.append("Name", name.toString());
+        if (email === null || email === undefined)
+            throw new globalThis.Error("The parameter 'email' cannot be null.");
+        else
+            content_.append("Email", email.toString());
+        if (message === null || message === undefined)
+            throw new globalThis.Error("The parameter 'message' cannot be null.");
+        else
+            content_.append("Message", message.toString());
+        if (images === null || images === undefined)
+            throw new globalThis.Error("The parameter 'images' cannot be null.");
+        else
+            images.forEach(item_ => content_.append("Images", item_.toString()));
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            context: httpContext,
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSubmitError(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSubmitError(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfboolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfboolean>;
+        }));
+    }
+
+    protected processSubmitError(response: HttpResponseBase): Observable<ResultOfboolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        let _mappings: { source: any, target: any }[] = [];
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : jsonParse(_responseText, this.jsonParseReviver) as ResultOfboolean;
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -6848,6 +7025,7 @@ export interface AddCodeSnippetCommand {
     title: string;
     code: string;
     sectionId: number;
+    type: number;
 
     [key: string]: any;
 }
@@ -7122,6 +7300,7 @@ export interface GetDepartmentDto2 {
 export interface GetSectionDetailsDto {
     id?: number;
     title?: string;
+    type?: string;
     codeSnippet?: string | null;
 
     [key: string]: any;
@@ -7184,6 +7363,14 @@ export interface LeaderDto {
     yearName?: string;
     departmentName?: string;
     isActived?: boolean;
+
+    [key: string]: any;
+}
+
+export interface LinkValidationResult {
+    isSafe: boolean;
+    threatType: string;
+    description: string;
 
     [key: string]: any;
 }
@@ -7445,6 +7632,16 @@ export interface ResultOfIEnumerableOfstring {
 
 export interface ResultOfint {
     data?: number;
+    isSuccess?: boolean;
+    statusCode?: number;
+    errors?: ValidationError[];
+    message?: string | null;
+
+    [key: string]: any;
+}
+
+export interface ResultOfLinkValidationResult {
+    data?: LinkValidationResult | null;
     isSuccess?: boolean;
     statusCode?: number;
     errors?: ValidationError[];
@@ -7856,6 +8053,12 @@ export interface UpdateVideoCommand {
 export interface UpdateYearCommand {
     id: number;
     name: string;
+
+    [key: string]: any;
+}
+
+export interface ValidateLinkCommand {
+    url: string;
 
     [key: string]: any;
 }

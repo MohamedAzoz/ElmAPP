@@ -16,7 +16,7 @@
 
         <div class="hidden lg:flex items-center gap-1">
           <a
-            [hidden]="isLoggedIn()"
+            [hidden]="isLoggedIn() && !isOnline()"
             [routerLink]="['/main/colleges']"
             routerLinkActive="bg-nav text-main border-1 border-main"
             [routerLinkActiveOptions]="{ exact: true }"
@@ -26,13 +26,42 @@
           </a>
           <!-- pdf editor -->
           <a
-            [hidden]="isLoggedIn()"
+            [hidden]="isLoggedIn() && !isOnline()"
             [routerLink]="['/main/pdf-editor']"
             routerLinkActive="bg-nav text-main border-1 border-main"
             [routerLinkActiveOptions]="{ exact: true }"
             class="px-4 py-2 rounded-lg hover:bg-link-hover hover:text-text-main"
           >
             محرر الملفات
+          </a>
+          <!-- wrong answers -->
+          <a
+            [hidden]="isLoggedIn() && !isOnline()"
+            [routerLink]="['/main/wrong-answers']"
+            routerLinkActive="bg-nav text-main border-1 border-main"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="px-4 py-2 rounded-lg hover:bg-link-hover hover:text-text-main"
+          >
+            الاسألة الخاطئة
+          </a>
+          <a
+            [hidden]="isLoggedIn() || isOnline()"
+            [routerLink]="['/main/saved-banks']"
+            routerLinkActive="bg-nav text-main border-1 border-main"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="px-4 py-2 rounded-lg hover:bg-link-hover hover:text-text-main"
+          >
+            البنوك المحفوظة
+          </a>
+          <!-- security link validator -->
+          <a
+            [hidden]="isLoggedIn() && !isOnline()"
+            [routerLink]="['/main/security-links']"
+            routerLinkActive="bg-nav text-main border-1 border-main"
+            [routerLinkActiveOptions]="{ exact: true }" 
+            class="px-4 py-2 rounded-lg hover:bg-link-hover hover:text-text-main"
+          >
+            مدقق الروابط الامنية
           </a>
           <a
             [hidden]="!isLoggedIn()"
@@ -136,6 +165,7 @@
     }
 
     <a
+      [hidden]="isLoggedIn() && !isOnline()"
       [routerLink]="['/main/colleges']"
       (click)="sidebarVisible.set(false)"
       routerLinkActive="bg-main/10 text-main ring-1 ring-main/20"
@@ -146,14 +176,57 @@
     </a>
     <!-- pdf editor -->
     <a
+      [hidden]="isLoggedIn() && !isOnline()"
       [routerLink]="['/main/pdf-editor']"
+      (click)="sidebarVisible.set(false)"
       routerLinkActive="bg-main/10 text-main ring-1 ring-main/20"
       [routerLinkActiveOptions]="{ exact: true }"
       class="p-4 rounded-2xl font-bold text-gray-700 flex items-center gap-4 transition-all active:scale-95"
     >
       <i class="pi pi-file text-lg"></i> محرر الملفات
     </a>
-
+    <!-- wrong answers -->
+    <a
+      [hidden]="isLoggedIn() && !isOnline()"
+      [routerLink]="['/main/wrong-answers']"
+      (click)="sidebarVisible.set(false)"
+      routerLinkActive="bg-nav text-main border-1 border-main"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="px-4 py-2 rounded-lg hover:bg-link-hover hover:text-text-main"
+    >
+      الاسألة الخاطئة
+    </a>
+    <a
+      [hidden]="isLoggedIn() || isOnline()"
+      [routerLink]="['/main/saved-banks']"
+      (click)="sidebarVisible.set(false)"
+      routerLinkActive="bg-nav text-main border-1 border-main"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="px-4 py-2 rounded-lg hover:bg-link-hover hover:text-text-main"
+    >
+      البنوك المحفوظة
+    </a>
+    <!-- security link validator -->
+    <a
+      [hidden]="isLoggedIn() && isOnline()"
+      [routerLink]="['/main/security-links']"
+      (click)="sidebarVisible.set(false)"
+      routerLinkActive="bg-main/10 text-main ring-1 ring-main/20"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="p-4 rounded-2xl font-bold text-gray-700 flex items-center gap-4 transition-all active:scale-95"
+    >
+      <i class="pi pi-home text-lg"></i> مدقق الروابط الامنية
+    </a>
+    <a
+      [hidden]="!isLoggedIn()"
+      [routerLink]="['/main/home']"
+      (click)="sidebarVisible.set(false)"
+      routerLinkActive="bg-main/10 text-main ring-1 ring-main/20"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="p-4 rounded-2xl font-bold text-gray-700 flex items-center gap-4 transition-all active:scale-95"
+    >
+      <i class="pi pi-home text-lg"></i> الصفحة الرئيسية
+    </a>
     @for (link of filteredLinks(); track link.label) {
       <a
         [routerLink]="[link.command()]"
