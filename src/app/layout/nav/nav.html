@@ -25,7 +25,7 @@
             الكليات والملخصات
           </a>
           <!-- pdf editor -->
-          <a
+          <!-- <a
             [hidden]="isLoggedIn() || !isOnline()"
             [routerLink]="['/main/pdf-editor']"
             routerLinkActive="bg-nav text-main border-1 border-main"
@@ -33,7 +33,7 @@
             class="px-4 py-2 rounded-lg hover:bg-link-hover hover:text-text-main"
           >
             محرر الملفات
-          </a>
+          </a> -->
           <!-- wrong answers -->
           <a
             [hidden]="isLoggedIn() || !isOnline()"
@@ -42,8 +42,9 @@
             [routerLinkActiveOptions]="{ exact: true }"
             class="px-4 py-2 rounded-lg hover:bg-link-hover hover:text-text-main"
           >
-            الاسألة الخاطئة
+            الأسئلة الخاطئة
           </a>
+          <!-- saved banks -->
           <a
             [hidden]="isLoggedIn() || isOnline()"
             [routerLink]="['/main/saved-banks']"
@@ -58,10 +59,10 @@
             [hidden]="isLoggedIn() || !isOnline()"
             [routerLink]="['/main/security-links']"
             routerLinkActive="bg-nav text-main border-1 border-main"
-            [routerLinkActiveOptions]="{ exact: true }" 
+            [routerLinkActiveOptions]="{ exact: true }"
             class="px-4 py-2 rounded-lg hover:bg-link-hover hover:text-text-main"
           >
-            مدقق الروابط الامنية
+            مصادرى
           </a>
           <a
             [hidden]="!isLoggedIn()"
@@ -175,7 +176,7 @@
       <i class="pi pi-building text-lg"></i> الكليات والملخصات
     </a>
     <!-- pdf editor -->
-    <a
+    <!-- <a
       [hidden]="isLoggedIn() || !isOnline()"
       [routerLink]="['/main/pdf-editor']"
       (click)="sidebarVisible.set(false)"
@@ -184,17 +185,17 @@
       class="p-4 rounded-2xl font-bold text-gray-700 flex items-center gap-4 transition-all active:scale-95"
     >
       <i class="pi pi-file text-lg"></i> محرر الملفات
-    </a>
+    </a> -->
     <!-- wrong answers -->
     <a
       [hidden]="isLoggedIn() || !isOnline()"
       [routerLink]="['/main/wrong-answers']"
       (click)="sidebarVisible.set(false)"
-      routerLinkActive="bg-nav text-main border-1 border-main"
+      routerLinkActive="bg-main/10 text-main ring-1 ring-main/20"
       [routerLinkActiveOptions]="{ exact: true }"
       class="px-4 py-2 rounded-lg hover:bg-link-hover hover:text-text-main"
     >
-      الاسألة الخاطئة
+      <i class="pi pi-times text-lg"></i> الأسئلة الخاطئة
     </a>
     <a
       [hidden]="isLoggedIn() || isOnline()"
@@ -204,7 +205,7 @@
       [routerLinkActiveOptions]="{ exact: true }"
       class="px-4 py-2 rounded-lg hover:bg-link-hover hover:text-text-main"
     >
-      البنوك المحفوظة
+      <i class="pi pi-star text-lg"></i> البنوك المحفوظة
     </a>
     <!-- security link validator -->
     <a
@@ -215,7 +216,7 @@
       [routerLinkActiveOptions]="{ exact: true }"
       class="p-4 rounded-2xl font-bold text-gray-700 flex items-center gap-4 transition-all active:scale-95"
     >
-      <i class="pi pi-home text-lg"></i> مدقق الروابط الامنية
+      <i class="pi pi-shield text-lg"></i> مصادرى
     </a>
     <a
       [hidden]="!isLoggedIn()"

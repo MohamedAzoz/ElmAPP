@@ -17,19 +17,20 @@ export class Workspace {
 
   // الأكواد الافتراضية المجهزة للطلاب عند اختيار اللغة
   private boilerplates: { [key: string]: string } = {
-    cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "مرحباً بك في منصة علم" << endl;\n    return 0;\n}`,
-    python: `# مرحباً بك في منصة علم\nprint("Hello from Elm Compiler!")`,
-    java: `public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello Elm!");\n    }\n}`,
     csharp: `using System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine("Hello Elm!");\n    }\n}`,
+    java: `public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello Elm!");\n    }\n}`,
+    python: `# مرحباً بك في منصة علم\nprint("Hello from Elm Compiler!")`,
     javascript: `console.log("Hello Elm!");`,
+    cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "مرحباً بك في منصة علم" << endl;\n    return 0;\n}`,
+    php: `<?php\necho "Hello Elm!";\n?>`,
   };
-
   languages = [
-    { id: 'cpp', name: 'C++' },
-    { id: 'python', name: 'Python' },
-    { id: 'java', name: 'Java' },
     { id: 'csharp', name: 'C#' },
+    { id: 'java', name: 'Java' },
+    { id: 'python', name: 'Python' },
     { id: 'javascript', name: 'JavaScript' },
+    { id: 'cpp', name: 'C++' },
+    { id: 'php', name: 'PHP' },
   ];
 
   selectedLanguage: string = 'cpp';
