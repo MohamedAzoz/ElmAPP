@@ -114,8 +114,7 @@ export class Nav {
   }
 
   logout() {
+    this.sidebarVisible.set(false);
     this.authFacade.logout();
-    window.location.reload();
-    this.router.navigate(['/main/login']);
   }
 }

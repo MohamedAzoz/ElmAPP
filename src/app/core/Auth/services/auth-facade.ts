@@ -78,11 +78,11 @@ export class AuthFacade {
     this.authClient.logout().subscribe({
       next: () => {
         this.clearState();
+        this.router.navigate(['/main/login']);
       },
-      error: () => {
+      error: (err) => {
+        console.error('Logout failed:', err);
         this.clearState();
-      },
-      complete: () => {
         this.router.navigate(['/main/login']);
       },
     });

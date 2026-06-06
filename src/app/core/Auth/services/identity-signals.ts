@@ -35,10 +35,10 @@ export class IdentitySignals {
   }
 
   get roles(): string {
+    const _ = this.userData; // Register reactive dependency on userData signal
     try {
-      // استخدمنا try-catch لأن قراءة JSON خاطئ توقف التطبيق
       const rolesStr = this.localStorage.get('role');
-      return rolesStr;
+      return rolesStr || '';
     } catch {
       return "";
     } 
@@ -53,6 +53,7 @@ export class IdentitySignals {
   }
 
   get expiresOn() {
+    const _ = this.userData; // Register reactive dependency on userData signal
     return this.localStorage.get('expires_on') ?? '';
   }
 }

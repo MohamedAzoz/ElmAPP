@@ -16,7 +16,7 @@
 
         <div class="hidden lg:flex items-center gap-1">
           <a
-            [hidden]="isLoggedIn() && !isOnline()"
+            [hidden]="isLoggedIn() || !isOnline()"
             [routerLink]="['/main/colleges']"
             routerLinkActive="bg-nav text-main border-1 border-main"
             [routerLinkActiveOptions]="{ exact: true }"
@@ -26,7 +26,7 @@
           </a>
           <!-- pdf editor -->
           <a
-            [hidden]="isLoggedIn() && !isOnline()"
+            [hidden]="isLoggedIn() || !isOnline()"
             [routerLink]="['/main/pdf-editor']"
             routerLinkActive="bg-nav text-main border-1 border-main"
             [routerLinkActiveOptions]="{ exact: true }"
@@ -36,7 +36,7 @@
           </a>
           <!-- wrong answers -->
           <a
-            [hidden]="isLoggedIn() && !isOnline()"
+            [hidden]="isLoggedIn() || !isOnline()"
             [routerLink]="['/main/wrong-answers']"
             routerLinkActive="bg-nav text-main border-1 border-main"
             [routerLinkActiveOptions]="{ exact: true }"
@@ -55,7 +55,7 @@
           </a>
           <!-- security link validator -->
           <a
-            [hidden]="isLoggedIn() && !isOnline()"
+            [hidden]="isLoggedIn() || !isOnline()"
             [routerLink]="['/main/security-links']"
             routerLinkActive="bg-nav text-main border-1 border-main"
             [routerLinkActiveOptions]="{ exact: true }" 
@@ -165,7 +165,7 @@
     }
 
     <a
-      [hidden]="isLoggedIn() && !isOnline()"
+      [hidden]="isLoggedIn() || !isOnline()"
       [routerLink]="['/main/colleges']"
       (click)="sidebarVisible.set(false)"
       routerLinkActive="bg-main/10 text-main ring-1 ring-main/20"
@@ -176,7 +176,7 @@
     </a>
     <!-- pdf editor -->
     <a
-      [hidden]="isLoggedIn() && !isOnline()"
+      [hidden]="isLoggedIn() || !isOnline()"
       [routerLink]="['/main/pdf-editor']"
       (click)="sidebarVisible.set(false)"
       routerLinkActive="bg-main/10 text-main ring-1 ring-main/20"
@@ -187,7 +187,7 @@
     </a>
     <!-- wrong answers -->
     <a
-      [hidden]="isLoggedIn() && !isOnline()"
+      [hidden]="isLoggedIn() || !isOnline()"
       [routerLink]="['/main/wrong-answers']"
       (click)="sidebarVisible.set(false)"
       routerLinkActive="bg-nav text-main border-1 border-main"
@@ -208,7 +208,7 @@
     </a>
     <!-- security link validator -->
     <a
-      [hidden]="isLoggedIn() && isOnline()"
+      [hidden]="isLoggedIn() || !isOnline()"
       [routerLink]="['/main/security-links']"
       (click)="sidebarVisible.set(false)"
       routerLinkActive="bg-main/10 text-main ring-1 ring-main/20"

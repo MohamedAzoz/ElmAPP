@@ -8,14 +8,11 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { SkeletonModule } from 'primeng/skeleton';
-import { ToastModule } from 'primeng/toast'; // 👈 تم إضافة استيراد موديول الرسائل التنبيهية
-
 import { LinkValidatorFacade } from '../link-validator-facade';
 import { LinkSourceType, SOURCE_TYPE_OPTIONS, STATUS_CONFIG, SavedLink } from '../link.model';
 
 @Component({
   selector: 'app-security-link-validator',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -26,7 +23,6 @@ import { LinkSourceType, SOURCE_TYPE_OPTIONS, STATUS_CONFIG, SavedLink } from '.
     TagModule,
     TooltipModule,
     SkeletonModule,
-    ToastModule, // 👈 تم دمج الموديول هنا ليعمل داخل الـ View بنجاح
   ],
   templateUrl: './security-link-validator.html',
   styleUrl: './security-link-validator.css',
@@ -37,14 +33,13 @@ export class SecurityLinkValidator implements OnInit {
   // Constants for template
   readonly SOURCE_TYPE_OPTIONS = [...SOURCE_TYPE_OPTIONS];
   readonly STATUS_CONFIG = STATUS_CONFIG as any;
-
   // Modal State
   showAddModal = signal(false);
-  
+
   // Form State
   newLinkTitle = signal('');
   newLinkUrl = signal('');
-  newLinkSourceType = signal<LinkSourceType>('external');
+  newLinkSourceType = signal<LinkSourceType>(LinkSourceType.external);
 
   // Edit State
   editingLinkId = signal<string | null>(null);
@@ -54,7 +49,7 @@ export class SecurityLinkValidator implements OnInit {
   }
 
   // --- Modal Management ---
-  
+
   openAddModal() {
     this.resetForm();
     this.editingLinkId.set(null);
@@ -77,8 +72,9 @@ export class SecurityLinkValidator implements OnInit {
   resetForm() {
     this.newLinkTitle.set('');
     this.newLinkUrl.set('');
-    this.newLinkSourceType.set('external');
+    this.newLinkSourceType.set(LinkSourceType.external);
     this.editingLinkId.set(null);
+    this.facade.clearValidationError();
   }
 
   // --- Actions ---
@@ -96,13 +92,13 @@ export class SecurityLinkValidator implements OnInit {
         isEditing,
         this.newLinkTitle(),
         this.newLinkUrl(),
-        this.newLinkSourceType()
+        this.newLinkSourceType(),
       );
     } else {
       success = await this.facade.addLink(
         this.newLinkTitle(),
         this.newLinkUrl(),
-        this.newLinkSourceType()
+        this.newLinkSourceType(),
       );
     }
 
@@ -145,12 +141,12 @@ export class SecurityLinkValidator implements OnInit {
   // --- Helpers ---
 
   getSourceIcon(type: LinkSourceType): string {
-    const option = this.SOURCE_TYPE_OPTIONS.find(o => o.value === type);
+    const option = this.SOURCE_TYPE_OPTIONS.find((o) => o.value === type);
     return option ? option.icon : 'pi pi-link';
   }
 
   formatDate(timestamp: number): string {
     const d = new Date(timestamp);
-    return d.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: '2-digit' });
+    return d.toLocaleDateString('ar-EG', { month: 'numeric', day: 'numeric', year: '2-digit' });
   }
 }

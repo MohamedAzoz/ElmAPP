@@ -57,6 +57,7 @@ function isApiRequest(url: string): boolean {
 }
 
 function isPublicOrLogoutRequest(url: string): boolean {
-  const excludedEndpoints = ['/Auth/login', '/Auth/Logout'];
-  return excludedEndpoints.some((endpoint) => url.includes(endpoint));
+  const excludedEndpoints = ['/auth/login', '/auth/logout'];
+  const lowercaseUrl = url.toLowerCase();
+  return excludedEndpoints.some((endpoint) => lowercaseUrl.includes(endpoint));
 }

@@ -1,18 +1,17 @@
 import { Component, EventEmitter, Output, computed, effect, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { GetCurriculumDto, GetDepartmentDto, GetYearDto } from '../../../core/api/clients';
-import { Card } from 'primeng/card';
 
 @Component({
   selector: 'app-carde',
-  imports: [RouterLink, Card],
+  imports: [RouterLink],
   templateUrl: './carde.html',
   styleUrl: './carde.css',
 })
 export class Carde {
   data = input.required<GetCurriculumDto | GetDepartmentDto | GetYearDto>();
   Link = input<string>('');
-  cardType = input<'default' | 'department' | 'curriculum' | 'section'|'bank'>('default');
+  cardType = input<'default' | 'department' | 'curriculum' | 'section' | 'bank'>('default');
   showSaveButton = input<boolean>(false);
   isSaved = input<boolean>(false);
   isSaving = input<boolean>(false);

@@ -1,16 +1,17 @@
 <section class="question-card">
   <div class="question-panel">
+    
     @if (safeImageUrl) {
-      <div class="question-image">
-        <img [src]="safeImageUrl" alt="صورة السؤال" loading="lazy" />
+      <div class="question-image-wrapper">
+        <div class="image-inner-container">
+          <img [src]="safeImageUrl" alt="صورة السؤال" loading="lazy" class="responsive-question-img" />
+        </div>
       </div>
     }
 
     <div class="question-header">
       <div class="question-title">
-        <h2
-          class="text-base md:text-lg lg:text-xl xl:text-2xl font-semibold text-gray-800 pb-1 leading-[1.4]"
-        >
+        <h2 class="text-base md:text-lg lg:text-xl xl:text-2xl font-semibold text-gray-800 ">
           @if (index !== undefined) {
             <span class="question-index">{{ index + 1 }}.</span> {{ question.content }}
           } @else {

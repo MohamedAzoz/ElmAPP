@@ -27,10 +27,10 @@ export class QuestionCarde implements OnChanges {
   @Input() isTestMode = false;
   @Output() answerSelect = new EventEmitter<number>();
 
-  selectedOptionId: number | null = null;
-  safeImageUrl: SafeResourceUrl | null = null;
-  optionLabels = ['A', 'B', 'C', 'D'];
   private sanitizer = inject(DomSanitizer);
+  safeImageUrl: SafeResourceUrl | null = null;
+  selectedOptionId: number | null = null;
+  optionLabels = ['A', 'B', 'C', 'D'];
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['savedAnswerId']) {
@@ -51,8 +51,28 @@ export class QuestionCarde implements OnChanges {
     }
 
     const trimmed = url.trim();
+    let fileId = '';
 
-    // all link only get from google drive
+    // 1. إذا كان المدخل رابطاً كاملاً من جوجل درايف
+    if (trimmed.includes('drive.google.com')) {
+      if (trimmed.includes('id=')) {
+        fileId = trimmed.split('id=')[1].split('&')[0];
+      } else if (trimmed.includes('d/')) {
+        fileId = trimmed.split('d/')[1].split('/')[0];
+      }
+    } 
+    // 2. إذا كان المدخل هو الـ File ID فقط القادم مباشرة من الباك إند
+    else if (trimmed.length > 20 && !trimmed.startsWith('http') && !trimmed.startsWith('data:') && !trimmed.startsWith('blob:')) {
+      fileId = trimmed;
+    }
+
+    // إذا تم العثور على مـعرف الملف (جوجل درايف)، نربطه برابط العرض المباشر والـ Direct Rendering الخفيف والممتاز للـ <img>
+    if (fileId) {
+      const directImageUrl = `https://lh3.googleusercontent.com/d/${fileId}`;
+      return this.sanitizer.bypassSecurityTrustResourceUrl(directImageUrl);
+    }
+
+    // 3. في حال كان الرابط عادياً ومباشراً من أي سيرفر آخر أو Base64
     const isAllowed =
       trimmed.startsWith('http://') ||
       trimmed.startsWith('https://') ||

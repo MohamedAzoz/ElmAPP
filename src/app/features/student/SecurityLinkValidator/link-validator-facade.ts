@@ -1,10 +1,13 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
-import { SecurityClient } from '../../../core/api/clients';
+import { firstValueFrom, Observable } from 'rxjs';
+import { ResultOfLinkValidationResult, SecurityClient } from '../../../core/api/clients';
 import { AppMessageService } from '../../../core/Services/app-message-service';
 import { LinkStorageService } from './link-storage.service';
 import { GoogleDriveSyncService, DriveConnectionStatus } from './google-drive-sync.service';
-import { SavedLink, LinkSourceType, LinkStatus, generateLinkId } from './link.model';
+import { SavedLink, LinkSourceType, generateLinkId, LinkStatus } from './link.model';
+import { HttpClient, HttpContext } from '@angular/common/http';
+import { environment } from '../../../../environments/environment.development';
+import { SkipLoading } from '../../../core/Interceptors/loading-interceptor';
 
 /**
  * واجهة موحدة لنظام حفظ الروابط الآمنة
@@ -12,10 +15,19 @@ import { SavedLink, LinkSourceType, LinkStatus, generateLinkId } from './link.mo
  */
 @Injectable({ providedIn: 'root' })
 export class LinkValidatorFacade {
-  private readonly securityClient = inject(SecurityClient);
+  private readonly http = inject(HttpClient);
   private readonly messageService = inject(AppMessageService);
   private readonly linkStorage = inject(LinkStorageService);
   private readonly driveSync = inject(GoogleDriveSyncService);
+
+  // api/Security/validateLink
+  validateLink(url: string): Observable<ResultOfLinkValidationResult> {
+    return this.http.post<any>(
+      `${environment.apiUrl}api/Security/validateLink`,
+      { url },
+      { context: new HttpContext().set(SkipLoading, true) },
+    );
+  }
 
   // --- الحالة المركزية ---
   private readonly _links = signal<SavedLink[]>([]);
@@ -25,8 +37,11 @@ export class LinkValidatorFacade {
   private readonly _driveStatus = signal<DriveConnectionStatus>('disconnected');
   private readonly _searchQuery = signal('');
   private readonly _activeFilter = signal<LinkSourceType | 'all'>('all');
+  private readonly _validationError = signal<string | null>(null);
 
   // --- الحالة العامة (read-only) ---
+  readonly validationError = this._validationError.asReadonly();
+
   readonly links = computed(() => {
     let result = this._links();
     const query = this._searchQuery().toLowerCase().trim();
@@ -88,11 +103,25 @@ export class LinkValidatorFacade {
    * 2. منع الحفظ تماماً إذا كان الرابط غير آمن (400 / 422)
    * 3. حفظ في IndexedDB مشفر ومزامنة مع Google Drive إذا كان آمناً فقط
    */
+  clearValidationError(): void {
+    this._validationError.set(null);
+  }
+
+  // --- إضافة رابط جديد ---
+
+  /**
+   * إضافة رابط جديد مع التحقق من الأمان
+   * 1. التحقق عبر SecurityClient.validate
+   * 2. منع الحفظ تماماً إذا كان الرابط غير آمن (400 / 422)
+   * 3. حفظ في IndexedDB مشفر ومزامنة مع Google Drive إذا كان آمناً فقط
+   */
   async addLink(title: string, url: string, sourceType: LinkSourceType): Promise<boolean> {
+    this._validationError.set(null);
+
     // التحقق من عدم التكرار
     const existing = this._links().find((l) => l.url === url);
     if (existing) {
-      this.messageService.addWarnMessage('هذا الرابط محفوظ مسبقاً');
+      this._validationError.set('هذا الرابط محفوظ مسبقاً في القائمة');
       return false;
     }
 
@@ -104,39 +133,42 @@ export class LinkValidatorFacade {
       title: title.trim(),
       url: url.trim(),
       sourceType,
-      status: 'pending',
+      status: LinkStatus.pending,
       checkedAt: Date.now(),
       createdAt: Date.now(),
     };
 
     try {
       // الخطوة 1: التحقق من الأمان عبر الباك إند
-      const result = await firstValueFrom(this.securityClient.validateLink({ url: newLink.url }));
+      const result = await firstValueFrom(this.validateLink(newLink.url));
       if (result.data?.isSafe) {
-        newLink.status = 'safe';
+        newLink.status = LinkStatus.safe;
         newLink.checkedAt = Date.now();
       } else {
         this._isValidating.set(false);
         const backendMessage =
+          result.data?.description ||
+          result.data?.threatType ||
           result?.errors?.at(0)?.errorMessage ||
-          'تحذير: هذا الرابط أصبح غير آمن أو غير متوفر حالياً ⚠️';
-        this.messageService.addWarnMessage(backendMessage);
+          result?.message ||
+          'تحذير: هذا الرابط غير آمن أو غير متوفر حالياً ولا يمكن حفظه ⚠️';
+        this._validationError.set(backendMessage);
+        return false;
       }
     } catch (error: any) {
       this._isValidating.set(false);
       const statusCode = error?.status;
 
       if (statusCode === 400 || statusCode === 422) {
-        // تم رفض الرابط من الباك إند (غير آمن أو غير متوفر) -> نلغي العملية فوراً ولا نحفظه
         const backendMessage =
           error?.error?.message ||
+          error?.message ||
           'عذراً، هذا الرابط غير آمن أو غير متوفر ولا يمكن حفظه في المنصة ⚠️';
-        this.messageService.addWarnMessage(backendMessage);
+        this._validationError.set(backendMessage);
         return false;
       } else {
-        // خطأ في الشبكة أو السيرفر نفسه (مثلاً 500 أو Connection Refused)
-        this.messageService.addErrorMessage(
-          this.messageService.buildHttpErrorDetail(error, 'فشل الاتصال بسيرفر فحص الأمان حالياً'),
+        this._validationError.set(
+          'فشل الاتصال بسيرفر فحص الأمان حالياً، يرجى التحقق من الشبكة وإعادة المحاولة.',
         );
         return false;
       }
@@ -179,12 +211,12 @@ export class LinkValidatorFacade {
     const link = this._links().find((l) => l.id === id);
     if (!link) return;
 
-    const updated: SavedLink = { ...link, status: 'pending' };
+    const updated: SavedLink = { ...link, status: LinkStatus.pending };
     this._links.update((prev) => prev.map((l) => (l.id === id ? updated : l)));
 
     try {
-      let result = await firstValueFrom(this.securityClient.validateLink({ url: link.url }));
-      if (result.data?.isSafe) updated.status = 'safe';
+      let result = await firstValueFrom(this.validateLink(link.url));
+      if (result.data?.isSafe) updated.status = LinkStatus.safe;
       else {
         this._isValidating.set(false);
         const backendMessage =
@@ -196,12 +228,12 @@ export class LinkValidatorFacade {
       this.messageService.addSuccessMessage('الرابط آمن ومتاح ✅');
     } catch (error: any) {
       if (error?.status === 400 || error?.status === 422) {
-        updated.status = 'suspicious';
+        updated.status = LinkStatus.suspicious;
         const backendMessage =
           error?.error?.message || 'تحذير: هذا الرابط أصبح غير آمن أو غير متوفر حالياً ⚠️';
         this.messageService.addWarnMessage(backendMessage);
       } else {
-        updated.status = 'error';
+        updated.status = LinkStatus.error;
         this.messageService.addErrorMessage('فشل إعادة الفحص، يرجى المحاولة لاحقاً');
       }
     }
@@ -219,6 +251,7 @@ export class LinkValidatorFacade {
     url: string,
     sourceType: LinkSourceType,
   ): Promise<boolean> {
+    this._validationError.set(null);
     const link = this._links().find((l) => l.id === id);
     if (!link) return false;
 
@@ -235,26 +268,33 @@ export class LinkValidatorFacade {
     if (urlChanged) {
       this._isValidating.set(true);
       try {
-        let result = await firstValueFrom(this.securityClient.validateLink({ url: updated.url }));
-        if (result.data?.isSafe) updated.status = 'safe';
-        else {
+        let result = await firstValueFrom(this.validateLink(updated.url));
+        if (result.data?.isSafe) {
+          updated.status = LinkStatus.safe;
+          updated.checkedAt = Date.now();
+        } else {
           this._isValidating.set(false);
           const backendMessage =
+            result.data?.description ||
+            result.data?.threatType ||
             result?.errors?.at(0)?.errorMessage ||
-            'تحذير: هذا الرابط أصبح غير آمن أو غير متوفر حالياً ⚠️';
-          this.messageService.addWarnMessage(backendMessage);
+            result?.message ||
+            'تحذير: هذا الرابط غير آمن أو غير متوفر حالياً ولا يمكن حفظه ⚠️';
+          this._validationError.set(backendMessage);
+          return false;
         }
-        updated.checkedAt = Date.now();
       } catch (error: any) {
         this._isValidating.set(false);
-        if (error?.status === 400 || error?.status === 422) {
-          // إذا تم تعديله لرابط غير آمن، نمنع التعديل ونلغي الخطوة فوراً
+        const statusCode = error?.status;
+        if (statusCode === 400 || statusCode === 422) {
           const backendMessage =
-            error?.error?.message || 'عذراً، الرابط الجديد غير آمن أو غير متوفر ولا يمكن حفظه ⚠️';
-          this.messageService.addWarnMessage(backendMessage);
+            error?.error?.message ||
+            error?.message ||
+            'عذراً، الرابط الجديد غير آمن أو غير متوفر ولا يمكن حفظه ⚠️';
+          this._validationError.set(backendMessage);
           return false;
         } else {
-          this.messageService.addErrorMessage('فشل التحقق من الرابط الجديد لتوقف الخدمة مؤقتاً');
+          this._validationError.set('فشل الاتصال بسيرفر فحص الأمان حالياً، يرجى المحاولة لاحقاً.');
           return false;
         }
       }

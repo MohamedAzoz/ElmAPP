@@ -1,22 +1,32 @@
+/* ==========================================================================
+   📦 الحاوية الرئيسية وهيكل الكارد (Question Card & Panel)
+   ========================================================================== */
 .question-card {
   width: 100%;
-  padding: 1.5rem;
+  display: block;
+  margin-bottom: 1.5rem;
+  box-sizing: border-box;
+}
+
+.question-panel {
   background: #ffffff;
-  border: 1px solid rgba(15, 23, 42, 0.06);
   border-radius: 1.5rem;
+  padding: 1rem; /* حواف متزنة ومريحة للموبايل */
   box-shadow: 0 18px 40px rgba(15, 23, 42, 0.05);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  transition: all 0.3s ease;
   display: grid;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
-.question-image img {
-  width: 100%;
-  height: auto;
-  border-radius: 1.25rem;
-  object-fit: cover;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+/* الشاشات المتوسطة والكبيرة (التابلت والكمبيوتر) */
+@media (min-width: 768px) {
+  .question-panel {
+    padding: 1.5rem; /* زيادة المسافات الداخلية للشاشات الكبيرة لراحة العين */
+  }
 }
 
+/* التنسيقات البنيوية لرأس السؤال */
 .question-header {
   display: grid;
   gap: 1rem;
@@ -24,7 +34,7 @@
 
 .question-title {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.7rem;
 }
 
 .question-index {
@@ -32,41 +42,102 @@
   width: fit-content;
 }
 
-.options-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
+
+/* ==========================================================================
+   🎯 التنسيق الاحترافي للصورة ودعم شاشات الموبايل بذكاء
+   ========================================================================== */
+.question-image-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  background-color: #fafafa; /* خلفية ناعمة جداً تبرز الرسومات الشفافة والبيضاء */
+  border-radius: 0.75rem;
+  border: 1px solid #f0f0f0;
+  padding: 0.5rem;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
+.image-inner-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.responsive-question-img {
+  width: 100%;
+  height: auto;
+  /* تحديد أقصى ارتفاع على الموبايل حتى لا تبتلع الصورة الشاشة بالكامل وتخفي الخيارات */
+  max-height: 220px; 
+  /* تمنع تشويه الصورة أو تمددها وتحافظ على أبعاد الرسمة الهندسية نقيّة وقابلة للقراءة */
+  object-fit: contain; 
+  mix-blend-mode: multiply; /* دمج ذكي مع الخلفية لإخفاء أي حواف بيضاء حادة حول الرسمة */
+  transition: transform 0.3s ease;
+}
+
+/* عند تدوير الموبايل أو على الشاشات الأكبر (التابلت واللابتوب) */
+@media (min-width: 768px) {
+  .responsive-question-img {
+    max-height: 380px; /* زيادة الارتفاع المسموح به للصورة لتبدو التفاصيل أكثر وضوحاً */
+  }
+}
+
+
+/* ==========================================================================
+   🎛️ شبكة الخيارات وتنسيق كارد الخيار (Options Grid & Cards)
+   ========================================================================== */
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr; /* خيار واحد في كل سطر للموبايل لسهولة الضغط بالإصبع */
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .options-grid {
+    grid-template-columns: 1fr; 
+    gap: 1rem;
+  }
+}
+
+/* كارد الخيار المفرد مأخوذ من الكود الأول ومعدل للمحاذاة العربية */
 .option-card {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  min-height: 4.5rem;
+  min-height: 4.5rem; /* مساحة ضغط ممتازة ومريحة تمنع اللمسات الخاطئة في الموبايل */
   padding: 1rem;
   border-radius: 1.25rem;
   border: 1px solid rgba(148, 163, 184, 0.25);
   background: #f8fafc;
   color: #0f172a;
+  cursor: pointer;
+  text-align: right; /* دعم محاذاة اللغة العربية بالكامل */
+  box-sizing: border-box;
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease,
     border-color 0.2s ease;
-  cursor: pointer;
-  text-align: left;
 }
 
+/* تأثير التمرير (Hover) عند تفعيل الخيار */
 .option-card:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 12px 25px rgba(15, 23, 42, 0.08);
 }
 
+/* حالة الخيار المعطل */
 .option-card:disabled {
   cursor: not-allowed;
   opacity: 0.82;
 }
 
+/* المكونات الداخلية للخيارات (Badge & Text) */
 .option-meta {
   display: flex;
   align-items: center;
@@ -76,15 +147,16 @@
 
 .option-badge {
   display: inline-flex;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.85rem;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  background: #f8fafc;
-  color: #1d4ed8;
-  border: 1px solid rgba(59, 130, 246, 0.16);
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: #eff6ff;
+  color: #2563eb;
+  font-weight: 600;
+  font-size: 0.875rem;
+  flex-shrink: 0; /* حماية الدائرة من الانضغاط إذا كان نص الإجابة طويلاً */
 }
 
 .option-text {
@@ -94,10 +166,15 @@
   font-weight: 600;
 }
 
+
+/* ==========================================================================
+   🚦 أيقونات الحالة والحالات الشرطية للخيارات (Status Icons & States)
+   ========================================================================== */
 .option-status {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .status-icon {
@@ -109,6 +186,7 @@
   justify-content: center;
   color: #ffffff;
   font-size: 1rem;
+  flex-shrink: 0;
 }
 
 .status-icon.correct {
@@ -123,6 +201,7 @@
   background: #2563eb;
 }
 
+/* كلاسات الألوان المتغيرة حسب حالة الإجابة (تأتي ديناميكياً من الـ Component) */
 .option-card.option-default {
   background: #f8fafc;
   border-color: rgba(148, 163, 184, 0.25);
@@ -156,6 +235,10 @@
   color: #0f172a;
 }
 
+
+/* ==========================================================================
+   📭 حالة عدم وجود خيارات والـ Media Queries الإضافية
+   ========================================================================== */
 .empty-state {
   padding: 1rem;
   border-radius: 1.25rem;
@@ -165,16 +248,14 @@
   border: 1px dashed rgba(148, 163, 184, 0.4);
 }
 
+/* تحسينات إضافية تناسب الشاشات الصغيرة جداً جداً (قديمة الصنع أو الضيقة) */
 @media (max-width: 640px) {
   .question-card {
-    padding: 1.25rem;
-  }
-
-  .options-grid {
-    grid-template-columns: 1fr;
+    margin-bottom: 1rem;
   }
 
   .option-card {
     padding: 0.95rem;
+    min-height: 4rem; /* تقليص طفيف جداً ليناسب الشاشات الصغيرة دون الإضرار بـ UX */
   }
 }
