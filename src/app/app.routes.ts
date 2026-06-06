@@ -19,6 +19,12 @@ export const routes: Routes = [
           import('./features/auth/components/log-in/log-in').then((m) => m.LogIn),
         canActivate: [guestGuard],
       },
+      // support
+      {
+        path: 'support',
+        title: 'الدعم الفني',
+        loadComponent: () => import('./features/support/support').then((s) => s.Support),
+      },
       {
         path: 'home',
         title: 'الرئيسية',

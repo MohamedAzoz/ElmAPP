@@ -157,7 +157,7 @@ export const publicRoutes: Routes = [
   },
   // Security Link Validator
   {
-    title: 'حفظ الروابط الآمنة',
+    title: 'مكتبتي',
     path: 'security-links',
     loadComponent: () =>
       import('./SecurityLinkValidator/security-link-validator/security-link-validator').then(
@@ -179,7 +179,7 @@ export const publicRoutes: Routes = [
   },
   {
     path: 'saved-banks',
-    title: 'البنوك المحفوظة',
+    title: 'الأسئلة المحفوظة',
     loadComponent: () =>
       import('./QuestionBanks/offline-saved-question-banks/offline-saved-question-banks').then(
         (m) => m.OfflineSavedQuestionBanks,

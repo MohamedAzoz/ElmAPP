@@ -1,6 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
-import { ResultOfLinkValidationResult, SecurityClient } from '../../../core/api/clients';
+import { ResultOfLinkValidationResult } from '../../../core/api/clients';
 import { AppMessageService } from '../../../core/Services/app-message-service';
 import { LinkStorageService } from './link-storage.service';
 import { GoogleDriveSyncService, DriveConnectionStatus } from './google-drive-sync.service';

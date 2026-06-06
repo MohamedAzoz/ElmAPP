@@ -42,7 +42,7 @@
             [routerLinkActiveOptions]="{ exact: true }"
             class="px-4 py-2 rounded-lg hover:bg-link-hover hover:text-text-main"
           >
-            الأسئلة الخاطئة
+           مراجعة الأخطاء
           </a>
           <!-- saved banks -->
           <a
@@ -62,7 +62,7 @@
             [routerLinkActiveOptions]="{ exact: true }"
             class="px-4 py-2 rounded-lg hover:bg-link-hover hover:text-text-main"
           >
-            مصادرى
+            مكتبتي
           </a>
           <a
             [hidden]="!isLoggedIn()"
@@ -85,6 +85,16 @@
               {{ link.label }}
             </a>
           }
+
+          <a
+            [hidden]="isLoggedIn() || !isOnline()"
+            [routerLink]="['/main/support']"
+            routerLinkActive="bg-nav text-main border-1 border-main"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="px-4 py-2 rounded-lg hover:bg-link-hover hover:text-text-main"
+          >
+            الدعم الفني
+          </a>
         </div>
       </div>
 
@@ -195,7 +205,7 @@
       [routerLinkActiveOptions]="{ exact: true }"
       class="px-4 py-2 rounded-lg hover:bg-link-hover hover:text-text-main"
     >
-      <i class="pi pi-times text-lg"></i> الأسئلة الخاطئة
+      <i class="pi pi-times text-lg"></i>مراجعة الأخطاء
     </a>
     <a
       [hidden]="isLoggedIn() || isOnline()"
@@ -216,7 +226,7 @@
       [routerLinkActiveOptions]="{ exact: true }"
       class="p-4 rounded-2xl font-bold text-gray-700 flex items-center gap-4 transition-all active:scale-95"
     >
-      <i class="pi pi-shield text-lg"></i> مصادرى
+      <i class="pi pi-shield text-lg"></i> مكتبتي
     </a>
     <a
       [hidden]="!isLoggedIn()"
@@ -239,6 +249,17 @@
         <i [class]="link.icon + ' text-lg'"></i> {{ link.label }}
       </a>
     }
+ <a
+      [hidden]="isLoggedIn() || !isOnline()"
+      [routerLink]="['/main/support']"
+      (click)="sidebarVisible.set(false)"
+      routerLinkActive="bg-main/10 text-main ring-1 ring-main/20"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="p-4 rounded-2xl font-bold text-gray-700 flex items-center gap-4 transition-all active:scale-95"
+    >
+      <i class="pi pi-coll text-lg"></i> الدعم الفني
+    </a>
+
     <!-- btn goback -->
     <div class="my-auto mt-4">
       <a

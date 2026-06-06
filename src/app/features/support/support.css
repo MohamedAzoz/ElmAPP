@@ -1,0 +1,42 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   support.css
+   Only what Tailwind cannot express:
+     • @keyframes (animations used via animate-[...] arbitrary syntax)
+     • :host display block (Angular encapsulation)
+     • Pseudo-element placeholder overrides that need a shared base
+   Everything else lives in the template via Tailwind utilities.
+───────────────────────────────────────────────────────────────────────────── */
+
+:host {
+  display: block;
+}
+
+/* ── Keyframes ─────────────────────────────────────────────────────────────── */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-5px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.5); }
+  to   { opacity: 1; transform: scale(1);   }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1);   }
+}
+
+/* ── Tailwind can't conditionally toggle focus ring color via [class] binding  */
+/* so we use a lightweight attribute selector for the error state on inputs     */
+input[aria-invalid="true"]:focus,
+textarea[aria-invalid="true"]:focus {
+  --tw-ring-color: rgba(220, 38, 38, 0.15);
+  border-color: #f87171;
+}
