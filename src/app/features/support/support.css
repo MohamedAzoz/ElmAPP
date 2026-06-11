@@ -1,42 +1,138 @@
-/* ─────────────────────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────────
    support.css
-   Only what Tailwind cannot express:
-     • @keyframes (animations used via animate-[...] arbitrary syntax)
-     • :host display block (Angular encapsulation)
-     • Pseudo-element placeholder overrides that need a shared base
-   Everything else lives in the template via Tailwind utilities.
-───────────────────────────────────────────────────────────────────────────── */
+   Minimal CSS Layer for:
+   • Angular host rendering
+   • Keyframes
+   • Accessibility enhancements
+   • Focus states
+   • Reduced motion support
+───────────────────────────────────────────────────────────── */
 
 :host {
   display: block;
+  width: 100%;
 }
 
-/* ── Keyframes ─────────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────
+   Performance Optimized Keyframes
+───────────────────────────────────────────────────────────── */
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0);    }
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-5px); }
-  to   { opacity: 1; transform: translateY(0);    }
+  from {
+    opacity: 0;
+    transform: translate3d(0, -6px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 @keyframes popIn {
-  from { opacity: 0; transform: scale(0.5); }
-  to   { opacity: 1; transform: scale(1);   }
+  from {
+    opacity: 0;
+    transform: scale3d(0.6, 0.6, 1);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to   { opacity: 1; transform: scale(1);   }
+  from {
+    opacity: 0;
+    transform: scale3d(0.96, 0.96, 1);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
 }
 
-/* ── Tailwind can't conditionally toggle focus ring color via [class] binding  */
-/* so we use a lightweight attribute selector for the error state on inputs     */
-input[aria-invalid="true"]:focus,
-textarea[aria-invalid="true"]:focus {
-  --tw-ring-color: rgba(220, 38, 38, 0.15);
-  border-color: #f87171;
+/* ─────────────────────────────────────────────────────────────
+   Better mobile rendering performance
+───────────────────────────────────────────────────────────── */
+
+.animate-gpu {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Validation focus states
+───────────────────────────────────────────────────────────── */
+
+input[aria-invalid='true']:focus,
+textarea[aria-invalid='true']:focus {
+  --tw-ring-color: rgb(239 68 68 / 0.18);
+
+  border-color: rgb(248 113 113);
+
+  box-shadow:
+    0 0 0 1px rgb(248 113 113 / 0.15),
+    0 0 0 4px rgb(239 68 68 / 0.08);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Mobile tap highlight removal
+───────────────────────────────────────────────────────────── */
+
+button,
+a,
+input,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Prevent accidental zoom on iOS
+───────────────────────────────────────────────────────────── */
+
+input,
+textarea,
+select {
+  font-size: 16px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Improve touch scrolling
+───────────────────────────────────────────────────────────── */
+
+.scroll-touch {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Reduced motion accessibility
+───────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+
+    transition-duration: 0.01ms !important;
+
+    scroll-behavior: auto !important;
+  }
 }

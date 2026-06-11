@@ -10,6 +10,17 @@ export const routes: Routes = [
     children: [
       {
         path: '',
+        title: 'الصفحة الرئيسية',
+        loadComponent: () => import('./features/elm-home/elm-home').then((m) => m.ElmHome),
+      },
+      {
+        path: 'setup-profile',
+        title: 'تجهيز الملف الشخصي',
+        loadComponent: () => import('./features/set-profile/set-profile').then((m) => m.SetProfile),
+        // canActivate: [authGuard],
+      },
+      {
+        path: 'student',
         loadChildren: () => import('./features/student/public.routes').then((m) => m.publicRoutes),
       },
       {

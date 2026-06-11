@@ -1,34 +1,103 @@
+/*
+ * nav.css — الحد الأدنى من CSS
+ * فقط الأشياء التي لا يستطيع Tailwind التعبير عنها:
+ *   1. Classes تُضاف ديناميكياً بـ routerLinkActive
+ *   2. Scrollbar styling
+ *   3. Shared interactive classes (elm-icon-btn, elm-nav-link, elm-sidebar-link)
+ *      التي تستخدم CSS variables في :hover — Tailwind لا يدعم var() في variants
+ */
 
-:host {
-  display: block;
+/* ── Desktop nav link ────────────────────────────────────────────── */
+.elm-nav-link {
+  display:         inline-flex;
+  align-items:     center;
+  padding:         7px 12px;
+  border-radius:   8px;
+  font-size:       14px;
+  font-weight:     600;
+  color:           var(--color-text-main);
+  text-decoration: none;
+  white-space:     nowrap;
+  transition:      background-color 0.15s ease, color 0.15s ease;
+  border:          1px solid transparent;
 }
 
-:host ::ng-deep .p-sidebar-header {
-   justify-content: space-between;
-  flex-direction: row-reverse; 
- }
-.toggle-button {
-  display: none;
-}
-.pi-graduation-cap{
-  font-size: 1.5rem;
+.elm-nav-link:hover {
+  background-color: var(--color-accent-soft);
+  color:            var(--color-main);
 }
 
-
-@media (max-width: 1024px) {
-  .toggle-button {
-    display: block;
-  }
-}
-
-
-@utility nav-link {
-  cursor: pointer;
-  transition: all 0.35s ease-in-out;
-  border-radius: 10px;
-  font-weight: 500;
-}
-
-:host ::ng-deep .p-menu-overlay {
+/* يُضاف بـ routerLinkActive="elm-link-active" */
+.elm-link-active {
   background-color: var(--color-nav);
+  color:            var(--color-main);
+  border-color:     var(--color-nav-hover);
+}
+
+/* ── Icon button ─────────────────────────────────────────────────── */
+.elm-icon-btn {
+  width:            36px;
+  height:           36px;
+  border-radius:    10px;
+  background:       transparent;
+  border:           none;
+  cursor:           pointer;
+  transition:       background-color 0.15s ease, color 0.15s ease;
+  position:         relative;
+  flex-shrink:      0;
+}
+
+/* ── Sidebar link ────────────────────────────────────────────────── */
+.elm-sidebar-link {
+  display:         flex;
+  align-items:     center;
+  gap:             12px;
+  padding:         11px 14px;
+  border-radius:   12px;
+  font-size:       14px;
+  font-weight:     600;
+  color:           var(--color-text-main);
+  text-decoration: none;
+  background:      transparent;
+  border:          none;
+  width:           100%;
+  text-align:      right;
+  cursor:          pointer;
+  transition:      background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.elm-sidebar-link:hover {
+  background-color: var(--color-accent-soft);
+  color:            var(--color-main);
+}
+
+.elm-sidebar-link:active {
+  transform: scale(0.98);
+}
+
+/* يُضاف بـ routerLinkActive="elm-sidebar-active" */
+.elm-sidebar-active {
+  background-color: var(--color-nav);
+  color:            var(--color-main);
+  box-shadow:       inset 0 0 0 1px var(--color-nav-hover);
+}
+
+/* Danger variant (logout) */
+.elm-sidebar-danger:hover {
+  background-color: #fef2f2;
+  color:            #ef4444;
+}
+
+/* Dark mode overrides للـ danger hover */
+.dark .elm-sidebar-danger:hover {
+  background-color: rgba(239, 68, 68, 0.15);
+  color:            #f87171;
+}
+
+/* ── Sidebar scrollbar ───────────────────────────────────────────── */
+.elm-sidebar-scroll::-webkit-scrollbar       { width: 4px; }
+.elm-sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+.elm-sidebar-scroll::-webkit-scrollbar-thumb {
+  background:    color-mix(in srgb, var(--color-text-main) 20%, transparent);
+  border-radius: 2px;
 }

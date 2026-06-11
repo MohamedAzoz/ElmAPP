@@ -1,6 +1,6 @@
 <!-- ─── Support Page ──────────────────────────────────────────────────────── -->
 <section
-  class="support-page relative min-h-screen overflow-hidden bg-slate-50 px-4 py-10 pb-16 sm:px-6 sm:py-14 font-[inherit] [direction:rtl]"
+  class="support-page relative min-h-screen overflow-hidden px-4 py-10 pb-16 sm:px-6 sm:py-14 font-[inherit] [direction:rtl]"
 >
   <!-- Decorative background blobs -->
   <div
@@ -51,7 +51,11 @@
           <line x1="12" y1="17" x2="12.01" y2="17" />
         </svg>
       </div>
-      <h1 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold tracking-tight text-slate-900">مركز الدعم الفني</h1>
+      <h1
+        class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold tracking-tight text-slate-900"
+      >
+        مركز الدعم الفني
+      </h1>
       <p class="mt-1.5 text-xs sm:text-sm leading-relaxed text-slate-500 md:text-base">
         واجهت مشكلة؟ أرسل لنا التفاصيل وسيتواصل معك فريقنا في أقرب وقت.
       </p>
@@ -127,155 +131,109 @@
           </div>
         }
 
-        <!-- ── Row: Name + Email (stacks on mobile) ────────────────────────── -->
-        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <!-- Name -->
-          <div class="flex flex-col gap-1.5" [class.is-error]="name.invalid && name.touched">
-            <label
-              class="flex items-center gap-1 text-sm font-semibold text-slate-800"
-              for="support-name"
+        <!-- ── Google Identity Section ──────────────────────────────────────────── -->
+        <div class="flex flex-col gap-3">
+          @if (!isGoogleVerified()) {
+            <div
+              class="flex flex-col items-center gap-3 rounded-2xl border-[1.5px] border-dashed border-slate-200 bg-slate-50 px-5 py-6 text-center"
             >
-              الاسم الكامل
-              <span class="text-red-500" aria-hidden="true">*</span>
-            </label>
-            <div class="relative flex items-center">
-              <span
-                class="pointer-events-none absolute right-3 flex text-slate-400"
-                aria-hidden="true"
+              <div
+                class="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm border border-slate-100"
               >
-                <svg
-                  class="h-4 w-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
-              </span>
-              <input
-                id="support-name"
-                type="text"
-                formControlName="name"
-                placeholder="مثال: أحمد محمد"
-                [attr.aria-describedby]="name.invalid && name.touched ? 'name-error' : null"
-                [attr.aria-invalid]="name.invalid && name.touched"
-                class="field-input w-full rounded-xl border-[1.5px] bg-slate-50 px-3 py-2.5 pr-9 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:ring-[3px] focus:ring-indigo-100 disabled:cursor-not-allowed disabled:opacity-60"
-                [class.border-slate-200]="!(name.invalid && name.touched)"
-                [class.border-red-400]="name.invalid && name.touched"
-                [class.bg-red-50]="name.invalid && name.touched"
-                [class.focus:ring-red-100]="name.invalid && name.touched"
-                [class.focus:border-red-400]="name.invalid && name.touched"
-              />
-            </div>
-            @if (name.invalid && name.touched) {
-              <p
-                id="name-error"
-                class="flex items-center gap-1.5 text-xs text-red-600 animate-[slideDown_.18s_ease]"
-                role="alert"
-              >
-                <svg
-                  class="h-3 w-3 shrink-0"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 16 16"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
+                <svg class="h-6 w-6" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path
-                    d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 10.5a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5zM7.25 5.5a.75.75 0 0 1 1.5 0v3a.75.75 0 0 1-1.5 0v-3z"
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    fill="#4285F4"
+                  />
+                  <path
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    fill="#34A853"
+                  />
+                  <path
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"
+                    fill="#FBBC05"
+                  />
+                  <path
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                    fill="#EA4335"
                   />
                 </svg>
-                {{ getError(name) }}
-              </p>
-            }
-          </div>
+              </div>
 
-          <!-- Email -->
-          <div class="flex flex-col gap-1.5">
-            <label
-              class="flex items-center gap-1 text-sm font-semibold text-slate-800"
-              for="support-email"
+              <div>
+                <p class="text-sm font-semibold text-slate-700">سجّل الدخول بحساب Google</p>
+                <p class="mt-0.5 text-xs text-slate-400">للتحقق من هويتك وملء بياناتك تلقائياً</p>
+              </div>
+
+              <!-- ✅ زر Google أو Spinner لو الـ script لسه بتتحمل -->
+              <div class="mt-1 flex min-h-[44px] items-center justify-center">
+                @if (googleScriptReady()) {
+                  <div class="w-fit" id="googleSignInBtn"></div>
+                } @else {
+                  <div class="flex items-center gap-2 text-xs text-slate-400">
+                    <div
+                      class="h-4 w-4 rounded-full border-2 border-slate-300 border-t-indigo-500 animate-spin"
+                    ></div>
+                    <span>جاري تحميل تسجيل الدخول…</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          @if (isGoogleVerified()) {
+            <div
+              class="flex items-center gap-3 rounded-2xl border-[1.5px] border-green-200 bg-green-50 px-4 py-3 animate-[fadeUp_.3s_ease_both]"
             >
-              البريد الإلكتروني
-              <span class="text-red-500" aria-hidden="true">*</span>
-            </label>
-            <div class="relative flex items-center">
-              <span
-                class="pointer-events-none absolute right-3 flex text-slate-400"
-                aria-hidden="true"
-              >
-                <svg
-                  class="h-4 w-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+              @if (verifiedAvatar()) {
+                <img
+                  [src]="verifiedAvatar()!"
+                  alt="صورة الحساب"
+                  class="h-10 w-10 shrink-0 rounded-full border-2 border-white shadow-sm"
+                  referrerpolicy="no-referrer"
+                />
+              } @else {
+                <div
+                  class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-200 text-green-700 font-bold text-sm"
                 >
-                  <rect x="2" y="4" width="20" height="16" rx="2" />
-                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-                </svg>
-              </span>
-              <input
-                id="support-email"
-                type="email"
-                formControlName="email"
-                placeholder="example@domain.com"
-                dir="ltr"
-                [attr.aria-describedby]="email.invalid && email.touched ? 'email-error' : null"
-                [attr.aria-invalid]="email.invalid && email.touched"
-                class="w-full rounded-xl border-[1.5px] bg-slate-50 px-3 py-2.5 pr-9 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:ring-[3px] focus:ring-indigo-100"
-                [class.border-slate-200]="!(email.invalid && email.touched)"
-                [class.border-red-400]="email.invalid && email.touched"
-                [class.bg-red-50]="email.invalid && email.touched"
-              />
+                  {{ verifiedName()?.charAt(0) }}
+                </div>
+              }
 
-              <!-- Valid check icon -->
-              @if (email.valid && email.dirty) {
+              <div class="flex min-w-0 flex-1 flex-col">
+                <span class="truncate text-sm font-semibold text-slate-800">{{
+                  verifiedName()
+                }}</span>
+                <span class="truncate text-xs text-slate-500" dir="ltr">{{ verifiedEmail() }}</span>
+              </div>
+
+              <div class="flex shrink-0 flex-col items-end gap-1.5">
                 <span
-                  class="absolute left-3 flex text-green-600 animate-[popIn_.2s_ease]"
-                  aria-label="بريد إلكتروني صالح"
+                  class="inline-flex items-center gap-1 rounded-full bg-green-600 px-2 py-0.5 text-[0.65rem] font-semibold text-white"
                 >
                   <svg
-                    class="h-4 w-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 16 16"
-                    fill="currentColor"
+                    class="h-2.5 w-2.5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
                   >
-                    <path
-                      d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm3.78 5.03-4.5 4.5a.75.75 0 0 1-1.06 0l-2-2a.75.75 0 0 1 1.06-1.06L6.75 8.94l3.97-3.97a.75.75 0 0 1 1.06 1.06z"
-                    />
+                    <polyline points="20 6 9 17 4 12" />
                   </svg>
+                  موثق
                 </span>
-              }
-            </div>
-            @if (email.invalid && email.touched) {
-              <p
-                id="email-error"
-                class="flex items-center gap-1.5 text-xs text-red-600 animate-[slideDown_.18s_ease]"
-                role="alert"
-              >
-                <svg
-                  class="h-3 w-3 shrink-0"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 16 16"
-                  fill="currentColor"
-                  aria-hidden="true"
+                <button
+                  type="button"
+                  (click)="signOut()"
+                  class="text-[0.68rem] font-medium text-slate-400 underline-offset-2 hover:text-red-500 hover:underline transition-colors cursor-pointer"
                 >
-                  <path
-                    d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 10.5a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5zM7.25 5.5a.75.75 0 0 1 1.5 0v3a.75.75 0 0 1-1.5 0v-3z"
-                  />
-                </svg>
-                {{ getError(email) }}
-              </p>
-            }
-          </div>
+                  تغيير الحساب
+                </button>
+              </div>
+            </div>
+          }
         </div>
         <!-- /grid row -->
 

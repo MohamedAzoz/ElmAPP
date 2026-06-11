@@ -1,19 +1,31 @@
-<section class="question-card">
-  <div class="question-panel">
-    
+<section class="w-full block mb-4 sm:mb-6 box-border">
+  <div
+    class="grid gap-4 rounded-3xl border border-slate-200/70 bg-surface p-4 shadow-[0_18px_40px_rgba(15,23,42,0.05)] transition-all duration-300 md:p-6"
+  >
     @if (safeImageUrl) {
-      <div class="question-image-wrapper">
-        <div class="image-inner-container">
-          <img [src]="safeImageUrl" alt="صورة السؤال" loading="lazy" class="responsive-question-img" />
+      <div
+        class="mb-5 flex w-full items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50 p-2"
+      >
+        <div class="flex w-full items-center justify-center">
+          <img
+            [src]="safeImageUrl"
+            alt="صورة السؤال"
+            loading="lazy"
+            class="h-auto max-h-[220px] w-full object-contain mix-blend-multiply transition-transform duration-300 md:max-h-[380px]"
+          />
         </div>
       </div>
     }
 
-    <div class="question-header">
-      <div class="question-title">
-        <h2 class="text-base md:text-lg lg:text-xl xl:text-2xl font-semibold text-gray-800 ">
+    <div class="grid gap-4">
+      <div class="grid gap-3">
+        <h2
+          class="text-base font-semibold leading-relaxed text-text-dark md:text-lg lg:text-xl xl:text-2xl"
+        >
           @if (index !== undefined) {
-            <span class="question-index">{{ index + 1 }}.</span> {{ question.content }}
+            <span class="inline-flex w-fit font-bold text-main"> {{ index + 1 }}. </span>
+
+            {{ question.content }}
           } @else {
             {{ question.content }}
           }
@@ -22,30 +34,37 @@
     </div>
 
     @if (question.options?.length) {
-      <div class="options-grid">
+      <div class="mt-6 grid grid-cols-1 gap-3 lg:gap-4">
         @for (option of question.options; track option.id; let i = $index) {
           <button
             type="button"
-            class="option-card"
-            [ngClass]="getOptionClass(option)"
-            (click)="select(option)"
             [disabled]="selectedOptionId !== null && !isTestMode"
+            (click)="select(option)"
+            [ngClass]="getOptionClass(option)"
+            class="flex min-h-16 w-full items-center justify-between gap-4 rounded-2xl border p-4 text-right transition-all duration-200 sm:min-h-18"
           >
-            <div class="option-meta">
-              <span class="option-badge">{{ optionLabels[i] || i + 1 }}</span>
-              <span class="option-text">{{ option.content }}</span>
+            <div class="flex flex-1 items-center gap-4">
+              <span
+                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-600"
+              >
+                {{ optionLabels[i] || i + 1 }}
+              </span>
+
+              <span class="text-[0.98rem] font-semibold leading-relaxed text-text-main">
+                {{ option.content }}
+              </span>
             </div>
 
             @if (selectedOptionId === option.id) {
-              <div class="option-status">
+              <div class="flex shrink-0 items-center justify-center">
                 <span
-                  class="status-icon"
-                  [class.correct]="option.isCorrect === true && !isTestMode"
-                  [class.wrong]="option.isCorrect === false && !isTestMode"
-                  [class.selected]="isTestMode"
+                  class="flex h-10 w-10 items-center justify-center rounded-full text-white"
+                  [class.bg-green-600]="option.isCorrect === true && !isTestMode"
+                  [class.bg-red-600]="option.isCorrect === false && !isTestMode"
+                  [class.bg-blue-600]="isTestMode"
                 >
                   <i
-                    class="pi"
+                    class="pi text-base"
                     [ngClass]="{
                       'pi-check': option.isCorrect !== false,
                       'pi-times': option.isCorrect === false,
@@ -58,7 +77,11 @@
         }
       </div>
     } @else {
-      <div class="empty-state">لا توجد خيارات متاحة لهذا السؤال.</div>
+      <div
+        class="rounded-2xl border border-dashed border-slate-300/70 bg-slate-50 p-4 text-center text-slate-600"
+      >
+        لا توجد خيارات متاحة لهذا السؤال.
+      </div>
     }
   </div>
 </section>

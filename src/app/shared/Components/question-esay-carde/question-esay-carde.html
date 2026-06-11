@@ -1,12 +1,16 @@
-<section class="essay-card">
-  <article class="essay-panel">
-    <header class="essay-header">
-      <div class="essay-meta">
+<section class="grid w-full gap-5">
+  <article
+    class="grid gap-5 rounded-[1.75rem] border border-slate-200/70 bg-white p-5 shadow-[0_18px_40px_rgba(15,23,42,0.05)] sm:p-6"
+  >
+    <header class="grid gap-4">
+      <div class="grid gap-3">
         <h2
-          class="text-base md:text-lg lg:text-xl xl:text-2xl pb-1 font-semibold text-gray-800 leading-[1.4]"
+          class="pb-1 text-base font-semibold leading-[1.4] text-gray-800 md:text-lg lg:text-xl xl:text-2xl"
         >
           @if (index !== undefined) {
-            <span class="essay-index">{{ index + 1 }}.</span> {{ question.content }}
+            <span class="inline-flex w-fit font-bold text-main"> {{ index + 1 }}. </span>
+
+            {{ question.content }}
           } @else {
             {{ question.content }}
           }
@@ -15,20 +19,35 @@
     </header>
 
     @if (safeImageUrl) {
-      <div class="essay-image">
-        <img [src]="safeImageUrl" alt="صورة السؤال" loading="lazy" />
+      <div class="overflow-hidden rounded-[1.25rem] border border-slate-200 bg-slate-50">
+        <img
+          [src]="safeImageUrl"
+          alt="صورة السؤال"
+          loading="lazy"
+          decoding="async"
+          class="block max-h-[420px] w-full object-cover shadow-[0_12px_28px_rgba(15,23,42,0.08)]"
+        />
       </div>
     }
 
-    <div class="essay-actions">
-      <button type="button" class="toggle-answer" (click)="toggleAnswer()">
+    <div class="flex justify-start">
+      <button
+        type="button"
+        (click)="toggleAnswer()"
+        class="flex min-h-13 items-center justify-center rounded-2xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition-all duration-200 hover:-translate-y-px hover:bg-blue-700 active:scale-[0.99] sm:text-base max-sm:w-full"
+      >
         {{ showAnswer ? 'إخفاء الإجابة' : 'عرض الإجابة' }}
       </button>
     </div>
 
-    <div class="essay-answer" *ngIf="showAnswer">
-      <h3>الإجابة النموذجية</h3>
-      <p>{{ answerText }}</p>
-    </div>
+    @if (showAnswer) {
+      <div class="grid gap-4 rounded-3xl border border-slate-300/30 bg-slate-50 p-5">
+        <h3 class="text-base font-bold text-slate-900 md:text-lg">الإجابة النموذجية</h3>
+
+        <p class="text-[0.98rem] leading-8 text-slate-700 whitespace-pre-line">
+          {{ answerText }}
+        </p>
+      </div>
+    }
   </article>
 </section>

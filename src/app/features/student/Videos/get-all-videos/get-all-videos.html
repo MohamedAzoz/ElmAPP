@@ -1,16 +1,15 @@
 <section class="max-w-full mx-auto px-1 pb-4 sm:pb-8" dir="rtl">
   <!-- Header Bar -->
   <div
-    class="px-3 py-2 sticky top-0 z-50 bg-white border-b border-gray-100 flex justify-between items-start sm:items-center gap-4 mb-3 sm:mb-6 pb-3"
+    class="px-3 py-2.5 sticky top-0 z-50 bg-surface border-b border-gray-100 flex justify-between items-center gap-4 mb-3 md:mb-6 pb-3"
   >
-    <div class="flex flex-col">
-      <span class="text-sm lg:text-lg font-semibold text-primary-600 tracking-wider uppercase mb-1"
-        >منصة علم</span
-      >
-      <h1 class="text-xs sm:text-base md:text-lg lg:text-xl font-semibold text-text-dark">
-        {{ isSection() ? 'السكاشن العملية والفيديوهات' : 'المحاضرات وفيديوهات الشرح' }}
-      </h1>
-    </div>
+    <!-- <div class="flex"> -->
+    <h1
+      class="text-xs sm:text-base md:text-lg lg:text-xl font-semibold text-text-dark tracking-wider"
+    >
+      {{ isSection() ? 'السكاشن العملية والفيديوهات' : 'المحاضرات وفيديوهات الشرح' }}
+    </h1>
+    <!-- </div> -->
 
     <button
       (click)="goBack()"
@@ -38,10 +37,13 @@
     </div>
   } @else {
     @if (videos().length > 0) {
-      <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 m-5" dir="ltr">
+      <div
+        class="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 lg:my-8 lg:mx-4 mx-2 my-4"
+        dir="ltr"
+      >
         <!-- Sidebar Playlist -->
         <div class="lg:col-span-1 flex flex-col gap-4 order-2 lg:order-1 px-2 sm:px-0">
-          <div class="bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col gap-3">
+          <div class="bg-gray-50 dark:bg-gray-400 border border-gray-100 dark:border-gray-400 rounded-2xl p-4 flex flex-col gap-3">
             <div class="flex items-center justify-between border-b border-gray-200/60 pb-2.5">
               <h3 class="text-sm font-bold text-gray-700 flex items-center gap-2">
                 <i class="pi pi-list"></i>
@@ -54,10 +56,10 @@
               </span>
             </div>
 
-            <div class="flex flex-col gap-3 max-h-150 overflow-y-auto pr-1 video-scroll">
-              @for (video of videos(); track video.id) {
+            <div class="flex flex-col gap-3 overflow-y-auto pr-1 video-scroll">
+              @for (video of videos(); track $index) {
                 <div
-                  class="flex gap-3 p-2.5 rounded-xl border transition-all cursor-pointer items-center group relative overflow-hidden"
+                  class="flex gap-3 p-3 rounded-xl border transition-all cursor-pointer items-center group relative overflow-hidden"
                   [class]="
                     selectedVideo()?.id === video.id
                       ? 'border-indigo-500 bg-indigo-50/20 shadow-xs'
@@ -78,12 +80,6 @@
                         <i class="pi pi-video text-xs"></i>
                       </div>
                     </div>
-                    <!-- Duration badge -->
-                    <span
-                      class="absolute bottom-1 left-1 px-1 py-0.2 text-[8px] font-bold bg-black/70 text-white rounded tracking-wide"
-                    >
-                      15:30
-                    </span>
                   </div>
 
                   <!-- Text info -->
@@ -107,7 +103,7 @@
         <!-- Video Player Main View -->
         <div class="lg:col-span-3 order-1 lg:order-2">
           <div
-            class="bg-white rounded-2xl sm:rounded-3xl border border-gray-100 p-2 sm:p-5 shadow-xs flex flex-col gap-4 sm:gap-5"
+            class="bg-surface rounded-2xl sm:rounded-3xl border border-gray-100 p-2 sm:p-5 shadow-xs flex flex-col gap-4 sm:gap-5"
           >
             <!-- Video Container -->
             <div
@@ -139,13 +135,13 @@
             <!-- Custom Controls -->
             @if (selectedVideo()) {
               <div
-                class="flex flex-wrap items-center justify-between gap-4 p-3 bg-gray-50 border border-gray-100/80 rounded-2xl"
+                class="flex flex-wrap items-center justify-between gap-4 p-3 bg-surface/20 border border-gray-100/80 rounded-2xl"
               >
                 <div class="flex items-center gap-3">
                   @if (isYouTube()) {
                     <button
                       (click)="isPlaying() ? pauseVideo() : playVideo()"
-                      class="w-10 h-10 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center transition-all hover:scale-105 active:scale-95 shadow-md shadow-indigo-600/10 cursor-pointer"
+                      class="lg:w-10 lg:h-10 w-7 h-7 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center transition-all hover:scale-105 active:scale-95 shadow-md shadow-indigo-600/10 cursor-pointer"
                       [title]="isPlaying() ? 'إيقاف مؤقت' : 'تشغيل'"
                     >
                       <i [class]="isPlaying() ? 'pi pi-pause' : 'pi pi-play'"></i>
@@ -155,11 +151,13 @@
                   <div
                     class="flex items-center gap-1 bg-white border border-gray-150 px-2 py-1 rounded-xl shadow-xs"
                   >
-                    <span class="text-[10px] font-bold text-gray-400 px-1">السرعة:</span>
+                    <span class="lg:text-[10px] text-[0.6rem] font-bold text-gray-400 px-1"
+                      >السرعة:</span
+                    >
                     @for (speed of [0.5, 1, 1.25, 1.5, 2]; track speed) {
                       <button
                         (click)="setSpeed(speed)"
-                        class="px-1.5 py-0.5 rounded-lg text-[10px] font-extrabold transition-all cursor-pointer"
+                        class="lg:px-1.5 lg:py-0.5 px-1 py-0.5 rounded-lg text-[0.6rem] lg:text-[10px] font-semibold transition-all cursor-pointer"
                         [class]="
                           currentSpeed() === speed
                             ? 'bg-indigo-600 text-white'
@@ -182,7 +180,9 @@
                     <i
                       [class]="isFullscreen() ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"
                     ></i>
-                    <span>{{ isFullscreen() ? 'شاشة عادية' : 'ملء الشاشة' }}</span>
+                    <span class="lg:text-xs text-[0.7rem]">{{
+                      isFullscreen() ? 'شاشة عادية' : 'ملء الشاشة'
+                    }}</span>
                   </button>
                 </div>
               </div>

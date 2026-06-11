@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Theme } from './theme';
 import { RouterOutlet } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
@@ -12,7 +12,10 @@ import { LoadingService } from './core/Services/loading-service';
   styleUrl: './app.css',
 })
 export class App {
-  constructor(public themeService: Theme , public loadingService :LoadingService) {
-    this.themeService.loadTheme();
+  protected readonly loading = inject(LoadingService);
+
+  constructor() {
+    // loadTheme يُشغَّل هنا مرة واحدة فقط
+    inject(Theme).loadTheme();
   }
 }

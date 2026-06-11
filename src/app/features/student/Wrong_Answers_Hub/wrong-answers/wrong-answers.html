@@ -1,9 +1,9 @@
-<div class="min-h-screen bg-bg-page p-2 sm:p-4 lg:p-6" dir="rtl">
+<div class="min-h-screen p-2 sm:p-4 lg:p-6" dir="rtl">
   <div class="max-w-6xl mx-auto space-y-4 sm:space-y-6">
     <div class="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div class="min-w-0">
-        <h1 class="text-2xl sm:text-3xl font-bold text-slate-900">الإجابات الخاطئة</h1>
-        <p class="mt-1 sm:mt-2 text-xs sm:text-sm text-slate-500 line-clamp-2">
+        <h1 class="text-2xl sm:text-3xl font-bold text-text-dark">الإجابات الخاطئة</h1>
+        <p class="mt-1 sm:mt-2 text-xs sm:text-sm text-text-muted line-clamp-2">
           عرض الأسئلة التي أخطأت فيها خلال الجلسة الحالية، مع تجميعها حسب بنك الأسئلة.
         </p>
       </div>
@@ -19,11 +19,11 @@
       </button>
     </div>
 
-    <div *ngIf="loading(); else summaryBlock" class="flex justify-center py-12 sm:py-20">
-      <i class="pi pi-spin pi-spinner text-4xl sm:text-5xl text-indigo-600"></i>
-    </div>
-
-    <ng-template #summaryBlock>
+    @if (loading()) {
+      <div class="flex justify-center py-12 sm:py-20">
+        <i class="pi pi-spin pi-spinner text-4xl sm:text-5xl text-indigo-600"></i>
+      </div>
+    } @else {
       @if (bankSummaries().length > 0) {
         <app-wrong-answers-banks
           [banks]="bankSummaries()"
@@ -34,16 +34,16 @@
         @if (selectedBankId()) {
           <div class="space-y-3 sm:space-y-4">
             <div
-              class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm p-3 sm:p-5"
+              class="bg-surface rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm p-3 sm:p-5"
             >
               <div
                 class="flex flex-col gap-2 sm:gap-3 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div class="min-w-0">
-                  <h2 class="text-lg sm:text-xl font-semibold text-slate-900 truncate">
+                  <h2 class="text-lg sm:text-xl font-semibold text-text-dark truncate">
                     تفاصيل بنك الأسئلة
                   </h2>
-                  <p class="mt-0.5 sm:mt-1 text-xs sm:text-sm text-slate-500">
+                  <p class="mt-0.5 sm:mt-1 text-xs sm:text-sm text-text-muted">
                     عرض الأسئلة الخاطئة الحالية.
                   </p>
                 </div>
@@ -58,22 +58,22 @@
             <div class="grid gap-3 sm:gap-4">
               @for (item of bankQuestions(); track item.id) {
                 <article
-                  class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm p-3 sm:p-5 transition-transform duration-200 hover:-translate-y-0.5 sm:hover:-translate-y-1"
+                  class="bg-surface rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm p-3 sm:p-5 transition-transform duration-200 hover:-translate-y-0.5 sm:hover:-translate-y-1"
                 >
                   <div class="flex flex-col gap-3 sm:gap-4">
                     <div class="flex flex-col gap-1.5 sm:gap-2">
                       <div
                         class="flex flex-col gap-2 sm:gap-3 sm:flex-row sm:items-center sm:justify-between"
                       >
-                        <h3 class="text-base sm:text-lg font-semibold text-slate-900 min-w-0">
+                        <h3 class="text-base sm:text-lg font-semibold text-text-dark min-w-0">
                           سؤال {{ item.questionId }}
                         </h3>
                         <span
-                          class="text-xs uppercase tracking-[0.15em] sm:tracking-[0.18em] text-slate-500 shrink-0"
+                          class="text-xs uppercase tracking-[0.15em] sm:tracking-[0.18em] text-text-muted shrink-0"
                           >محاولات: {{ item.attempts }}</span
                         >
                       </div>
-                      <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+                      <p class="text-sm sm:text-base text-text-muted leading-relaxed">
                         {{ item.questionContent }}
                       </p>
                     </div>
@@ -104,7 +104,7 @@
                     </div>
 
                     <div
-                      class="flex flex-col gap-1 sm:gap-2 sm:flex-row sm:items-center sm:justify-between text-slate-500 text-xs sm:text-sm"
+                      class="flex flex-col gap-1 sm:gap-2 sm:flex-row sm:items-center sm:justify-between text-text-muted text-xs sm:text-sm"
                     >
                       <span class="truncate"
                         >نوع السؤال: {{ item.questionType || 'غير محدد' }}</span
@@ -117,26 +117,26 @@
           </div>
         } @else {
           <div
-            class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 text-center text-slate-600 text-sm sm:text-base"
+            class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 text-center text-text-muted text-sm sm:text-base"
           >
             اختر بنك أسئلة من القائمة أعلاه لعرض تفاصيل الأخطاء الخاصة به.
           </div>
         }
       } @else {
         <div
-          class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-12 text-center"
+          class="bg-surface rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-12 text-center"
         >
           <i
             class="pi pi-check-circle text-4xl sm:text-5xl text-indigo-600 mb-3 sm:mb-4 inline-block"
           ></i>
-          <h2 class="text-lg sm:text-xl font-semibold text-slate-900 mt-2 sm:mt-0">
+          <h2 class="text-lg sm:text-xl font-semibold text-text-dark mt-2 sm:mt-0">
             لا توجد أخطاء مسجلة حتى الآن
           </h2>
-          <p class="mt-1 sm:mt-2 text-xs sm:text-sm text-slate-500">
+          <p class="mt-1 sm:mt-2 text-xs sm:text-sm text-text-muted">
             ابدأ حل اختبار أو بنك أسئلة جديد ليتم تسجيل الأخطاء داخل الجلسة الحالية.
           </p>
         </div>
       }
-    </ng-template>
+    }
   </div>
 </div>

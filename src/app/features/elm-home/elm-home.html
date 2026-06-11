@@ -1,0 +1,85 @@
+<div
+  class="min-h-screen bg-linear-to-br from-[#f8f6ff] via-white to-[#f4f0ff] text-slate-800 font-sans"
+  dir="rtl"
+>
+  <!-- Navbar -->
+  <!-- <nav class="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto w-full">
+    <div class="text-3xl font-extrabold text-[#5c2dd5] tracking-tight flex items-center">
+      Elm
+    </div>
+    <ul class="hidden md:flex items-center gap-8 text-sm font-medium text-gray-500">
+      <li>
+        <a href="#" class="text-[#5c2dd5] border-b-2 border-[#5c2dd5] pb-1 font-bold">الرئيسية</a>
+      </li>
+      <li>
+        <a href="#" class="hover:text-[#5c2dd5] transition-colors font-semibold">الخدمات</a>
+      </li>
+      <li>
+        <a routerLink="/faculty-login" class="hover:text-[#5c2dd5] transition-colors font-semibold">دخول الهيئة</a>
+      </li>
+      <li>
+        <a href="#" class="hover:text-[#5c2dd5] transition-colors font-semibold">الدعم</a>
+      </li>
+      <li>
+        <a href="#" class="hover:text-[#5c2dd5] transition-colors font-semibold">حول</a>
+      </li>
+    </ul>
+    <div>
+      <button class="bg-[#7c3aed] hover:bg-[#6d28d9] text-white px-8 py-2.5 rounded-full text-sm font-bold transition-all shadow-md hover:shadow-lg">
+        تسجيل الدخول
+      </button>
+    </div>
+  </nav> -->
+
+  <!-- Hero Section -->
+  <main class="flex flex-col items-center justify-center text-center mt-28 px-4">
+    <!-- Main Heading -->
+    <h1
+      class="text-4xl md:text-[3.5rem] font-bold text-[#1e0a45] leading-tight mb-6 tracking-tight"
+    >
+      منصة عِلم .. شريك نجاحك الأكاديمي
+    </h1>
+
+    <!-- Subheading -->
+    <p class="text-gray-500 text-lg md:text-xl max-w-2xl mx-auto mb-14 leading-relaxed font-medium">
+      توفير الوقت، تنظيم الملخصات، وحل بنوك الأسئلة بالكامل حتى بدون اتصال بالإنترنت.
+    </p>
+
+    <!-- Main CTA Button -->
+    <button
+      [disabled]="authService.isLoading()"
+      (click)="authService.loginWithGoogle()"
+      class="group relative cursor-pointer flex items-center justify-center gap-4 disabled:opacity-50 disabled:cursor-not-allowed bg-[#7c3aed] hover:bg-[#6d28d9] text-white px-8 py-4 rounded-full text-lg font-bold transition-all shadow-xl shadow-purple-500/30 hover:shadow-2xl hover:shadow-purple-500/40 hover:-translate-y-1 overflow-hidden"
+    >
+      <div
+        class="absolute inset-0 bg-white/20 group-hover:translate-x-full transition-transform duration-700 -translate-x-full skew-x-12"
+      ></div>
+      @if (authService.isLoading()) {
+        <div class="spinner"></div>
+      } @else {
+        <span>ابدأ المذاكرة الآن بضغطة زر واحدة</span>
+      }
+      <!-- Google Icon Container -->
+      <div class="bg-white rounded-full p-1.5 flex items-center justify-center mr-1">
+        <svg class="w-5 h-5" viewBox="0 0 24 24">
+          <path
+            fill="#4285F4"
+            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+          />
+          <path
+            fill="#34A853"
+            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+          />
+          <path
+            fill="#FBBC05"
+            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+          />
+          <path
+            fill="#EA4335"
+            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+          />
+        </svg>
+      </div>
+    </button>
+  </main>
+</div>

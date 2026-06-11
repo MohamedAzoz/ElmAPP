@@ -60,9 +60,14 @@ export class QuestionCarde implements OnChanges {
       } else if (trimmed.includes('d/')) {
         fileId = trimmed.split('d/')[1].split('/')[0];
       }
-    } 
+    }
     // 2. إذا كان المدخل هو الـ File ID فقط القادم مباشرة من الباك إند
-    else if (trimmed.length > 20 && !trimmed.startsWith('http') && !trimmed.startsWith('data:') && !trimmed.startsWith('blob:')) {
+    else if (
+      trimmed.length > 20 &&
+      !trimmed.startsWith('http') &&
+      !trimmed.startsWith('data:') &&
+      !trimmed.startsWith('blob:')
+    ) {
       fileId = trimmed;
     }
 
@@ -96,24 +101,29 @@ export class QuestionCarde implements OnChanges {
   }
 
   getOptionClass(option: OptionsDto2): string {
-    if (this.selectedOptionId === null) {
-      return 'option-card option-default';
-    }
+    const base =
+      'cursor-pointer box-border hover:-translate-y-[1px] hover:shadow-[0_12px_25px_rgba(15,23,42,0.08)] disabled:cursor-not-allowed disabled:opacity-80';
 
-    const isSelected = option.id === this.selectedOptionId;
+    if (!this.selectedOptionId) {
+      return `${base} border-slate-300/30 bg-slate-50`;
+    }
 
     if (this.isTestMode) {
-      return isSelected ? 'option-card option-selected' : 'option-card option-passive';
+      if (this.selectedOptionId === option.id) {
+        return `${base} border-blue-300 bg-blue-50`;
+      }
+
+      return `${base} border-slate-300/30 bg-slate-50`;
     }
 
-    if (isSelected) {
-      return option.isCorrect ? 'option-card option-correct' : 'option-card option-wrong';
+    if (option.isCorrect) {
+      return `${base} border-green-500 bg-green-100 text-green-950`;
     }
 
-    if (option.isCorrect && this.selectedOptionId !== null) {
-      return 'option-card option-correct-fade';
+    if (this.selectedOptionId === option.id && option.isCorrect === false) {
+      return `${base} border-red-500 bg-red-100 text-red-950`;
     }
 
-    return 'option-card option-passive';
+    return `${base} border-slate-300/30 bg-slate-50`;
   }
 }

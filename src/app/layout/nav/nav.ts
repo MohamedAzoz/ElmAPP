@@ -1,120 +1,97 @@
-import { Component, computed, effect, inject, Renderer2, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule, Router, RouterLinkActive } from '@angular/router';
-import { IdentitySignals } from '../../core/Auth/services/identity-signals';
-import { AuthFacade } from '../../core/Auth/services/auth-facade';
+import { Component, computed, inject, signal } from '@angular/core';
+import { CommonModule, Location } from '@angular/common';
+import { Router, RouterModule, RouterLinkActive } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { MenuModule } from 'primeng/menu';
 import { AvatarModule } from 'primeng/avatar';
 import { MenuItem } from 'primeng/api';
-import { ILink } from '../ilink';
+import { IdentitySignals } from '../../core/Auth/services/identity-signals';
+import { AuthFacade } from '../../core/Auth/services/auth-facade';
 import { Theme } from '../../theme';
-import { Location } from '@angular/common';
 import { Roles } from '../../core/Const/Roles';
+import { ILink } from '../ilink';
 
 @Component({
   selector: 'app-nav',
+  standalone: true,
   imports: [CommonModule, RouterModule, RouterLinkActive, ButtonModule, MenuModule, AvatarModule],
   templateUrl: './nav.html',
-  styleUrl: './nav.css',
+  styleUrl:    './nav.css',
 })
 export class Nav {
-  public identity = inject(IdentitySignals);
-  private authFacade = inject(AuthFacade);
-  private router = inject(Router);
-  private location = inject(Location);
+  // ── Services ───────────────────────────────────────────────────────
+  readonly identity   = inject(IdentitySignals);
+  readonly theme      = inject(Theme);
+  private readonly authFacade = inject(AuthFacade);
+  private readonly router     = inject(Router);
+  private readonly location   = inject(Location);
 
-  public themeService = inject(Theme);
+  // ── State ──────────────────────────────────────────────────────────
+  readonly sidebarVisible = signal(false);
+  readonly isOnline       = signal(navigator.onLine);
 
-  sidebarVisible = signal(false);
-  isOnline = signal(window.navigator.onLine);
+  // ✅ computed بدل effect — أنظف وأسرع
+  readonly isLoggedIn = computed(() => this.identity.isAuthenticated);
 
-  isLoggedIn = signal(false);
   constructor() {
-    window.addEventListener('online', () => this.isOnline.set(true));
+    window.addEventListener('online',  () => this.isOnline.set(true));
     window.addEventListener('offline', () => this.isOnline.set(false));
-
-    effect(() => {
-      this.isLoggedIn.set(this.identity.isAuthenticated);
-    });
   }
 
-  private allLinks: ILink[] = [
-    {
-      label: 'إدارة الكليات',
-      icon: 'pi pi-building',
-      role: Roles.SuperAdmin,
-      command: () => '/main/admin/colleges',
-    },
-    {
-      label: 'إدارة المواد',
-      icon: 'pi pi-book',
-      role: Roles.SuperAdmin,
-      command: () => '/main/admin/subjects',
-    },
-    {
-      label: 'ادارة الدكاترة',
-      icon: 'pi pi-users',
-      role: Roles.SuperAdmin,
-      command: () => '/main/admin/management',
-    },
-    {
-      label: 'ادارة الطلاب',
-      icon: 'pi pi-users',
-      role: Roles.SuperAdmin,
-      command: () => '/main/admin/management/leaders',
-    },
-    {
-      label: 'الاعدادات',
-      icon: 'pi pi-cog',
-      role: Roles.SuperAdmin,
-      command: () => '/main/admin/settings',
-    },
-    {
-      label: 'المواد',
-      icon: 'pi pi-check-circle',
-      role: Roles.Doctor,
-      command: () => '/main/doctor/subjects',
-    },
-    {
-      label: 'الإشعارات',
-      icon: 'pi pi-bell',
-      role: Roles.Doctor,
-      command: () => '/main/doctor/notifications',
-    },
-    {
-      label: 'موادي',
-      icon: 'pi pi-briefcase',
-      role: Roles.Leader,
-      command: () => '/main/leader/my-subjects',
-    },
+  // ── Theme label للـ tooltip ────────────────────────────────────────
+ // nav.ts — themeButtonLabel (لا تغيير مطلوب، صحيح مسبقاً)
+themeButtonLabel = computed(() =>
+  this.theme.isAutoMode()
+    ? `وضع تلقائي — ${this.theme.currentTimeLabel()}`
+    : this.theme.isDark() ? 'تفعيل الوضع النهاري' : 'تفعيل الوضع الليلي'
+);
+
+  // ── Navigation Links ───────────────────────────────────────────────
+  private readonly allLinks: ILink[] = [
+    { label: 'إدارة الكليات',   icon: 'pi pi-building',    role: Roles.SuperAdmin, command: () => '/main/admin/colleges' },
+    { label: 'إدارة المواد',    icon: 'pi pi-book',         role: Roles.SuperAdmin, command: () => '/main/admin/subjects' },
+    { label: 'إدارة الدكاترة',  icon: 'pi pi-users',        role: Roles.SuperAdmin, command: () => '/main/admin/management' },
+    { label: 'إدارة الطلاب',    icon: 'pi pi-users',        role: Roles.SuperAdmin, command: () => '/main/admin/management/leaders' },
+    { label: 'الإعدادات',       icon: 'pi pi-cog',          role: Roles.SuperAdmin, command: () => '/main/admin/settings' },
+    { label: 'المواد',          icon: 'pi pi-check-circle', role: Roles.Doctor,     command: () => '/main/doctor/subjects' },
+    { label: 'الإشعارات',       icon: 'pi pi-bell',         role: Roles.Doctor,     command: () => '/main/doctor/notifications' },
+    { label: 'موادي',           icon: 'pi pi-briefcase',    role: Roles.Leader,     command: () => '/main/leader/my-subjects' },
   ];
 
-  filteredLinks = computed(() => {
-    return this.allLinks.filter((link) => this.can(link.role!));
-  });
+  readonly filteredLinks = computed(() =>
+    this.allLinks.filter((link) => this.can(link.role!))
+  );
 
-  userItems: MenuItem[] = [
+  readonly userItems: MenuItem[] = [
     {
-      label: 'تغيير كلمة المرور',
-      icon: 'pi pi-key',
+      label:   'تغيير كلمة المرور',
+      icon:    'pi pi-key',
       command: () => this.router.navigate(['/main/changePassword']),
     },
     { separator: true },
-    { label: 'تسجيل الخروج', icon: 'pi pi-sign-out', command: () => this.logout() },
+    {
+      label:   'تسجيل الخروج',
+      icon:    'pi pi-sign-out',
+      command: () => this.logout(),
+    },
   ];
 
+  // ── Methods ────────────────────────────────────────────────────────
   can(role: string): boolean {
     return this.identity.roles === role;
   }
 
-  goBack() {
-    this.location.back();
+  closeSidebar(): void {
     this.sidebarVisible.set(false);
   }
 
-  logout() {
-    this.sidebarVisible.set(false);
+  goBack(): void {
+    this.location.back();
+    this.closeSidebar();
+  }
+
+  logout(): void {
+    this.closeSidebar();
     this.authFacade.logout();
   }
 }

@@ -1,0 +1,150 @@
+<div
+  class="min-h-screen bg-linear-to-br from-[#f8f6ff] via-white to-[#f4f0ff] text-slate-800 font-sans flex flex-col items-center justify-center relative p-4"
+  dir="rtl"
+>
+  <div
+    class="bg-white rounded-4xl shadow-xl shadow-purple-500/5 p-8 sm:p-12 max-w-lg w-full flex flex-col items-center z-10 border border-purple-50/50"
+  >
+    <!-- Icon -->
+    <div
+      class="bg-[#f3e8ff] text-[#7c3aed] w-16 h-16 rounded-2xl flex items-center justify-center mb-6"
+    >
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          d="M12 14l9-5-9-5-9 5 9 5z"
+        ></path>
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
+        ></path>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14v7"></path>
+      </svg>
+    </div>
+
+    <!-- Title & Subtitle -->
+    <h1 class="xl:text-2xl md:text-lg text-sm font-semibold text-[#1e0a45] mb-3">
+      مرحباً بك في منصة عِلم
+    </h1>
+    <p class="text-gray-500 text-sm lg:mb-8 md:mb-6 mb-3 text-center px-4 leading-relaxed">
+      للبدء، يرجى تحديد مسارك الأكاديمي لعرض المواد الخاصة بك
+    </p>
+
+    <!-- Form -->
+    <div class="w-full space-y-6">
+      <!-- College -->
+      <div class="space-y-2 relative">
+        <label class="block text-sm font-semibold text-gray-700 mr-2 mb-1">الكلية</label>
+        <div class="relative">
+          <select
+            (change)="onCollegeChange($event)"
+            class="w-full appearance-none bg-[#f8fafc] border border-gray-200 rounded-xl px-4 py-3.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#7c3aed]/50 focus:border-[#7c3aed] transition-all cursor-pointer"
+          >
+            <option value="" disabled selected>اختر كليتك...</option>
+            @for (col of facade.colleges(); track $index) {
+              <option [value]="col.id">{{ col.nameAr || col.name }}</option>
+            }
+          </select>
+          <div
+            class="pointer-events-none absolute inset-y-0 left-0 flex items-center px-4 text-gray-500"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              ></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Year -->
+      <div class="space-y-2 relative">
+        <label class="block text-sm font-semibold text-gray-700 mr-2 mb-1">السنة الدراسية</label>
+        <div class="relative">
+          <select
+            [disabled]="!facade.selectedCollegeId()"
+            (change)="onYearChange($event)"
+            class="w-full appearance-none bg-[#f8fafc] border border-gray-200 rounded-xl px-4 py-3.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#7c3aed]/50 focus:border-[#7c3aed] transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <option value="" disabled selected>اختر السنة الدراسية...</option>
+            @for (yr of facade.years(); track $index) {
+              <option [value]="yr.id">{{ yr.nameAr || yr.name }}</option>
+            }
+          </select>
+          <div
+            class="pointer-events-none absolute inset-y-0 left-0 flex items-center px-4 text-gray-500"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              ></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Department -->
+      <div class="space-y-2 relative">
+        <label class="block text-sm font-semibold text-gray-700 mr-2 mb-1">القسم</label>
+        <div class="relative">
+          <select
+            [disabled]="!facade.selectedYearId()"
+            (change)="onDepartmentChange($event)"
+            class="w-full appearance-none bg-[#f8fafc] border border-gray-200 rounded-xl px-4 py-3.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#7c3aed]/50 focus:border-[#7c3aed] transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <option value="" disabled selected>اختر قسمك التخصصي...</option>
+            @for (dep of facade.departments(); track $index) {
+              <option [value]="dep.id">{{ dep.nameAr || dep.name }}</option>
+            }
+          </select>
+          <div
+            class="pointer-events-none absolute inset-y-0 left-0 flex items-center px-4 text-gray-500"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              ></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        [disabled]="
+          !facade.selectedCollegeId() || !facade.selectedYearId() || !facade.selectedDepartmentId()
+        "
+        (click)="onSubmit()"
+        class="w-full mt-6 bg-[#7c3aed] hover:bg-[#6d28d9] disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-2 sm:py-4 px-4 sm:px-6 rounded-xl transition-all flex items-center justify-center gap-2 sm:gap-3 group shadow-lg shadow-purple-500/25"
+      >
+        <span class="lg:text-lg text-xs sm:text-sm">الانتقال إلى المسار الدراسي</span>
+        <svg
+          class="lg:w-5 lg:h-5 w-4 h-4 group-hover:-translate-x-1 transition-transform rtl:rotate-180"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M14 5l7 7m0 0l-7 7m7-7H3"
+          ></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
