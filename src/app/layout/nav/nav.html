@@ -11,7 +11,6 @@
     class="flex items-center justify-between h-16 mx-auto gap-4 px-4 sm:px-6 xl:px-8"
     style="max-width: 1400px"
   >
-    <!-- ── Logo ─────────────────────────────────────────── -->
     <a [routerLink]="['/main']" class="flex items-center gap-2.5 no-underline shrink-0 group">
       <div
         class="w-9 h-9 rounded-xl flex items-center justify-center text-white text-lg shrink-0 transition-transform duration-200 group-hover:scale-105"
@@ -32,11 +31,14 @@
       </div>
     </a>
 
-    <!-- ── Desktop Links ─────────────────────────────────── -->
-    <div class="hidden lg:flex items-center gap-0.5 flex-1 px-3">
-      @if (!isLoggedIn() && isOnline()) {
-        <a [routerLink]="['/main/student/colleges']" routerLinkActive="elm-link-active" class="elm-nav-link"
-          >الكليات والملخصات</a
+    <div class="hidden lg:flex items-center justify-center gap-1 flex-1 px-3">
+      @if (isStudent() && isOnline()) {
+        <a
+          [routerLink]="['/main/student']"
+          routerLinkActive="elm-link-active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="elm-nav-link"
+          >الصفحة الرئيسية</a
         >
         <a
           [routerLink]="['/main/student/wrong-answers']"
@@ -50,12 +52,14 @@
           class="elm-nav-link"
           >مكتبتي</a
         >
+      }
+      @if (isOnline()) {
         <a [routerLink]="['/main/support']" routerLinkActive="elm-link-active" class="elm-nav-link"
           >الدعم الفني</a
         >
       }
 
-      @if (!isLoggedIn() && !isOnline()) {
+      @if (isStudent() && !isOnline()) {
         <a
           [routerLink]="['/main/student/saved-banks']"
           routerLinkActive="elm-link-active"
@@ -81,74 +85,75 @@
       }
     </div>
 
-    <!-- ── Right Controls ────────────────────────────────── -->
     <div class="flex items-center gap-2 shrink-0">
-      <!-- User block (logged in) -->
-      @if (isLoggedIn()) {
+      <div class="relative flex items-center bg-btnMode border border-text-muted rounded-full">
+        <button
+          type="button"
+          (click)="theme.toggleTheme()"
+          [title]="themeButtonLabel()"
+          class="elm-icon-btn text-white"
+        >
+          @if (theme.isDark()) {
+            <i class="pi pi-sun"></i>
+          } @else {
+            <i class="pi pi-moon"></i>
+          }
+        </button>
+
+        @if (!theme.isAutoMode()) {
+          <span
+            class="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-yellow-200 ring-1"
+            title="تم التغيير يدوياً — يعود تلقائياً الغد"
+          ></span>
+        }
+      </div>
+
+      <!-- @if (!theme.isAutoMode()) {
+        <div class="rounded-full border border-red-500 text-red-500 bg-red-500/30">
+          <button
+            type="button"
+            (click)="theme.enableAutoMode()"
+            title="العودة للوضع التلقائي"
+            class="elm-icon-btn"
+          >
+            <i class="pi pi-clock"></i>
+          </button>
+        </div>
+      } -->
+
+      @if (isLoggedIn() || studentAuth.currentUser()) {
         <div
-          class="flex items-center gap-2.5 pl-3 pr-3"
+          class="hidden md:flex items-center gap-2.5 pl-3 pr-3"
           style="
             border-right: 1px solid color-mix(in srgb, var(--color-text-main) 12%, transparent);
           "
         >
           <div class="hidden lg:flex flex-col leading-none text-right">
-            <span
-              class="text-[13px] font-bold leading-none"
-              style="color: var(--color-text-dark)"
-              >{{ identity.fullName }}</span
-            >
-            <span class="text-[11px] mt-0.5" style="color: var(--color-text-muted)">{{
-              identity.roles
-            }}</span>
+            <span class="text-[13px] font-bold leading-none" style="color: var(--color-text-dark)">
+              {{ isLoggedIn() ? identity.fullName : studentAuth.currentUser()?.displayName }}
+            </span>
+            <span class="text-[11px] mt-0.5" style="color: var(--color-text-muted)">
+              {{ isLoggedIn() ? identity.roles : 'طالب' }}
+            </span>
           </div>
-          <p-avatar
-            icon="pi pi-user"
-            shape="circle"
-            class="cursor-pointer"
-            (click)="menu.toggle($event)"
-          />
-          <p-menu #menu [model]="userItems" [popup]="true" />
-        </div>
-      } @else {
-        <!-- Theme toggle -->
-        <div class="relative flex items-center bg-btnMode border border-text-muted rounded-full">
-          <button
-            type="button"
-            (click)="theme.toggleTheme()"
-            [title]="themeButtonLabel()"
-            class="elm-icon-btn text-white"
-          >
-            @if (theme.isDark()) {
-              <i class="pi pi-sun"></i>
-            } @else {
-              <i class="pi pi-moon"></i>
-            }
-          </button>
 
-          <!-- نقطة تدل على override يدوي -->
-          @if (!theme.isAutoMode()) {
-            <span
-              class="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-yellow-400 ring-1"
-              title="تم التغيير يدوياً — يعود تلقائياً الغد"
-            ></span>
+          @if (isLoggedIn()) {
+            <p-avatar
+              icon="pi pi-user"
+              shape="circle"
+              class="cursor-pointer"
+              (click)="desktopMenu.toggle($event)"
+            />
+            <p-menu #desktopMenu [model]="userItems" [popup]="true" />
+          } @else {
+            <img
+              [src]="studentAuth.currentUser()?.photoURL"
+              alt="User Avatar"
+              class="w-9 h-9 rounded-full cursor-pointer object-cover border border-main"
+            />
           }
         </div>
-
-        <!-- زر إعادة الوضع التلقائي -->
-        @if (!theme.isAutoMode()) {
-          <div class="rounded-full border border-red-500 text-red-500 bg-red-500/30">
-            <button
-              type="button"
-              (click)="theme.enableAutoMode()"
-              title="العودة للوضع التلقائي"
-              class="elm-icon-btn"
-            >
-              <i class="pi pi-clock"></i>
-            </button>
-          </div>
-        }
-
-        <!-- Login button -->
+      } @else {
         <a
           [routerLink]="['/main/login']"
           class="hidden lg:inline-flex items-center justify-center px-5 py-2 rounded-xl text-[13px] font-bold text-white no-underline transition-all duration-200 hover:-translate-y-px"
@@ -161,7 +166,6 @@
         </a>
       }
 
-      <!-- Hamburger (mobile) -->
       <button
         type="button"
         class="elm-icon-btn flex items-center justify-center lg:hidden"
@@ -174,9 +178,6 @@
   </div>
 </nav>
 
-<!-- ══════════════════════════════════════════════════════════════
-     OVERLAY
-     ══════════════════════════════════════════════════════════════ -->
 <div
   class="fixed inset-0 z-60 transition-opacity duration-300 lg:hidden"
   style="
@@ -190,16 +191,12 @@
   aria-hidden="true"
 ></div>
 
-<!-- ══════════════════════════════════════════════════════════════
-     SIDEBAR
-     ══════════════════════════════════════════════════════════════ -->
 <aside
   class="fixed top-0 right-0 z-70 h-full w-[280px] flex flex-col transition-transform duration-300 lg:hidden"
   style="
     background-color: var(--color-surface);
     border-left: 1px solid color-mix(in srgb, var(--color-text-main) 8%, transparent);
     box-shadow: -8px 0 32px rgba(0, 0, 0, 0.12);
-    transform: translateX(100%);
   "
   [style.transform]="sidebarVisible() ? 'translateX(0)' : 'translateX(100%)'"
   role="dialog"
@@ -207,7 +204,6 @@
   [attr.aria-hidden]="!sidebarVisible()"
   aria-label="القائمة الجانبية"
 >
-  <!-- Sidebar Header -->
   <div
     class="flex items-center justify-between px-5 py-4 shrink-0"
     style="
@@ -231,54 +227,64 @@
       القائمة
     </div>
     <button
-      class="w-8 h-8 rounded-full flex items-center justify-center border-none bg-transparent cursor-pointer text-[14px] transition-colors duration-150"
+      class="w-8 h-8 rounded-full flex items-center justify-center border-none bg-transparent cursor-pointer text-[14px] transition-colors duration-200 hover:bg-red-500/10 hover:text-red-500"
       style="color: var(--color-text-muted)"
       (click)="closeSidebar()"
       aria-label="إغلاق"
-      onmouseenter="
-        this.style.backgroundColor = '#fef2f2';
-        this.style.color = '#ef4444';
-      "
-      onmouseleave="
-        this.style.backgroundColor = 'transparent';
-        this.style.color = 'var(--color-text-muted)';
-      "
     >
       <i class="pi pi-times"></i>
     </button>
   </div>
 
-  <!-- Sidebar Body -->
   <div class="flex-1 overflow-y-auto flex flex-col gap-1 p-4 elm-sidebar-scroll">
-    <!-- User card -->
-    @if (isLoggedIn()) {
+    @if (isLoggedIn() || studentAuth.currentUser()) {
       <div
         class="flex items-center gap-3 px-3.5 py-3 rounded-2xl mb-2"
         style="
-          background-color: color-mix(in srgb, var(--color-main) 8%, transparent);
-          border: 1px solid color-mix(in srgb, var(--color-main) 15%, transparent);
+          background-color: color-mix(in srgb, var(--color-main) 6%, transparent);
+          border: 1px solid color-mix(in srgb, var(--color-main) 12%, transparent);
         "
       >
-        <p-avatar icon="pi pi-user" shape="circle" class="shrink-0" />
-        <div class="overflow-hidden min-w-0">
+        @if (studentAuth.currentUser()?.photoURL) {
+          <img
+            [src]="studentAuth.currentUser()?.photoURL"
+            class="w-10 h-10 rounded-full shrink-0 object-cover border border-main"
+            alt="User avatar"
+          />
+        } @else {
+          <div
+            class="w-10 h-10 rounded-full bg-main/10 text-main flex items-center justify-center text-lg shrink-0"
+          >
+            <i class="pi pi-user"></i>
+          </div>
+        }
+        <div class="overflow-hidden min-w-0 flex-1 text-right">
           <div class="text-[13px] font-bold truncate" style="color: var(--color-text-dark)">
-            {{ identity.fullName }}
+            {{ studentAuth.currentUser()?.displayName || identity.fullName }}
           </div>
           <div class="text-[11px] font-medium mt-0.5" style="color: var(--color-main)">
-            {{ identity.roles }}
+            {{ studentAuth.currentUser() ? 'طالب' : identity.roles }}
           </div>
         </div>
       </div>
     }
 
-    <!-- Public (online) -->
-    @if (!isLoggedIn() && isOnline()) {
+    <a
+      [routerLink]="['/main/support']"
+      (click)="closeSidebar()"
+      routerLinkActive="elm-sidebar-active"
+      class="elm-sidebar-link"
+      ><i class="pi pi-headphones"></i>الدعم الفني</a
+    >
+
+    @if (isStudent() && isOnline()) {
       <a
-        [routerLink]="['/main/student/colleges']"
+        [routerLink]="['/main/student']"
         (click)="closeSidebar()"
+        [routerLinkActiveOptions]="{ exact: true }"
         routerLinkActive="elm-sidebar-active"
         class="elm-sidebar-link"
-        ><i class="pi pi-building"></i>الكليات والملخصات</a
+        ><i class="pi pi-building"></i>الصفحة الرئيسية</a
       >
       <a
         [routerLink]="['/main/student/wrong-answers']"
@@ -294,17 +300,9 @@
         class="elm-sidebar-link"
         ><i class="pi pi-shield"></i>مكتبتي</a
       >
-      <a
-        [routerLink]="['/main/support']"
-        (click)="closeSidebar()"
-        routerLinkActive="elm-sidebar-active"
-        class="elm-sidebar-link"
-        ><i class="pi pi-headphones"></i>الدعم الفني</a
-      >
     }
 
-    <!-- Offline -->
-    @if (!isLoggedIn() && !isOnline()) {
+    @if (isStudent() && !isOnline()) {
       <a
         [routerLink]="['/main/student/saved-banks']"
         (click)="closeSidebar()"
@@ -314,7 +312,6 @@
       >
     }
 
-    <!-- Logged-in home -->
     @if (isLoggedIn()) {
       <a
         [routerLink]="['/main/home']"
@@ -326,7 +323,6 @@
       >
     }
 
-    <!-- Role-based -->
     @for (link of filteredLinks(); track link.label) {
       <a
         [routerLink]="[link.command()]"
@@ -337,16 +333,10 @@
       >
     }
 
-    <!-- Divider -->
     <div
       class="my-2 h-px"
       style="background: color-mix(in srgb, var(--color-text-main) 8%, transparent)"
     ></div>
-
-    <!-- Utilities -->
-    <button type="button" class="elm-sidebar-link" (click)="goBack()">
-      <i class="pi pi-arrow-left"></i>رجوع
-    </button>
 
     <button type="button" class="elm-sidebar-link" (click)="theme.toggleTheme()">
       @if (theme.isDark()) {
@@ -356,37 +346,46 @@
       }
     </button>
 
-    @if (!theme.isAutoMode()) {
+    <!-- @if (!theme.isAutoMode()) {
       <button type="button" class="elm-sidebar-link" (click)="theme.enableAutoMode()">
         <i class="pi pi-clock" style="color: var(--color-text-muted)"></i>العودة للتلقائي
       </button>
-    }
+    } -->
+
+    <button type="button" class="elm-sidebar-link" (click)="goBack()">
+      <i class="pi pi-arrow-left"></i>رجوع
+    </button>
   </div>
 
-  <!-- Sidebar Footer -->
-  <div
-    class="flex flex-col gap-1 p-4 shrink-0"
-    style="border-top: 1px solid color-mix(in srgb, var(--color-text-main) 8%, transparent)"
-  >
-    @if (isLoggedIn()) {
-      <a [routerLink]="['/main/change-password']" (click)="closeSidebar()" class="elm-sidebar-link">
-        <i class="pi pi-key"></i>تغيير كلمة المرور
-      </a>
-      <button type="button" class="elm-sidebar-link elm-sidebar-danger" (click)="logout()">
-        <i class="pi pi-sign-out"></i>تسجيل الخروج
-      </button>
-    } @else {
-      <a
-        [routerLink]="['/main/login']"
-        (click)="closeSidebar()"
-        class="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl text-[14px] font-bold text-white no-underline transition-all duration-200 hover:-translate-y-px"
-        style="
-          background: linear-gradient(135deg, var(--color-main), var(--color-main-hover));
-          box-shadow: 0 4px 16px color-mix(in srgb, var(--color-main) 30%, transparent);
-        "
-      >
-        <i class="pi pi-sign-in"></i>تسجيل الدخول
-      </a>
-    }
-  </div>
+  @if (!isStudent()) {
+    <div
+      class="flex flex-col gap-1 p-4 shrink-0"
+      style="border-top: 1px solid color-mix(in srgb, var(--color-text-main) 8%, transparent)"
+    >
+      @if (isLoggedIn()) {
+        <a
+          [routerLink]="['/main/change-password']"
+          (click)="closeSidebar()"
+          class="elm-sidebar-link"
+        >
+          <i class="pi pi-key"></i>تغيير كلمة المرور
+        </a>
+        <button type="button" class="elm-sidebar-link elm-sidebar-danger" (click)="logout()">
+          <i class="pi pi-sign-out"></i>تسجيل الخروج
+        </button>
+      } @else {
+        <a
+          [routerLink]="['/main/login']"
+          (click)="closeSidebar()"
+          class="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl text-[14px] font-bold text-white no-underline transition-all duration-200 hover:-translate-y-px"
+          style="
+            background: linear-gradient(135deg, var(--color-main), var(--color-main-hover));
+            box-shadow: 0 4px 16px color-mix(in srgb, var(--color-main) 30%, transparent);
+          "
+        >
+          <i class="pi pi-sign-in"></i>تسجيل الدخول
+        </a>
+      }
+    </div>
+  }
 </aside>

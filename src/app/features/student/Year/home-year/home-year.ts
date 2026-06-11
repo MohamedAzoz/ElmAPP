@@ -1,10 +1,10 @@
-import { Component, effect, inject, OnInit, computed, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, effect, inject, signal } from '@angular/core';
 import { DepartmentFacade } from '../../Department/department-facade';
 import { YearFacade } from '../year-facade';
 import { Skeleton } from 'primeng/skeleton';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { Carde } from '../../../../shared/Components/carde/carde';
+import { StudentAuthService } from '../../../../core/Services/student-auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home-year',
@@ -15,11 +15,10 @@ import { Carde } from '../../../../shared/Components/carde/carde';
 export class HomeYear {
   private departmentFacade = inject(DepartmentFacade);
   private yearFacade = inject(YearFacade);
-  private active = inject(ActivatedRoute);
+  private router = inject(Router);
+  private studentAuth = inject(StudentAuthService);
 
   private lastLoadedId = signal<number | null>(null);
-  private params = toSignal(this.active.paramMap);
-  private yearId = computed(() => Number(this.params()?.get('yearId')));
 
   departments = this.departmentFacade.departments;
   year = this.yearFacade.year;
@@ -27,7 +26,17 @@ export class HomeYear {
 
   constructor() {
     effect(() => {
-      const id = this.yearId();
+      const nav = this.router.getCurrentNavigation();
+      const state = nav?.extras.state || window.history.state;
+      let id = state?.academicYear;
+
+      if (!id) {
+        const profile = this.studentAuth.studentProfile();
+        if (profile) {
+          id = profile.academicYear;
+        }
+      }
+
       if (!id || this.lastLoadedId() === id) return;
       this.lastLoadedId.set(id);
       this.yearFacade.getYearById(id);

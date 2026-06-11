@@ -10,6 +10,7 @@ import { AuthFacade } from '../../core/Auth/services/auth-facade';
 import { Theme } from '../../theme';
 import { Roles } from '../../core/Const/Roles';
 import { ILink } from '../ilink';
+import { StudentAuthService } from '../../core/Services/student-auth.service';
 
 @Component({
   selector: 'app-nav',
@@ -25,6 +26,7 @@ export class Nav {
   private readonly authFacade = inject(AuthFacade);
   private readonly router     = inject(Router);
   private readonly location   = inject(Location);
+  readonly studentAuth = inject(StudentAuthService);
 
   // ── State ──────────────────────────────────────────────────────────
   readonly sidebarVisible = signal(false);
@@ -32,6 +34,8 @@ export class Nav {
 
   // ✅ computed بدل effect — أنظف وأسرع
   readonly isLoggedIn = computed(() => this.identity.isAuthenticated);
+
+  readonly isStudent = computed(() => !!this.studentAuth.currentUser());
 
   constructor() {
     window.addEventListener('online',  () => this.isOnline.set(true));

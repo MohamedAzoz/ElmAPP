@@ -1,11 +1,11 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, effect, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { DepartmentFacade } from '../department-facade';
 import { Skeleton } from 'primeng/skeleton';
 import { CurriulumFacade } from '../../Curriulums/curriulum-facade';
 import { YearFacade } from '../../Year/year-facade';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { Carde } from '../../../../shared/Components/carde/carde';
+import { StudentAuthService } from '../../../../core/Services/student-auth.service';
 
 @Component({
   selector: 'app-home-department',
@@ -17,22 +17,28 @@ export class HomeDepartment {
   departmentFacade = inject(DepartmentFacade);
   curriulumFacade = inject(CurriulumFacade);
   private yearFacade = inject(YearFacade);
-  private active = inject(ActivatedRoute);
+  private router = inject(Router);
+  private studentAuth = inject(StudentAuthService);
 
-  private params = toSignal(this.active.paramMap, {
-    initialValue: this.active.snapshot.paramMap,
-  });
   private lastLoadedId = signal<{ dId: number; yId: number } | null>(null);
-  private departmentId = computed(() => Number(this.params().get('departmentId')));
-  private yearId = computed(() => Number(this.params().get('yearId')));
 
   constructor() {
     effect(() => {
-      const dId = this.departmentId();
-      const yId = this.yearId();
+      const nav = this.router.getCurrentNavigation();
+      const state = nav?.extras.state || window.history.state;
+      let yId = state?.academicYear;
+      let dId = state?.department;
 
-      if (dId > 0 && yId > 0) {
-        if (!dId || (this.lastLoadedId()?.dId === dId && this.lastLoadedId()?.yId === yId)) return;
+      if (!yId || !dId) {
+        const profile = this.studentAuth.studentProfile();
+        if (profile) {
+          yId = yId || profile.academicYear;
+          dId = dId || profile.department;
+        }
+      }
+
+      if (dId && yId) {
+        if (this.lastLoadedId()?.dId === dId && this.lastLoadedId()?.yId === yId) return;
         this.lastLoadedId.set({ dId, yId });
         this.yearFacade.getYearById(yId);
         this.departmentFacade.getDepartmentById(dId);

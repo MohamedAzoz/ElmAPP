@@ -22,7 +22,7 @@ export const routes: Routes = [
       },
       {
         path: 'student',
-        canActivate: [studentGuard],
+        canActivate: [studentGuard], 
         loadChildren: () => import('./features/student/public.routes').then((m) => m.publicRoutes),
       },
       {

@@ -1,161 +1,107 @@
 import { Routes } from '@angular/router';
 
 export const publicRoutes: Routes = [
-  { path: '', redirectTo: 'colleges', pathMatch: 'full' },
   {
-    path: 'colleges',
+    path: '',
+    title: 'الصفحة الرئيسية',
+    loadComponent: () =>
+      import('./student-dashboard/student-dashboard').then((m) => m.StudentDashboard),
+    pathMatch: 'full',
+  },
+  {
+    path: 'home-department',
+    title: 'المواد الدراسية',
+    loadComponent: () =>
+      import('./Department/home-department/home-department').then((m) => m.HomeDepartment),
+  },
+  {
+    path: 'curriculum',
     children: [
       {
-        path: '',
-        title: 'الكليات المتاحة',
-        loadComponent: () => import('./Universty/home/home').then((m) => m.Home),
-      },
-      {
-        path: ':collegeId/years',
+        path: ':curriculumId',
         children: [
           {
-            path: '',
-            title: 'المستويات الدراسية',
+            path: 'F',
+            title: 'الملخصات',
             loadComponent: () =>
-              import('./Colleges/home-college/home-college').then((m) => m.HomeCollege),
+              import('./Files/get-all-files/get-all-files').then((m) => m.GetAllFiles),
           },
           {
-            path: ':yearId/departments',
+            path: 'V',
+            title: 'فيديوهات الشرح',
+            loadComponent: () =>
+              import('./Videos/get-all-videos/get-all-videos').then((m) => m.GetAllVideos),
+          },
+          {
+            path: 'C',
+            title: 'Compiler',
+            loadComponent: () => import('./Compiler/workspace/workspace').then((m) => m.Workspace),
+          },
+          {
+            path: 'QB',
             children: [
               {
                 path: '',
-                title: 'الاقسام',
-                loadComponent: () => import('./Year/home-year/home-year').then((m) => m.HomeYear),
+                title: 'بنوك الأسئلة',
+                loadComponent: () =>
+                  import('./QuestionBanks/get-all-question-banks/get-all-question-banks').then(
+                    (m) => m.GetAllQuestionBanks,
+                  ),
+                pathMatch: 'full',
               },
               {
-                path: ':departmentId/sections',
-                children: [
-                  {
-                    path: '',
-                    title: 'السكاشن',
-                    loadComponent: () =>
-                      import('./Sections/get-all-sections/get-all-sections').then(
-                        (m) => m.GetAllSections,
-                      ),
-                  },
-                  {
-                    path: ':sectionId/code-playground',
-                    title: 'تتبع الكود البرمجي والتجارب العملية',
-                    loadComponent: () =>
-                      import('./Sections/code-playground/code-playground').then(
-                        (m) => m.CodePlayground,
-                      ),
-                  },
-                  {
-                    path: ':curriculumId/F',
-                    title: 'الملخصات',
-                    loadComponent: () =>
-                      import('./Files/get-all-files/get-all-files').then((m) => m.GetAllFiles),
-                  },
-                  {
-                    path: ':curriculumId/V',
-                    title: 'فيديوهات الشرح',
-                    loadComponent: () =>
-                      import('./Videos/get-all-videos/get-all-videos').then((m) => m.GetAllVideos),
-                  },
-                ],
-              },
-              {
-                path: ':departmentId/curriulums',
-                children: [
-                  {
-                    path: '',
-                    title: 'المناهج الدراسية',
-                    loadComponent: () =>
-                      import('./Department/home-department/home-department').then(
-                        (m) => m.HomeDepartment,
-                      ),
-                  },
-                  {
-                    path: ':curriculumId',
-                    children: [
-                      {
-                        path: '',
-                        redirectTo: 'F',
-                        pathMatch: 'full',
-                      },
-                      {
-                        path: 'F',
-                        title: 'الملخصات',
-                        loadComponent: () =>
-                          import('./Files/get-all-files/get-all-files').then((m) => m.GetAllFiles),
-                      },
-                      {
-                        path: 'V',
-                        title: 'فيديوهات الشرح',
-                        loadComponent: () =>
-                          import('./Videos/get-all-videos/get-all-videos').then(
-                            (m) => m.GetAllVideos,
-                          ),
-                      },
-                      {
-                        path: 'C',
-                        title: 'Compiler',
-                        loadComponent: () =>
-                          import('./Compiler/workspace/workspace').then((m) => m.Workspace),
-                      },
-                      {
-                        path: 'QB',
-                        children: [
-                          {
-                            path: '',
-                            title: 'بنوك الأسئلة',
-                            loadComponent: () =>
-                              import('./QuestionBanks/get-all-question-banks/get-all-question-banks').then(
-                                (m) => m.GetAllQuestionBanks,
-                              ),
-                          },
-                          {
-                            path: ':bankId/:questionId',
-                            title: 'الأسئلة',
-                            loadComponent: () =>
-                              import('./Questions/get-all-questions/get-all-questions').then(
-                                (m) => m.GetAllQuestions,
-                              ),
-                          },
-                        ],
-                      },
-                      {
-                        path: 'T',
-                        children: [
-                          {
-                            path: '',
-                            loadComponent: () =>
-                              import('./Tests/Components/start-test/start-test').then(
-                                (m) => m.StartTest,
-                              ),
-                          },
-                          {
-                            path: ':questionId',
-                            loadComponent: () =>
-                              import('./Tests/Components/test-session/test-session').then(
-                                (m) => m.TestSession,
-                              ),
-                          },
-                        ],
-                      },
-                      {
-                        path: 'result',
-                        title: 'النتيجة',
-                        loadComponent: () =>
-                          import('./Result_Exam/result/result').then((m) => m.Result),
-                      },
-                    ],
-                  },
-                ],
+                path: ':bankId/:questionId',
+                title: 'الأسئلة',
+                loadComponent: () =>
+                  import('./Questions/get-all-questions/get-all-questions').then(
+                    (m) => m.GetAllQuestions,
+                  ),
               },
             ],
+          },
+          {
+            path: 'T',
+            children: [
+              {
+                path: '',
+                loadComponent: () =>
+                  import('./Tests/Components/start-test/start-test').then((m) => m.StartTest),
+                pathMatch: 'full',
+              },
+              {
+                path: ':questionId',
+                loadComponent: () =>
+                  import('./Tests/Components/test-session/test-session').then((m) => m.TestSession),
+              },
+            ],
+          },
+          {
+            path: 'result',
+            title: 'النتيجة',
+            loadComponent: () => import('./Result_Exam/result/result').then((m) => m.Result),
           },
         ],
       },
     ],
   },
-  // Security Link Validator
+  {
+    path: 'sections',
+    children: [
+      {
+        path: '',
+        title: 'السكاشن',
+        loadComponent: () =>
+          import('./Sections/get-all-sections/get-all-sections').then((m) => m.GetAllSections),
+        pathMatch: 'full',
+      },
+      {
+        path: ':sectionId/code-playground',
+        title: 'تتبع الكود البرمجي والتجارب العملية',
+        loadComponent: () =>
+          import('./Sections/code-playground/code-playground').then((m) => m.CodePlayground),
+      },
+    ],
+  },
   {
     title: 'مكتبتي',
     path: 'security-links',
@@ -164,7 +110,6 @@ export const publicRoutes: Routes = [
         (m) => m.SecurityLinkValidator,
       ),
   },
-  // PdfEditorComponent
   {
     title: 'محرر الملفات',
     path: 'pdf-editor',
@@ -172,18 +117,17 @@ export const publicRoutes: Routes = [
       import('./PDF/pdf-editor-component/pdf-editor-component').then((m) => m.PdfEditorComponent),
   },
   {
-    path: 'wrong-answers',
-    title: 'الإجابات الخاطئة',
+    path: 'wrong-answers/:bankId',
+    title: 'تفاصيل البنك',
     loadComponent: () =>
       import('./Wrong_Answers_Hub/wrong-answers/wrong-answers').then((m) => m.WrongAnswers),
   },
   {
-    path: 'saved-banks',
-    title: 'الأسئلة المحفوظة',
+    path: 'wrong-answers',
+    title: 'مراجعة الاخطاء',
     loadComponent: () =>
-      import('./QuestionBanks/offline-saved-question-banks/offline-saved-question-banks').then(
-        (m) => m.OfflineSavedQuestionBanks,
-      ),
+      import('./Wrong_Answers_Hub/wrong-answers/wrong-answers').then((m) => m.WrongAnswers),
+    pathMatch: 'full',
   },
   {
     path: 'saved-banks/questions',
@@ -209,9 +153,12 @@ export const publicRoutes: Routes = [
     loadComponent: () => import('./Result_Exam/result/result').then((m) => m.Result),
   },
   {
-    path: 'wrong-answers/:bankId',
-    title: 'تفاصيل البنك',
+    path: 'saved-banks',
+    title: 'الأسئلة المحفوظة',
     loadComponent: () =>
-      import('./Wrong_Answers_Hub/wrong-answers/wrong-answers').then((m) => m.WrongAnswers),
+      import('./QuestionBanks/offline-saved-question-banks/offline-saved-question-banks').then(
+        (m) => m.OfflineSavedQuestionBanks,
+      ),
+    pathMatch: 'full',
   },
 ];

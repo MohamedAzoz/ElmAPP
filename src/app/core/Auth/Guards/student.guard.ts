@@ -14,6 +14,6 @@ export const studentGuard: CanActivateFn = (route, state) => {
         return true;
       }
       return router.createUrlTree(['/main']);
-    })
+    }),
   );
 };

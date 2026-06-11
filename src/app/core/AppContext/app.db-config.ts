@@ -2,10 +2,15 @@ import { CatbeeIndexedDBConfig } from '@ng-catbee/indexed-db';
 
 export const dbConfig: CatbeeIndexedDBConfig = {
   name: 'ElmAppDB',
-  version: 24,
+  version: 21,
   objectStoresMeta: [
     {
       store: 'authStore',
+      storeConfig: { keyPath: 'id', autoIncrement: false },
+      storeSchema: [],
+    },
+    {
+      store: 'studentProfileStore',
       storeConfig: { keyPath: 'id', autoIncrement: false },
       storeSchema: [],
     },
@@ -30,9 +35,7 @@ export const dbConfig: CatbeeIndexedDBConfig = {
     {
       store: 'linksStore',
       storeConfig: { keyPath: 'id', autoIncrement: false },
-      storeSchema: [
-        { name: 'sourceType', keypath: 'sourceType', options: { unique: false } },
-      ],
+      storeSchema: [{ name: 'sourceType', keypath: 'sourceType', options: { unique: false } }],
     },
     // {
     //   store: 'encryptionKeys',

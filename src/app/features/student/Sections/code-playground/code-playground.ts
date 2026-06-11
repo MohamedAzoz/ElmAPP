@@ -17,9 +17,6 @@ export class CodePlayground {
   private params = toSignal(this.active.paramMap, {
     initialValue: this.active.snapshot.paramMap,
   });
-  private queryParams = toSignal(this.active.queryParamMap, {
-    initialValue: this.active.snapshot.queryParamMap,
-  });
 
   private lastLoadedId = signal<number | null>(null);
   sectionId = computed(() => Number(this.params().get('sectionId')));
@@ -63,16 +60,8 @@ export class CodePlayground {
 
   // Navigate to Compiler workspace
   openInCompiler() {
-    // Build absolute path using route params
-    const collegeId = this.active.snapshot.paramMap.get('collegeId');
-    const yearId = this.active.snapshot.paramMap.get('yearId');
-    const departmentId = this.active.snapshot.paramMap.get('departmentId');
-    
-    // We navigate to the compiler route defined in public.routes.ts
-    // Since we are coming from the sections page we don't have a specific curriculumId,
-    // so we use '0' as a placeholder to satisfy the route pattern.
     this.router.navigate(
-      ['/main/colleges', collegeId, 'years', yearId, 'departments', departmentId, 'curriulums', 0, 'C'],
+      ['/main/student/',  this.curriculumId() || 0, 'C'],
       { state: { code: this.codeSnippet() } }
     );
   }

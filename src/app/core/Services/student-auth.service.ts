@@ -19,6 +19,8 @@ import {
 } from '@angular/fire/auth';
 import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
+import { CatbeeIndexedDBService } from '@ng-catbee/indexed-db';
+import { firstValueFrom, catchError, of } from 'rxjs';
 
 export interface StudentProfile {
   college: number;
@@ -34,6 +36,7 @@ export class StudentAuthService {
   private readonly router     = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly injector   = inject(Injector);
+  private readonly db         = inject(CatbeeIndexedDBService);
 
   readonly currentUser    = signal<User | null>(null);
   readonly studentProfile = signal<StudentProfile | null>(null);
@@ -131,9 +134,23 @@ export class StudentAuthService {
       const ref = doc(this.firestore, `students/${activeUser.uid}`);
       await setDoc(ref, fullProfile);
       this.studentProfile.set(fullProfile);
-      await this.router.navigate([
-        `/main/${fullProfile.college}/${fullProfile.academicYear}/${fullProfile.department}`,
-      ]);
+
+      const storeData = { id: activeUser.uid, ...fullProfile };
+      const existing = await firstValueFrom(
+        this.db.getByID('studentProfileStore', activeUser.uid).pipe(catchError(() => of(null)))
+      );
+      if (existing) {
+        await firstValueFrom(this.db.update('studentProfileStore', storeData).pipe(catchError(() => of(null))));
+      } else {
+        await firstValueFrom(this.db.add('studentProfileStore', storeData).pipe(catchError(() => of(null))));
+      }
+
+      await this.router.navigate(['/main/student'], {
+        state: {
+          academicYear: fullProfile.academicYear,
+          department: fullProfile.department
+        }
+      });
     } catch (error) {
       console.error('[Auth] Onboarding save error:', error);
     }
@@ -141,6 +158,10 @@ export class StudentAuthService {
 
   async logout(): Promise<void> {
     try {
+      const activeUser = this.currentUser();
+      if (activeUser) {
+        await firstValueFrom(this.db.deleteByKey('studentProfileStore', activeUser.uid).pipe(catchError(() => of(null))));
+      }
       await signOut(this.auth);
       this.studentProfile.set(null);
       await this.router.navigate(['/']);
@@ -153,17 +174,40 @@ export class StudentAuthService {
 
   private async fetchProfileFromFirestore(uid: string): Promise<void> {
     try {
+      const cached = await firstValueFrom(
+        this.db.getByID<StudentProfile>('studentProfileStore', uid).pipe(catchError(() => of(null)))
+      );
+
+      if (cached) {
+        this.studentProfile.set(cached);
+        await this.router.navigate(['/main/student'], {
+          state: {
+            academicYear: cached.academicYear,
+            department: cached.department
+          }
+        });
+        return;
+      }
+
       const ref      = doc(this.firestore, `students/${uid}`);
       const snapshot = await getDoc(ref);
 
       if (snapshot.exists()) {
         const data = snapshot.data() as StudentProfile;
         this.studentProfile.set(data);
-        await this.router.navigate([
-          `/main/${data.college}/${data.academicYear}/${data.department}`,
-        ]);
+
+        await firstValueFrom(
+          this.db.add('studentProfileStore', { id: uid, ...data }).pipe(catchError(() => of(null)))
+        );
+
+        await this.router.navigate(['/main/student'], {
+          state: {
+            academicYear: data.academicYear,
+            department: data.department
+          }
+        });
       } else {
-        await this.router.navigate(['/main/setup-profile']);
+        await this.router.navigate(['/main/student/setup-profile']);
       }
     } catch (error) {
       console.error('[Auth] Firestore fetch error:', error);

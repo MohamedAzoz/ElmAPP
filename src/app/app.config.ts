@@ -17,9 +17,14 @@ import { definePreset } from '@primeuix/themes';
 import Aura from '@primeuix/themes/aura';
 import { MessageService } from 'primeng/api';
 
-import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
-import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import {
+  getFirestore,
+  initializeFirestore,
+  persistentLocalCache,
+  provideFirestore,
+} from '@angular/fire/firestore';
 
 import { provideCatbeeIndexedDB } from '@ng-catbee/indexed-db';
 import { provideMonacoEditor } from 'ngx-monaco-editor-v2';
@@ -62,7 +67,12 @@ export const appConfig: ApplicationConfig = {
       }),
     ),
     provideAuth(() => getAuth()),
-    provideFirestore(() => getFirestore()),
+    provideFirestore(() =>
+      initializeFirestore(getApp(), {
+        localCache: persistentLocalCache(), // هنا يخبر Firebase المتصفح بفتح مخزن IndexedDB خاص به تلقائياً
+      }),
+    ),
+    // provideFirestore(() => getFirestore()),
 
     // ── 2. Angular Core ────────────────────────────────────────────
     provideBrowserGlobalErrorListeners(),
