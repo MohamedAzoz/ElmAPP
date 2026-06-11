@@ -5,14 +5,11 @@ import {
   DestroyRef,
   runInInjectionContext,
   Injector,
-  isDevMode,
 } from '@angular/core';
 import {
   Auth,
   GoogleAuthProvider,
-  signInWithRedirect,
   signInWithPopup,
-  getRedirectResult,
   signOut,
   onAuthStateChanged,
   User,
@@ -33,7 +30,7 @@ export interface StudentProfile {
 export class StudentAuthService {
   private readonly auth       = inject(Auth);
   private readonly firestore  = inject(Firestore);
-  private readonly router     = inject(Router);
+  private readonly router      = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly injector   = inject(Injector);
   private readonly db         = inject(CatbeeIndexedDBService);
@@ -43,8 +40,6 @@ export class StudentAuthService {
   readonly loginError     = signal<string | null>(null);
   readonly isLoading      = signal<boolean>(false);
 
-  private redirectHandled = false;
-
   constructor() {
     this.initAuth();
   }
@@ -53,40 +48,16 @@ export class StudentAuthService {
 
   private initAuth(): void {
     runInInjectionContext(this.injector, () => {
+      // طالما نستخدم Popup، لا داعي لانتظار getRedirectResult هنا، مما يسرع تشغيل التطبيق.
 
-      // getRedirectResult في Production فقط
-      if (!isDevMode()) {
-        this.isLoading.set(true);
-        getRedirectResult(this.auth)
-          .then((credential): Promise<void> | void => {
-            // ✅ FIX: explicit return type + return في كل الحالات
-            if (credential?.user) {
-              this.redirectHandled = true;
-              this.currentUser.set(credential.user);
-              return this.fetchProfileFromFirestore(credential.user.uid);
-            }
-            // حالة: لا يوجد credential — لا نفعل شيئاً (void مقبول)
-          })
-          .catch((err: any) => {
-            console.error('[Auth] Redirect result error:', err);
-            this.loginError.set(this.getReadableError(err?.code));
-          })
-          .finally(() => this.isLoading.set(false));
-      }
-
-      // Auth State Listener
+      // Auth State Listener مراقب حالة المستخدم
       const unsubscribe = onAuthStateChanged(this.auth, (firebaseUser) => {
         this.currentUser.set(firebaseUser);
 
-        if (firebaseUser && !this.redirectHandled) {
+        if (firebaseUser) {
           void this.fetchProfileFromFirestore(firebaseUser.uid);
-        } else if (!firebaseUser) {
+        } else {
           this.studentProfile.set(null);
-          this.redirectHandled = false;
-        }
-
-        if (this.redirectHandled) {
-          this.redirectHandled = false;
         }
       });
 
@@ -102,22 +73,16 @@ export class StudentAuthService {
       this.isLoading.set(true);
       const provider = new GoogleAuthProvider();
 
-      if (isDevMode()) {
-        // localhost → Popup (لا يحتاج Firebase Hosting)
-        const credential = await signInWithPopup(this.auth, provider);
-        if (credential.user) {
-          this.currentUser.set(credential.user);
-          await this.fetchProfileFromFirestore(credential.user.uid);
-        }
-        this.isLoading.set(false);
-      } else {
-        // Production → Redirect (Firebase Hosting موجود)
-        await signInWithRedirect(this.auth, provider);
-        // لا نوقف isLoading — المتصفح سينتقل لـ Google
+      // استخدام الـ Popup في كل البيئات لأنه الحل المثالي لـ Netlify
+      const credential = await signInWithPopup(this.auth, provider);
+      if (credential.user) {
+        this.currentUser.set(credential.user);
+        await this.fetchProfileFromFirestore(credential.user.uid);
       }
     } catch (error: any) {
       console.error('[Auth] Login error:', error);
       this.loginError.set(this.getReadableError(error?.code));
+    } finally {
       this.isLoading.set(false);
     }
   }
