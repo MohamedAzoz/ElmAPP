@@ -35,17 +35,17 @@
     <!-- ── Desktop Links ─────────────────────────────────── -->
     <div class="hidden lg:flex items-center gap-0.5 flex-1 px-3">
       @if (!isLoggedIn() && isOnline()) {
-        <a [routerLink]="['/main/colleges']" routerLinkActive="elm-link-active" class="elm-nav-link"
+        <a [routerLink]="['/main/student/colleges']" routerLinkActive="elm-link-active" class="elm-nav-link"
           >الكليات والملخصات</a
         >
         <a
-          [routerLink]="['/main/wrong-answers']"
+          [routerLink]="['/main/student/wrong-answers']"
           routerLinkActive="elm-link-active"
           class="elm-nav-link"
           >مراجعة الأخطاء</a
         >
         <a
-          [routerLink]="['/main/security-links']"
+          [routerLink]="['/main/student/security-links']"
           routerLinkActive="elm-link-active"
           class="elm-nav-link"
           >مكتبتي</a
@@ -57,7 +57,7 @@
 
       @if (!isLoggedIn() && !isOnline()) {
         <a
-          [routerLink]="['/main/saved-banks']"
+          [routerLink]="['/main/student/saved-banks']"
           routerLinkActive="elm-link-active"
           class="elm-nav-link"
           >البنوك المحفوظة</a
@@ -274,21 +274,21 @@
     <!-- Public (online) -->
     @if (!isLoggedIn() && isOnline()) {
       <a
-        [routerLink]="['/main/colleges']"
+        [routerLink]="['/main/student/colleges']"
         (click)="closeSidebar()"
         routerLinkActive="elm-sidebar-active"
         class="elm-sidebar-link"
         ><i class="pi pi-building"></i>الكليات والملخصات</a
       >
       <a
-        [routerLink]="['/main/wrong-answers']"
+        [routerLink]="['/main/student/wrong-answers']"
         (click)="closeSidebar()"
         routerLinkActive="elm-sidebar-active"
         class="elm-sidebar-link"
         ><i class="pi pi-times-circle"></i>مراجعة الأخطاء</a
       >
       <a
-        [routerLink]="['/main/security-links']"
+        [routerLink]="['/main/student/security-links']"
         (click)="closeSidebar()"
         routerLinkActive="elm-sidebar-active"
         class="elm-sidebar-link"
@@ -306,7 +306,7 @@
     <!-- Offline -->
     @if (!isLoggedIn() && !isOnline()) {
       <a
-        [routerLink]="['/main/saved-banks']"
+        [routerLink]="['/main/student/saved-banks']"
         (click)="closeSidebar()"
         routerLinkActive="elm-sidebar-active"
         class="elm-sidebar-link"

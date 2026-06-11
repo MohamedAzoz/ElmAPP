@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/Auth/Guards/auth-guard';
 import { guestGuard } from './core/Auth/Guards/guest-guard';
+import { studentGuard } from './core/Auth/Guards/student.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'main', pathMatch: 'full' },
@@ -21,6 +22,7 @@ export const routes: Routes = [
       },
       {
         path: 'student',
+        canActivate: [studentGuard],
         loadChildren: () => import('./features/student/public.routes').then((m) => m.publicRoutes),
       },
       {
