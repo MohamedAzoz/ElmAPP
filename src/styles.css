@@ -1,12 +1,11 @@
-
 /* 1. استدعاء Tailwind الأساسي */
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* 2. استدعاء إضافة PrimeUI لـ Tailwind v4 (المسار المباشر) */
-@import "../node_modules/tailwindcss-primeui/v4/index.css";
+@import '../node_modules/tailwindcss-primeui/v4/index.css';
 
 /* 3. استدعاء الأيقونات */
-@import "primeicons/primeicons.css";
+@import 'primeicons/primeicons.css';
 
 @layer tailwind-base, primeng, tailwind-utilities;
 /* 4. تنظيم الطبقات */
@@ -17,47 +16,78 @@
 
 @theme {
   /* ألوان العلامة التجارية (للأزرار والتفاعلات) */
-  --color-main: #2563EB;       /* أزرق احترافي وجذاب */
-  --color-main-hover: #1D4ED8; /* أزرق أغمق عند التمرير Hover */
-  
-  --color-nav:#CCE0FF;
-  --color-nav-hover:#99C2FF;
-  --color-link-hover:oklch(90.5% 0.182 98.111);
+  --color-main: #2563eb; /* أزرق احترافي وجذاب */
+  --color-main-hover: #1d4ed8; /* أزرق أغمق عند التمرير Hover */
+
+  --color-nav: #cce0ff;
+  --color-nav-hover: #99c2ff;
+  --color-link-hover: oklch(90.5% 0.182 98.111);
   /* ألوان الخلفيات (لخلق العمق) */
-  --color-bg-page: #F8FAFC;       /* خلفية الموقع بالكامل (مريحة جداً للعين) */
-  --color-surface: #FFFFFF;       /* أبيض ناصع للكروت والـ Navbar */
-  
+  --color-bg-page: #f8fafc; /* خلفية الموقع بالكامل (مريحة جداً للعين) */
+  --color-surface: #ffffff; /* أبيض ناصع للكروت والـ Navbar */
+
   /* ألوان النصوص (حسب معايير القراءة العالمية) */
-  --color-text-dark: #0F172A;          /* للـ Footer والعناوين الرئيسية (أسود مزرق أنيق) */
-  --color-text-main: #334155;     /* للنصوص العادية والفقرات (رمادي داكن) */
-  --color-text-muted: #64748B;    /* للنصوص الفرعية والملاحظات */
+  --color-text-dark: #0f172a; /* للـ Footer والعناوين الرئيسية (أسود مزرق أنيق) */
+  --color-text-main: #334155; /* للنصوص العادية والفقرات (رمادي داكن) */
+  --color-text-muted: #64748b; /* للنصوص الفرعية والملاحظات */
   /* لون مميز للـ Hover في القوائم */
-  --color-accent-soft: #EFF6FF;   /* أزرق فاتح جداً لتظليل العناصر عند التمرير */
+  --color-accent-soft: #eff6ff; /* أزرق فاتح جداً لتظليل العناصر عند التمرير */
+  /* لون الخلفية للـ LightBox في الوضع الفاتح */
+  --color-btnMode: #8a8f96;
 }
-.dark{
-  --color-bg-page: #1E293B;
-  --color-surface: #0F172A;
-  --color-text-dark: #F8FAFC;
-  --color-text-main: #94A3B8;
-  --color-text-muted: #CBD5E1;
-  --color-main: #10b981;
-  --color-main-hover: #059669;
-  --color-nav: #14b8a6;
-  --color-nav-hover: #0d9488;
+.dark {
+  /* bg-page خفف شدة الون الاسود به قليلا */
+  --color-bg-page: #1e293b;
+  --color-surface: #0f172a;
+  --color-text-dark: #f8fafc;
+  --color-text-main: #94a3b8;
+  --color-text-muted: #cbd5e1;
+  --color-main: #2563eb;
+  --color-main-hover: #4e75ff;
+  --color-nav: #183662;
+  --color-nav-hover: #1d4ed8;
   --color-link-hover: oklch(90.5% 0.182 98.111);
   --color-accent-soft: #1e293b;
-   
+
+  /* لون الخلفية للـ DarkMode Button في الوضع الداكن */
+  --color-btnMode: #ffcb20;
 }
 
 @layer base {
   body {
     background-color: var(--color-bg-page);
     color: var(--color-text-main);
-    font-family: 'Rubik','Cairo', sans-serif;
+    font-family: 'Rubik', 'Cairo', sans-serif;
     box-sizing: border-box;
     margin: 0;
     padding: 0;
   }
 }
- 
 
+/* ════════════════════════════════════════════════════════════════
+   Theme Transitions
+   يُضاف في نهاية styles.css
+   
+   .theme-ready تُضاف بواسطة Theme service بعد أول render
+   → يمنع FOUC (وميض الألوان) عند تحميل الصفحة
+   → يُفعّل التحولات السلسة عند التبديل اليدوي فقط
+════════════════════════════════════════════════════════════════ */
+
+html.theme-ready,
+html.theme-ready *,
+html.theme-ready *::before,
+html.theme-ready *::after {
+  transition:
+    background-color 300ms ease,
+    border-color 250ms ease,
+    color 200ms ease,
+    box-shadow 200ms ease !important;
+}
+
+/* استثناء: العناصر التي لا تحتاج transition (أداء أفضل) */
+html.theme-ready svg,
+html.theme-ready img,
+html.theme-ready video,
+html.theme-ready canvas {
+  transition: none !important;
+}
